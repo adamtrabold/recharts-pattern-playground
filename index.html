@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Highcharts Pattern Playground</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="wrap">
+        <div class="header-row">
+          <h1 class="title">Highcharts Pattern Playground</h1>
+          <div class="header-actions" role="group" aria-label="View toggles">
+            <label class="toggle">
+              <input id="toggleTheme" type="checkbox" />
+              <span>Dark</span>
+            </label>
+            <label class="toggle">
+              <input id="toggleGrayscale" type="checkbox" />
+              <span>Grayscale</span>
+            </label>
+            <label class="toggle">
+              <input id="toggleLowContrast" type="checkbox" />
+              <span>Low contrast</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="wrap dashboard">
+      <!-- Left: Controls Sidebar -->
+      <div class="controls-sidebar">
+      <aside class="controls-panel">
+        <div class="controls-header">
+          <h2>Palette</h2>
+          <div class="controls-actions">
+            <button id="btnExport" type="button" class="btn-sm">Export</button>
+            <button id="btnShare" type="button" class="btn-sm">Share</button>
+            <button id="btnResetAll" type="button" class="btn-sm danger">Reset</button>
+          </div>
+        </div>
+
+        <div
+          id="slotList"
+          class="slot-list"
+          role="listbox"
+          aria-label="Palette slots"
+          aria-activedescendant=""
+        ></div>
+
+        <form id="slotEditor" class="editor" autocomplete="off">
+          <div class="editor-row">
+            <div class="field">
+              <label for="slotName">Label</label>
+              <input id="slotName" name="slotName" type="text" maxlength="32" />
+            </div>
+            <div class="field">
+              <label for="slotMode">Mode</label>
+              <select id="slotMode" name="slotMode">
+                <option value="solid">Solid</option>
+                <option value="pattern">Pattern</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="editor-row">
+            <div class="field" data-only="solid">
+              <label for="solidColor">Color</label>
+              <div class="hex-input"><span class="hash">#</span><input id="solidColor" name="solidColor" type="text" maxlength="6" placeholder="1f77b4" spellcheck="false" /></div>
+            </div>
+            <div class="field" data-only="pattern">
+              <label for="backgroundColor">Background</label>
+              <div class="hex-input"><span class="hash">#</span><input id="backgroundColor" name="backgroundColor" type="text" maxlength="6" placeholder="1f77b4" spellcheck="false" /></div>
+            </div>
+            <div class="field" data-only="pattern">
+              <label for="inkColor">Ink</label>
+              <div class="hex-input"><span class="hash">#</span><input id="inkColor" name="inkColor" type="text" maxlength="6" placeholder="ffffff" spellcheck="false" /></div>
+            </div>
+          </div>
+
+          <div class="editor-row" data-only="pattern">
+            <div class="field">
+              <label for="patternType">Pattern</label>
+              <select id="patternType" name="patternType">
+                <option value="lines">Lines</option>
+                <option value="crosshatch">Crosshatch</option>
+                <option value="dots">Dots</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="spacing">Spacing <span id="spacingValue" class="val"></span></label>
+              <input id="spacing" name="spacing" type="range" min="4" max="40" step="1" />
+            </div>
+            <div class="field">
+              <label for="strokeWidth">Stroke <span id="strokeWidthValue" class="val"></span></label>
+              <input id="strokeWidth" name="strokeWidth" type="range" min="1" max="12" step="1" />
+            </div>
+          </div>
+
+          <div class="editor-row" data-only="pattern">
+            <div class="field">
+              <label for="opacity">Opacity <span id="opacityValue" class="val"></span></label>
+              <input id="opacity" name="opacity" type="range" min="0.05" max="1" step="0.05" />
+            </div>
+            <div class="field" data-hide="dots">
+              <label for="angle">Angle <span id="angleValue" class="val"></span></label>
+              <div class="range-with-snaps">
+                <input id="angle" name="angle" type="range" min="0" max="180" step="5" />
+                <div class="snap-buttons" data-target="angle">
+                  <button type="button" data-value="0">0</button>
+                  <button type="button" data-value="45">45</button>
+                  <button type="button" data-value="90">90</button>
+                  <button type="button" data-value="135">135</button>
+                  <button type="button" data-value="180">180</button>
+                </div>
+              </div>
+            </div>
+            <div class="field icon-toggles" data-hide="dots">
+              <label>Options</label>
+              <div class="toggle-row">
+                <button type="button" id="invert" class="icon-toggle" title="Invert colors">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/></svg>
+                </button>
+                <button type="button" id="roundCaps" class="icon-toggle" title="Round line caps">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-row" data-only="pattern" data-show="dots">
+            <div class="field">
+              <label for="dotShape">Shape</label>
+              <select id="dotShape" name="dotShape">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+                <option value="diamond">Diamond</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="dotOffsetX">X offset <span id="dotOffsetXValue" class="val"></span></label>
+              <input id="dotOffsetX" name="dotOffsetX" type="range" min="0" max="100" step="5" />
+            </div>
+            <div class="field">
+              <label for="dotOffsetY">Y offset <span id="dotOffsetYValue" class="val"></span></label>
+              <input id="dotOffsetY" name="dotOffsetY" type="range" min="0" max="100" step="5" />
+            </div>
+          </div>
+
+          <div class="editor-row" data-only="pattern" data-show="dots">
+            <div class="field icon-toggles">
+              <label>Options</label>
+              <div class="toggle-row">
+                <button type="button" id="dotStaggered" class="icon-toggle" title="Staggered pattern">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="8" cy="10" r="2"/></svg>
+                </button>
+                <button type="button" id="invertDots" class="icon-toggle" title="Invert colors">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Area Gradient Section -->
+          <details class="gradient-section" id="gradientSection">
+            <summary>Area Gradient</summary>
+            <div class="gradient-body">
+              <label class="cs-toggle"><input type="checkbox" id="grad-enabled" /> Enable gradient</label>
+              
+              <div class="field">
+                <label for="grad-angle">Angle <span id="grad-angle-val" class="val"></span></label>
+                <div class="range-with-snaps">
+                  <input id="grad-angle" type="range" min="0" max="360" step="5" />
+                  <div class="snap-buttons" data-target="grad-angle">
+                    <button type="button" data-value="0">0</button>
+                    <button type="button" data-value="45">45</button>
+                    <button type="button" data-value="90">90</button>
+                    <button type="button" data-value="180">180</button>
+                    <button type="button" data-value="270">270</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="gradient-color-row">
+                <div class="gradient-color-field">
+                  <label>Top color</label>
+                  <div class="color-input-group">
+                    <button type="button" id="grad-topColor-swatch" class="color-swatch" title="Pick from palette"></button>
+                    <div class="hex-input hex-input-sm">
+                      <span class="hash">#</span>
+                      <input id="grad-topColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field field-sm">
+                  <label for="grad-topOpacity">Opacity <span id="grad-topOpacity-val" class="val"></span></label>
+                  <input id="grad-topOpacity" type="range" min="0" max="1" step="0.05" />
+                </div>
+              </div>
+
+              <div class="gradient-color-row">
+                <div class="gradient-color-field">
+                  <label>Bottom color</label>
+                  <div class="color-input-group">
+                    <button type="button" id="grad-bottomColor-swatch" class="color-swatch" title="Pick from palette"></button>
+                    <div class="hex-input hex-input-sm">
+                      <span class="hash">#</span>
+                      <input id="grad-bottomColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field field-sm">
+                  <label for="grad-bottomOpacity">Opacity <span id="grad-bottomOpacity-val" class="val"></span></label>
+                  <input id="grad-bottomOpacity" type="range" min="0" max="1" step="0.05" />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="editor-row editor-actions">
+            <div class="actions-left">
+              <div class="ab-toggle">
+                <button type="button" id="btnVersionA" class="ab-btn active">A</button>
+                <button type="button" id="btnVersionB" class="ab-btn">B</button>
+              </div>
+              <button type="button" id="btnCopyAtoB" class="btn-sm ghost" title="Copy A to B">A→B</button>
+              <button type="button" id="btnCopyBtoA" class="btn-sm ghost" title="Copy B to A">B→A</button>
+              <button id="btnResetSlot" type="button" class="btn-sm ghost">Reset</button>
+            </div>
+            <div class="copy-to">
+              <span class="copy-label">Copy to</span>
+              <div class="copy-targets" role="group" aria-label="Copy to slot">
+                <button type="button" class="copy-btn" data-slot="0">1</button>
+                <button type="button" class="copy-btn" data-slot="1">2</button>
+                <button type="button" class="copy-btn" data-slot="2">3</button>
+                <button type="button" class="copy-btn" data-slot="3">4</button>
+                <button type="button" class="copy-btn" data-slot="4">5</button>
+                <button type="button" class="copy-btn" data-slot="5">6</button>
+                <button type="button" class="copy-btn" data-slot="6">7</button>
+                <button type="button" class="copy-btn" data-slot="7">8</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </aside>
+
+      <!-- Chart Settings Card -->
+      <details class="chart-settings-card" id="chartSettingsPanel">
+        <summary class="chart-settings-header">Chart Settings</summary>
+
+        <!-- Global Settings -->
+        <fieldset class="cs-fieldset">
+          <legend>Global</legend>
+          <div class="cs-toggles">
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-animation" /> Animation</label>
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-legend" /> Legend</label>
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-tooltip" /> Tooltip</label>
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-gridLines" /> Grid lines</label>
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-axisLabels" /> Axis labels</label>
+            <label class="cs-toggle"><input type="checkbox" id="cs-global-dataLabels" /> Data labels</label>
+          </div>
+        </fieldset>
+
+        <!-- Column/Bar Settings -->
+        <details class="cs-type-section">
+          <summary>Column / Bar</summary>
+          <div class="cs-type-body">
+            <div class="field">
+              <label for="cs-cb-borderRadius">Border radius <span id="cs-cb-borderRadius-val" class="val"></span></label>
+              <input id="cs-cb-borderRadius" type="range" min="0" max="20" step="1" />
+            </div>
+            <div class="field">
+              <label for="cs-cb-pointPadding">Point padding <span id="cs-cb-pointPadding-val" class="val"></span></label>
+              <input id="cs-cb-pointPadding" type="range" min="0" max="0.5" step="0.05" />
+            </div>
+            <div class="field">
+              <label for="cs-cb-groupPadding">Group padding <span id="cs-cb-groupPadding-val" class="val"></span></label>
+              <input id="cs-cb-groupPadding" type="range" min="0" max="0.5" step="0.05" />
+            </div>
+            <div class="field">
+              <label for="cs-cb-borderWidth">Border width <span id="cs-cb-borderWidth-val" class="val"></span></label>
+              <input id="cs-cb-borderWidth" type="range" min="0" max="5" step="1" />
+            </div>
+          </div>
+        </details>
+
+        <!-- Line Settings -->
+        <details class="cs-type-section">
+          <summary>Line</summary>
+          <div class="cs-type-body">
+            <div class="field">
+              <label for="cs-line-lineWidth">Line width <span id="cs-line-lineWidth-val" class="val"></span></label>
+              <input id="cs-line-lineWidth" type="range" min="1" max="8" step="1" />
+            </div>
+            <div class="field">
+              <label for="cs-line-dashStyle">Dash style</label>
+              <select id="cs-line-dashStyle">
+                <option value="Solid">Solid</option>
+                <option value="Dash">Dash</option>
+                <option value="Dot">Dot</option>
+                <option value="DashDot">Dash-Dot</option>
+                <option value="LongDash">Long Dash</option>
+                <option value="ShortDash">Short Dash</option>
+              </select>
+            </div>
+            <label class="cs-toggle"><input type="checkbox" id="cs-line-markerEnabled" /> Show markers</label>
+            <div class="field">
+              <label for="cs-line-markerRadius">Marker radius <span id="cs-line-markerRadius-val" class="val"></span></label>
+              <input id="cs-line-markerRadius" type="range" min="2" max="10" step="1" />
+            </div>
+          </div>
+        </details>
+
+        <!-- Area Settings -->
+        <details class="cs-type-section">
+          <summary>Area</summary>
+          <div class="cs-type-body">
+            <div class="field">
+              <label for="cs-area-fillOpacity">Fill opacity <span id="cs-area-fillOpacity-val" class="val"></span></label>
+              <input id="cs-area-fillOpacity" type="range" min="0.1" max="1" step="0.05" />
+            </div>
+            <div class="field">
+              <label for="cs-area-lineWidth">Line width <span id="cs-area-lineWidth-val" class="val"></span></label>
+              <input id="cs-area-lineWidth" type="range" min="0" max="8" step="1" />
+            </div>
+            <label class="cs-toggle"><input type="checkbox" id="cs-area-markerEnabled" /> Show markers</label>
+            
+            <div class="cs-divider"></div>
+            <label class="cs-toggle"><input type="checkbox" id="cs-area-gradientEnabled" /> Enable gradient</label>
+            
+            <div class="gradient-sync-controls" id="gradientSyncControls">
+              <div class="gradient-color-row">
+                <div class="gradient-color-field">
+                  <label>Shared bottom color</label>
+                  <div class="color-input-group">
+                    <button type="button" id="cs-area-sharedBottomColor-swatch" class="color-swatch" title="Pick from palette"></button>
+                    <div class="hex-input hex-input-sm">
+                      <span class="hash">#</span>
+                      <input id="cs-area-sharedBottomColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field field-sm">
+                  <label for="cs-area-sharedBottomOpacity">Opacity <span id="cs-area-sharedBottomOpacity-val" class="val"></span></label>
+                  <input id="cs-area-sharedBottomOpacity" type="range" min="0" max="1" step="0.05" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Pie/Donut Settings -->
+        <details class="cs-type-section">
+          <summary>Pie / Donut</summary>
+          <div class="cs-type-body">
+            <div class="field">
+              <label for="cs-pie-startAngle">Start angle <span id="cs-pie-startAngle-val" class="val"></span></label>
+              <div class="range-with-snaps">
+                <input id="cs-pie-startAngle" type="range" min="-180" max="180" step="5" />
+                <div class="snap-buttons" data-target="cs-pie-startAngle">
+                  <button type="button" data-value="-90">-90</button>
+                  <button type="button" data-value="-45">-45</button>
+                  <button type="button" data-value="0">0</button>
+                  <button type="button" data-value="45">45</button>
+                  <button type="button" data-value="90">90</button>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="cs-pie-slicedOffset">Sliced offset <span id="cs-pie-slicedOffset-val" class="val"></span></label>
+              <input id="cs-pie-slicedOffset" type="range" min="0" max="40" step="1" />
+            </div>
+            <div class="field">
+              <label for="cs-pie-borderWidth">Gap <span id="cs-pie-borderWidth-val" class="val"></span></label>
+              <input id="cs-pie-borderWidth" type="range" min="0" max="10" step="1" />
+            </div>
+            <div class="field">
+              <label for="cs-pie-dataLabelDistance">Label distance <span id="cs-pie-dataLabelDistance-val" class="val"></span></label>
+              <input id="cs-pie-dataLabelDistance" type="range" min="-50" max="80" step="5" />
+            </div>
+          </div>
+        </details>
+
+        <!-- Funnel Settings -->
+        <details class="cs-type-section">
+          <summary>Funnel</summary>
+          <div class="cs-type-body">
+            <div class="field">
+              <label for="cs-funnel-neckWidthPercent">Neck width <span id="cs-funnel-neckWidthPercent-val" class="val"></span></label>
+              <input id="cs-funnel-neckWidthPercent" type="range" min="0" max="100" step="5" />
+            </div>
+            <div class="field">
+              <label for="cs-funnel-neckHeightPercent">Neck height <span id="cs-funnel-neckHeightPercent-val" class="val"></span></label>
+              <input id="cs-funnel-neckHeightPercent" type="range" min="0" max="100" step="5" />
+            </div>
+            <label class="cs-toggle"><input type="checkbox" id="cs-funnel-reversed" /> Reversed (pyramid)</label>
+          </div>
+        </details>
+      </details>
+
+      <!-- Import/Export Card -->
+      <details class="import-card" id="importPanel">
+        <summary class="import-card-header">Import / Export</summary>
+        <div class="import-card-body">
+          <div class="field">
+            <label for="importFile">JSON file</label>
+            <input id="importFile" type="file" accept="application/json,.json" />
+          </div>
+          <div class="field">
+            <label for="importText">Paste JSON</label>
+            <textarea id="importText" rows="3" spellcheck="false"></textarea>
+          </div>
+          <div class="import-actions">
+            <button id="btnImportText" type="button" class="btn-sm">Load JSON</button>
+            <button id="btnClearSaved" type="button" class="btn-sm ghost">Clear saved</button>
+          </div>
+        </div>
+      </details>
+      </div>
+
+      <!-- Right: Charts Panel -->
+      <section class="charts-panel">
+        <div class="chart-grid" id="chartGrid">
+          <div class="chart-card">
+            <h3 class="chart-card-title">Column</h3>
+            <div id="chart-column" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Bar</h3>
+            <div id="chart-bar" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Stacked bar</h3>
+            <div id="chart-stacked-bar" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Line</h3>
+            <div id="chart-line" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Area</h3>
+            <div id="chart-area" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Stacked area</h3>
+            <div id="chart-stacked-area" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Pie</h3>
+            <div id="chart-pie" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Donut</h3>
+            <div id="chart-donut" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card-title">Funnel</h3>
+            <div id="chart-funnel" class="chart"></div>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-header">
+            <h3>Map</h3>
+            <button id="btnLoadMap" type="button" class="btn-sm ghost">Load map</button>
+            <span id="mapStatus" class="map-status" role="status" aria-live="polite"></span>
+          </div>
+          <div id="chart-map" class="chart map-chart" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Color Picker Popover -->
+    <div id="colorPickerPopover" class="color-picker-popover" hidden>
+      <div class="color-picker-header">Pick a color</div>
+      <div class="color-picker-swatches" id="colorPickerSwatches"></div>
+      <div class="color-picker-actions">
+        <button type="button" class="btn-sm" id="colorPickerTransparent">Transparent</button>
+        <button type="button" class="btn-sm" id="colorPickerSlotColor">Use slot color</button>
+      </div>
+    </div>
+
+    <!-- Highcharts via CDN -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/funnel.js"></script>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
