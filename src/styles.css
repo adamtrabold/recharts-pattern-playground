@@ -1,20 +1,22 @@
 :root {
-  --bg: #ffffff;
+  --bg: #F5F6F7;          /* gray100 */
   --fg: #0f172a;
   --muted: #64748b;
-  --panel: #f8fafc;
-  --border: #e2e8f0;
+  --panel: #ffffff;        /* white for cards */
+  --panel-inset: #FAFBFC;  /* gray25 for interior elements */
+  --border: #EEF0F1;       /* gray300 */
   --focus: #2563eb;
   --danger: #dc2626;
   --radius: 8px;
 }
 
 body.dark {
-  --bg: #0b1220;
+  --bg: #1F2426;          /* gray1200 */
   --fg: #e2e8f0;
   --muted: #94a3b8;
-  --panel: #0f1a2f;
-  --border: #1e293b;
+  --panel: #272D30;        /* gray1150 */
+  --panel-inset: #2E3538;  /* gray1100 */
+  --border: #394247;       /* gray1050 */
 }
 
 * {
@@ -237,7 +239,7 @@ body.low-contrast .charts-panel {
   padding: 6px 4px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--panel-inset);
   cursor: pointer;
   text-align: center;
   position: relative;
@@ -290,7 +292,7 @@ body.low-contrast .charts-panel {
 /* A/B Controls */
 .ab-toggle {
   display: flex;
-  background: var(--bg);
+  background: var(--panel-inset);
   border: 1px solid var(--border);
   border-radius: 5px;
   padding: 2px;
@@ -355,6 +357,7 @@ body.low-contrast .charts-panel {
 }
 
 input[type="text"],
+input[type="number"],
 select,
 textarea {
   width: 100%;
@@ -363,7 +366,7 @@ textarea {
   color: inherit;
   border: 1px solid var(--border);
   border-radius: 5px;
-  background: var(--bg);
+  background: var(--panel-inset);
 }
 
 /* Hex color input */
@@ -372,7 +375,7 @@ textarea {
   align-items: center;
   border: 1px solid var(--border);
   border-radius: 5px;
-  background: var(--bg);
+  background: var(--panel-inset);
   overflow: hidden;
 }
 
@@ -763,7 +766,7 @@ textarea:focus-visible,
 /* Segmented tab control */
 .export-tabs-segmented {
   display: flex;
-  background: var(--bg);
+  background: var(--panel-inset);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 2px;
@@ -827,7 +830,7 @@ textarea:focus-visible,
   font-size: 10px;
   font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
   line-height: 1.5;
-  background: var(--bg);
+  background: var(--panel-inset);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 8px;
@@ -1061,7 +1064,7 @@ textarea:focus-visible,
 .cs-type-section {
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--panel-inset);
   margin-bottom: 6px;
 }
 
@@ -1165,7 +1168,7 @@ textarea:focus-visible,
   text-align: right;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--bg);
+  background: var(--panel-inset);
   color: var(--fg);
   -moz-appearance: textfield;
 }
@@ -1331,7 +1334,7 @@ textarea:focus-visible,
 }
 
 .color-option:hover {
-  background: var(--bg);
+  background: var(--panel-inset);
   border-color: var(--border);
 }
 

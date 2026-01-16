@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import html2canvas from 'html2canvas';
+import { toPng, toBlob } from 'html-to-image';
 import { usePalette } from '../context/PaletteContext';
 import { writeClipboard } from '../utils/helpers';
 import { generatePatternDef, renderPatternContent, getSlotFill } from '../utils/patternGenerator';
@@ -254,23 +254,67 @@ export function ExportPanel() {
         return;
       }
 
-      const canvas = await html2canvas(chartGrid, {
+      // html-to-image handles SVG patterns correctly
+      const dataUrl = await toPng(chartGrid, {
         backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#ffffff',
-        scale: 2,
-        useCORS: true,
-        logging: false,
+        pixelRatio: 2,
+        // Include SVG pattern definitions
+        filter: (node) => {
+          // Don't filter out any nodes - include everything
+          return true;
+        },
       });
 
       // Create download link
       const link = document.createElement('a');
       link.download = `recharts-palette-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
       
       showFeedback('PNG exported!');
     } catch (err) {
       console.error('Export failed:', err);
       showFeedback('Export failed');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [isExporting]);
+
+  const handleCopyImageToClipboard = useCallback(async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isExporting) return;
+    setIsExporting(true);
+    
+    try {
+      const chartGrid = document.getElementById('chart-grid-capture');
+      if (!chartGrid) {
+        showFeedback('Could not find charts');
+        return;
+      }
+
+      // Generate blob from the chart grid
+      const blob = await toBlob(chartGrid, {
+        backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#ffffff',
+        pixelRatio: 2,
+        filter: () => true,
+      });
+
+      if (!blob) {
+        showFeedback('Failed to create image');
+        return;
+      }
+
+      // Copy to clipboard using Clipboard API
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      
+      showFeedback('Image copied to clipboard!');
+    } catch (err) {
+      console.error('Copy to clipboard failed:', err);
+      showFeedback('Copy failed');
     } finally {
       setIsExporting(false);
     }
@@ -343,10 +387,26 @@ export function ExportPanel() {
         <button
           type="button"
           className="export-png-btn"
+          onClick={handleCopyImageToClipboard}
+          disabled={isExporting}
+          title="Copy image to clipboard"
+          aria-label="Copy charts as image to clipboard"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Clipboard board */}
+            <rect x="2" y="3" width="12" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            {/* Clip at top */}
+            <path d="M6 3V2C6 1.45 6.45 1 7 1H9C9.55 1 10 1.45 10 2V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <rect x="5" y="2" width="6" height="2" rx="0.5" fill="currentColor"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="export-png-btn"
           onClick={handleExportPNG}
           disabled={isExporting}
-          title="Export PNG"
-          aria-label="Export charts as PNG image"
+          title="Download PNG"
+          aria-label="Download charts as PNG image"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="2" y="2" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>

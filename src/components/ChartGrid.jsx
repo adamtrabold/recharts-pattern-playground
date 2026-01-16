@@ -17,10 +17,9 @@ export function ChartGrid() {
   
   return (
     <section className="charts-panel">
-      {/* Hidden SVG with pattern definitions - referenced by all charts */}
-      <ChartPatternDefs />
-      
       <div id="chart-grid-capture" className="chart-grid">
+        {/* Hidden SVG with pattern definitions - must be inside capture area for PNG export */}
+        <ChartPatternDefs />
         <div className="chart-card">
           <h3 className="chart-card-title">Column</h3>
           <div className="chart">
