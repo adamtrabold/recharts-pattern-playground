@@ -28,9 +28,22 @@ export function safeParseJSON(text) {
  */
 export function normalizeHexColor(input, fallback) {
   if (typeof input !== 'string') return fallback;
-  const v = input.trim();
-  if (/^#[0-9a-fA-F]{6}$/.test(v)) return v;
-  if (/^[0-9a-fA-F]{6}$/.test(v)) return '#' + v;
+  const v = input.trim().toUpperCase();
+  
+  // 6-character hex with #
+  if (/^#[0-9A-F]{6}$/.test(v)) return v;
+  // 6-character hex without #
+  if (/^[0-9A-F]{6}$/.test(v)) return '#' + v;
+  // 3-character hex with # - expand to 6 characters
+  if (/^#[0-9A-F]{3}$/.test(v)) {
+    const r = v[1], g = v[2], b = v[3];
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+  // 3-character hex without # - expand to 6 characters
+  if (/^[0-9A-F]{3}$/.test(v)) {
+    const r = v[0], g = v[1], b = v[2];
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
   return fallback;
 }
 
