@@ -100,15 +100,11 @@ export function AreaChartComponent() {
   const cursorStrokeWidth = area.cursorWidth || 1;
   const cursorDashArray = getCursorDashArray();
 
-  // Generate data with 8 series - each slot has unique values
-  const data = CATEGORIES.map((name, catIndex) => {
-    const entry = { name };
-    for (let i = 0; i < 8; i++) {
-      // Use different offsets for each slot to ensure distinct areas
-      entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
-    }
-    return entry;
-  });
+  // Generate data for single area (slot 0 only)
+  const data = CATEGORIES.map((name, catIndex) => ({
+    name,
+    value: 2 + ((catIndex * 3 + 1) % 5) + catIndex,
+  }));
 
   // Use global gap settings if enabled and applied to area
   const useGap = gap?.enabled && gap?.applyTo?.area;
@@ -147,15 +143,14 @@ export function AreaChartComponent() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-        {/* Gradient definitions */}
+        {/* Gradient definition for slot 0 */}
         <defs>
-          {gradientEnabled && [0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
-            const slot = getActiveSlot(slotIndex);
+          {gradientEnabled && (() => {
+            const slot = getActiveSlot(0);
             const color = getSlotColor(slot);
             return (
               <linearGradient 
-                key={`gradient-${slotIndex}`}
-                id={`area-gradient-${slotIndex}`}
+                id="area-gradient-0"
                 x1={gradientCoords.x1}
                 y1={gradientCoords.y1}
                 x2={gradientCoords.x2}
@@ -165,7 +160,7 @@ export function AreaChartComponent() {
                 <stop offset="100%" stopColor={color} stopOpacity={bottomOpacity} />
               </linearGradient>
             );
-          })}
+          })()}
         </defs>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
@@ -202,9 +197,9 @@ export function AreaChartComponent() {
             label={referenceLine?.label || undefined}
           />
         )}
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
-          const slot = getActiveSlot(slotIndex);
-          const fillValue = getFillForSlot(slot, slotIndex);
+        {(() => {
+          const slot = getActiveSlot(0);
+          const fillValue = getFillForSlot(slot, 0);
           const strokeColor = getSlotColor(slot);
           const dotShape = area.dotShape ?? 'circle';
           const dotProps = showMarkers 
@@ -224,9 +219,8 @@ export function AreaChartComponent() {
           
           return (
             <Area
-              key={slotIndex}
               type={area.curveType}
-              dataKey={`slot${slotIndex}`}
+              dataKey="value"
               fill={fillValue}
               fillOpacity={gradientEnabled ? 1 : area.fillOpacity}
               stroke={useGap ? gapColor : strokeColor}
@@ -238,11 +232,11 @@ export function AreaChartComponent() {
               isAnimationActive={global.animation}
             >
               {global.dataLabels && (
-                <LabelList dataKey={`slot${slotIndex}`} position="top" fill="#333" fontSize={9} />
+                <LabelList dataKey="value" position="top" fill="#333" fontSize={9} />
               )}
             </Area>
           );
-        })}
+        })()}
         {/* Cursor overlay rendered on top */}
         <Customized
           component={(props) => (

@@ -131,6 +131,26 @@ These features have been implemented:
    - `silhouette`: Centered around zero baseline
    - Applied to: StackedBarChart, StackedAreaChart
 
+4. **Per-Slot Line Styles** - Line charts now support per-slot customization:
+   - Each palette slot has `lineStyle` settings: `dashStyle`, `lineWidth`, `curveType`
+   - Falls back to global line settings when set to "Use Global"
+   - UI controls in PatternControls under "Line Chart Style" section
+
+### Chart Refinements (Jan 2026) ✅
+
+1. **Area Chart** - Now renders only slot 0 (single area). StackedAreaChart handles multiple areas.
+
+2. **Funnel Gap Controls** - Fixed to match Pie/Donut behavior:
+   - Gap draws horizontal lines between segments only (not around entire shape)
+   - Uses custom LabelList renderer like Pie/Donut radial strokes
+   - Works alongside data labels when both enabled
+
+3. **Dynamic Y-Axis Width** - Added `calcYAxisWidth()` helper that calculates axis width based on max value digits
+
+4. **Reset Button** - Header includes reset button to clear localStorage and restore defaults
+
+5. **Axis Domain Fix** - All charts now start Y-axis (or X-axis for horizontal) at 0 by default
+
 ## How to Run
 
 ```bash
