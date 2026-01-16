@@ -18,6 +18,13 @@ import { getSlotFill } from '../../utils/patternGenerator';
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
 
+// Static data - generated once, never changes
+const STATIC_DATA = CATEGORIES.map((name, i) => ({
+  name,
+  value: VALUES[i],
+  slotIndex: i,
+}));
+
 const getRefLineDashArray = (style) => {
   switch (style) {
     case 'dashed': return '5 5';
@@ -35,12 +42,6 @@ export function BarChartHorizontal() {
   const hoverEnabled = columnBar.hoverEnabled ?? true;
   const hoverColor = columnBar.hoverColor ?? '#000000';
   const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
-
-  const data = CATEGORIES.map((name, i) => ({
-    name,
-    value: VALUES[i],
-    slotIndex: i,
-  }));
 
   // Native activeBar prop for bar hover styling
   const activeBarConfig = hoverEnabled ? { 
@@ -73,7 +74,7 @@ export function BarChartHorizontal() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
-        data={data} 
+        data={STATIC_DATA} 
         layout="vertical"
         margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         barGap={`${barGap}%`}
@@ -87,16 +88,15 @@ export function BarChartHorizontal() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <YAxis dataKey="name" type="category" interval={0} width={20} />}
-        {global.axisLabels && (
-          <XAxis 
-            type="number"
-            domain={xDomain}
-            tickCount={xTickCount}
-            scale={xScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <YAxis dataKey="name" type="category" interval={0} width={global.axisLabels ? 20 : 0} hide={!global.axisLabels} />
+        <XAxis 
+          type="number"
+          domain={xDomain}
+          tickCount={xTickCount}
+          scale={xScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {global.tooltip && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}
@@ -148,7 +148,7 @@ export function BarChartHorizontal() {
           animationBegin={animDelay}
           activeBar={activeBarConfig}
         >
-          {data.map((entry, index) => {
+          {STATIC_DATA.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

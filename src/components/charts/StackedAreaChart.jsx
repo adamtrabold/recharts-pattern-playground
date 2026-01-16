@@ -151,16 +151,15 @@ export function StackedAreaChart() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <XAxis dataKey="name" />}
-        {global.axisLabels && (
-          <YAxis 
-            width={calcYAxisWidth(50)}
-            domain={yDomain} 
-            tickCount={yTickCount}
-            scale={yScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <XAxis dataKey="name" hide={!global.axisLabels} />
+        <YAxis 
+          width={global.axisLabels ? calcYAxisWidth(50) : 0}
+          domain={yDomain} 
+          tickCount={yTickCount}
+          scale={yScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {(global.tooltip || showCursor) && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}

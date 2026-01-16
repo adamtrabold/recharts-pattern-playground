@@ -13,6 +13,16 @@ import { getSlotFill } from '../../utils/patternGenerator';
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const VALUES = [100, 80, 60, 50, 40, 30, 20, 10];
 
+// Static data - generated once, never changes
+const STATIC_DATA = CATEGORIES.map((name, i) => ({
+  name,
+  value: VALUES[i],
+  slotIndex: i,
+}));
+
+// Reversed (pyramid) data
+const STATIC_DATA_REVERSED = [...STATIC_DATA].reverse();
+
 // Custom label renderer that draws horizontal lines between segments
 function renderHorizontalDivider(props, strokeColor, strokeWidth, totalSegments) {
   const { x, y, width, index } = props;
@@ -45,16 +55,8 @@ export function FunnelChartComponent() {
   const animEasing = animation?.easing ?? 'ease';
   const animDelay = animation?.delay ?? 0;
 
-  let data = CATEGORIES.map((name, i) => ({
-    name,
-    value: VALUES[i],
-    slotIndex: i,
-  }));
-
-  // Reverse for pyramid mode
-  if (funnel.reversed) {
-    data = [...data].reverse();
-  }
+  // Use pre-computed static data (reversed for pyramid mode)
+  const data = funnel.reversed ? STATIC_DATA_REVERSED : STATIC_DATA;
 
   // Use global gap settings if enabled and applied to funnel
   const useGap = gap?.enabled && gap?.applyTo?.funnel;

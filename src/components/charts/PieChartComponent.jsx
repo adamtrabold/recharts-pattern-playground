@@ -13,6 +13,13 @@ import { getSlotFill } from '../../utils/patternGenerator';
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
 
+// Static data - generated once, never changes
+const STATIC_DATA = CATEGORIES.map((name, i) => ({
+  name,
+  value: VALUES[i],
+  slotIndex: i,
+}));
+
 // Custom label renderer that draws radial stroke at segment start
 function renderRadialStroke(props, strokeColor, strokeWidth, pieInnerRadius) {
   const { cx, cy, outerRadius, startAngle } = props;
@@ -73,12 +80,6 @@ export function PieChartComponent() {
   const animEasing = animation?.easing ?? 'ease';
   const animDelay = animation?.delay ?? 0;
 
-  const data = CATEGORIES.map((name, i) => ({
-    name,
-    value: VALUES[i],
-    slotIndex: i,
-  }));
-
   // Use global gap settings if enabled and applied to pie
   const useGap = gap?.enabled && gap?.applyTo?.pie;
   const useAngle = gap?.useAngle ?? true;
@@ -133,7 +134,7 @@ export function PieChartComponent() {
           />
         )}
         <Pie
-          data={data}
+          data={STATIC_DATA}
           dataKey="value"
           nameKey="name"
           cx="50%"
@@ -152,7 +153,7 @@ export function PieChartComponent() {
             : (global.dataLabels ? (props) => renderDataLabel(props, labelColor) : false)}
           labelLine={false}
         >
-          {data.map((entry, index) => {
+          {STATIC_DATA.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

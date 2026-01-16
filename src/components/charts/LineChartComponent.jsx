@@ -35,6 +35,16 @@ const CustomDot = ({ cx, cy, fill, stroke, r, shape }) => {
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+// Static data - generated once, never changes (8 series for 8 slots)
+const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
+  const entry = { name };
+  for (let i = 0; i < 8; i++) {
+    // Use different offsets for each slot to ensure distinct lines
+    entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
+  }
+  return entry;
+});
+
 const getRefLineDashArray = (style) => {
   switch (style) {
     case 'dashed': return '5 5';
@@ -53,16 +63,6 @@ export function LineChartComponent() {
   const markersEnabled = line.markerOverride !== null && line.markerOverride !== undefined
     ? line.markerOverride
     : global.markersEnabled;
-
-  // Generate data with 8 series - each slot has unique values
-  const data = CATEGORIES.map((name, catIndex) => {
-    const entry = { name };
-    for (let i = 0; i < 8; i++) {
-      // Use different offsets for each slot to ensure distinct lines
-      entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
-    }
-    return entry;
-  });
 
   const getDashArray = (style) => {
     switch (style) {
@@ -103,7 +103,7 @@ export function LineChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
-      <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <LineChart data={STATIC_DATA} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         {global.gridLines && (
           <CartesianGrid 
             horizontal={grid?.horizontal ?? true}
@@ -113,16 +113,15 @@ export function LineChartComponent() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <XAxis dataKey="name" />}
-        {global.axisLabels && (
-          <YAxis 
-            width={calcYAxisWidth(10)}
-            domain={yDomain} 
-            tickCount={yTickCount}
-            scale={yScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <XAxis dataKey="name" hide={!global.axisLabels} />
+        <YAxis 
+          width={global.axisLabels ? calcYAxisWidth(10) : 0}
+          domain={yDomain} 
+          tickCount={yTickCount}
+          scale={yScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {global.tooltip && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}

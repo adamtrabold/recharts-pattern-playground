@@ -123,16 +123,15 @@ export function StackedBarChart() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <YAxis dataKey="name" type="category" width={28} />}
-        {global.axisLabels && (
-          <XAxis 
-            type="number"
-            domain={xDomain}
-            tickCount={xTickCount}
-            scale={xScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <YAxis dataKey="name" type="category" width={global.axisLabels ? 28 : 0} hide={!global.axisLabels} />
+        <XAxis 
+          type="number"
+          domain={xDomain}
+          tickCount={xTickCount}
+          scale={xScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {global.tooltip && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}

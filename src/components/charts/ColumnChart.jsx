@@ -21,6 +21,13 @@ const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
 const MAX_VALUE = Math.max(...VALUES);
 
+// Static data - generated once, never changes
+const STATIC_DATA = CATEGORIES.map((name, i) => ({
+  name,
+  value: VALUES[i],
+  slotIndex: i,
+}));
+
 const getRefLineDashArray = (style) => {
   switch (style) {
     case 'dashed': return '5 5';
@@ -38,12 +45,6 @@ export function ColumnChart() {
   const hoverEnabled = columnBar.hoverEnabled ?? true;
   const hoverColor = columnBar.hoverColor ?? '#000000';
   const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
-
-  const data = CATEGORIES.map((name, i) => ({
-    name,
-    value: VALUES[i],
-    slotIndex: i,
-  }));
 
   // Native activeBar prop for bar hover styling
   const activeBarConfig = hoverEnabled ? { 
@@ -83,7 +84,7 @@ export function ColumnChart() {
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
-      <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
+      <BarChart data={STATIC_DATA} margin={{ top: 5, right: 5, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
         {global.gridLines && (
           <CartesianGrid 
             horizontal={grid?.horizontal ?? true}
@@ -93,16 +94,15 @@ export function ColumnChart() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <XAxis dataKey="name" />}
-        {global.axisLabels && (
-          <YAxis 
-            width={calcYAxisWidth(MAX_VALUE)}
-            domain={yDomain} 
-            tickCount={yTickCount}
-            scale={yScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <XAxis dataKey="name" hide={!global.axisLabels} />
+        <YAxis 
+          width={global.axisLabels ? calcYAxisWidth(MAX_VALUE) : 0}
+          domain={yDomain} 
+          tickCount={yTickCount}
+          scale={yScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {global.tooltip && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}
@@ -154,7 +154,7 @@ export function ColumnChart() {
           animationBegin={animDelay}
           activeBar={activeBarConfig}
         >
-          {data.map((entry, index) => {
+          {STATIC_DATA.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

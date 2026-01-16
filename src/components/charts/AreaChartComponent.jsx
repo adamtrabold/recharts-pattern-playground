@@ -55,6 +55,12 @@ function angleToCoords(angle) {
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+// Static data - generated once, never changes
+const STATIC_DATA = CATEGORIES.map((name, catIndex) => ({
+  name,
+  value: 2 + ((catIndex * 3 + 1) % 5) + catIndex,
+}));
+
 export function AreaChartComponent() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, area, axis, legend, referenceLine, brush, animation, grid, tooltip } = state.chartSettings;
@@ -81,12 +87,6 @@ export function AreaChartComponent() {
   const cursorStroke = area.cursorColor || '#666666';
   const cursorStrokeWidth = area.cursorWidth || 1;
   const cursorDashArray = getCursorDashArray();
-
-  // Generate data for single area (slot 0 only)
-  const data = CATEGORIES.map((name, catIndex) => ({
-    name,
-    value: 2 + ((catIndex * 3 + 1) % 5) + catIndex,
-  }));
 
   // Use global gap settings if enabled and applied to area
   const useGap = gap?.enabled && gap?.applyTo?.area;
@@ -137,7 +137,7 @@ export function AreaChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
-      <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+      <AreaChart data={STATIC_DATA} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         {/* Gradient definition for slot 0 */}
         <defs>
           {gradientEnabled && (() => {
@@ -166,16 +166,15 @@ export function AreaChartComponent() {
             strokeOpacity={grid?.strokeOpacity ?? 1}
           />
         )}
-        {global.axisLabels && <XAxis dataKey="name" />}
-        {global.axisLabels && (
-          <YAxis 
-            width={calcYAxisWidth(10)}
-            domain={yDomain} 
-            tickCount={yTickCount}
-            scale={yScale}
-            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
-          />
-        )}
+        <XAxis dataKey="name" hide={!global.axisLabels} />
+        <YAxis 
+          width={global.axisLabels ? calcYAxisWidth(10) : 0}
+          domain={yDomain} 
+          tickCount={yTickCount}
+          scale={yScale}
+          allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          hide={!global.axisLabels}
+        />
         {(global.tooltip || showCursor) && (
           <Tooltip 
             trigger={tooltip?.trigger ?? 'hover'}
