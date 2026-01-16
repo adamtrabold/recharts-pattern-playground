@@ -232,12 +232,10 @@
             </div>
           </details>
 
-          <!-- Area Gradient Section -->
+          <!-- Slot Gradient Section (only visible when gradients enabled + individual mode) -->
           <details class="gradient-section" id="gradientSection">
-            <summary>Area Gradient</summary>
+            <summary>Gradient</summary>
             <div class="gradient-body">
-              <label class="cs-toggle"><input type="checkbox" id="grad-enabled" /> Enable gradient</label>
-              
               <div class="field">
                 <label for="grad-angle">Angle</label>
                 <div class="range-input-combo with-snaps">
@@ -246,11 +244,10 @@
                   <span class="unit">°</span>
                 </div>
                 <div class="snap-buttons" data-target="grad-angle">
-                  <button type="button" data-value="0" tabindex="-1">0</button>
-                  <button type="button" data-value="45" tabindex="-1">45</button>
-                  <button type="button" data-value="90" tabindex="-1">90</button>
-                  <button type="button" data-value="180" tabindex="-1">180</button>
-                  <button type="button" data-value="270" tabindex="-1">270</button>
+                  <button type="button" data-value="0" tabindex="-1">0°</button>
+                  <button type="button" data-value="90" tabindex="-1">90°</button>
+                  <button type="button" data-value="180" tabindex="-1">180°</button>
+                  <button type="button" data-value="270" tabindex="-1">270°</button>
                 </div>
               </div>
 
@@ -443,29 +440,83 @@
             <label class="cs-toggle"><input type="checkbox" id="cs-area-markerEnabled" /> Show markers</label>
             
             <div class="cs-divider"></div>
-            <label class="cs-toggle"><input type="checkbox" id="cs-area-gradientEnabled" /> Enable gradient</label>
             
-            <div class="gradient-sync-controls" id="gradientSyncControls">
-              <div class="gradient-color-row">
-                <div class="gradient-color-field">
-                  <label>Shared bottom color</label>
-                  <div class="color-input-group">
-                    <button type="button" id="cs-area-sharedBottomColor-swatch" class="color-swatch" title="Pick from palette"></button>
-                    <div class="hex-input hex-input-sm">
-                      <span class="hash">#</span>
-                      <input id="cs-area-sharedBottomColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+            <!-- Gradient Controls -->
+            <label class="cs-toggle"><input type="checkbox" id="cs-area-gradientEnabled" /> Enable gradients</label>
+            
+            <div class="gradient-global-controls" id="gradientGlobalControls">
+              <div class="field">
+                <label for="cs-area-gradientMode">Apply to</label>
+                <select id="cs-area-gradientMode">
+                  <option value="shared">All series (shared settings)</option>
+                  <option value="individual">Each series (individual settings)</option>
+                </select>
+              </div>
+              
+              <!-- Shared Gradient Controls -->
+              <div class="gradient-shared-controls" id="gradientSharedControls">
+                <div class="field">
+                  <label for="cs-area-sharedAngle">Angle</label>
+                  <div class="range-input-combo with-snaps">
+                    <input id="cs-area-sharedAngle" type="range" min="0" max="360" step="5" tabindex="-1" />
+                    <input id="cs-area-sharedAngleNum" type="number" class="num-input" min="0" max="360" step="5" aria-label="Gradient angle in degrees" />
+                    <span class="unit">°</span>
+                  </div>
+                  <div class="snap-buttons" data-target="cs-area-sharedAngle">
+                    <button type="button" data-value="0" tabindex="-1">0°</button>
+                    <button type="button" data-value="90" tabindex="-1">90°</button>
+                    <button type="button" data-value="180" tabindex="-1">180°</button>
+                    <button type="button" data-value="270" tabindex="-1">270°</button>
+                  </div>
+                </div>
+                
+                <div class="gradient-color-row">
+                  <div class="gradient-color-field">
+                    <label>Top color</label>
+                    <div class="color-input-group">
+                      <button type="button" id="cs-area-sharedTopColor-swatch" class="color-swatch" title="Pick from palette"></button>
+                      <div class="hex-input hex-input-sm">
+                        <span class="hash">#</span>
+                        <input id="cs-area-sharedTopColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field field-sm">
+                    <label for="cs-area-sharedTopOpacity">Opacity</label>
+                    <div class="range-input-combo compact">
+                      <input id="cs-area-sharedTopOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
+                      <input id="cs-area-sharedTopOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Top opacity percentage" />
+                      <span class="unit">%</span>
                     </div>
                   </div>
                 </div>
-                <div class="field field-sm">
-                  <label for="cs-area-sharedBottomOpacity">Opacity</label>
-                  <div class="range-input-combo compact">
-                    <input id="cs-area-sharedBottomOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
-                    <input id="cs-area-sharedBottomOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Shared bottom opacity percentage" />
-                    <span class="unit">%</span>
+                
+                <div class="gradient-color-row">
+                  <div class="gradient-color-field">
+                    <label>Bottom color</label>
+                    <div class="color-input-group">
+                      <button type="button" id="cs-area-sharedBottomColor-swatch" class="color-swatch" title="Pick from palette"></button>
+                      <div class="hex-input hex-input-sm">
+                        <span class="hash">#</span>
+                        <input id="cs-area-sharedBottomColor" type="text" maxlength="6" placeholder="auto" spellcheck="false" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field field-sm">
+                    <label for="cs-area-sharedBottomOpacity">Opacity</label>
+                    <div class="range-input-combo compact">
+                      <input id="cs-area-sharedBottomOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
+                      <input id="cs-area-sharedBottomOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Bottom opacity percentage" />
+                      <span class="unit">%</span>
+                    </div>
                   </div>
                 </div>
               </div>
+              
+              <!-- Hint for individual mode -->
+              <p class="gradient-mode-hint" id="gradientIndividualHint">
+                Configure gradients for each slot in the palette editor above.
+              </p>
             </div>
           </div>
         </details>

@@ -208,6 +208,10 @@
         lineWidth: 2,
         markerEnabled: false,
         gradientEnabled: false,
+        gradientMode: "shared", // "shared" or "individual"
+        sharedAngle: 90,
+        sharedTopColor: null,
+        sharedTopOpacity: 1,
         sharedBottomColor: null,
         sharedBottomOpacity: 0.1,
       },
@@ -285,6 +289,10 @@
         state.chartSettings.area.markerEnabled = !!cs.area.markerEnabled;
         // Migrate old syncBottomGradient to new gradientEnabled
         state.chartSettings.area.gradientEnabled = !!(cs.area.gradientEnabled ?? cs.area.syncBottomGradient);
+        state.chartSettings.area.gradientMode = cs.area.gradientMode === "individual" ? "individual" : "shared";
+        state.chartSettings.area.sharedAngle = clamp(Number(cs.area.sharedAngle ?? def.area.sharedAngle), 0, 360);
+        state.chartSettings.area.sharedTopColor = cs.area.sharedTopColor === null ? null : normalizeHexColor(cs.area.sharedTopColor, null);
+        state.chartSettings.area.sharedTopOpacity = clamp(Number(cs.area.sharedTopOpacity ?? def.area.sharedTopOpacity), 0, 1);
         state.chartSettings.area.sharedBottomColor = cs.area.sharedBottomColor === null ? null : normalizeHexColor(cs.area.sharedBottomColor, null);
         state.chartSettings.area.sharedBottomOpacity = clamp(Number(cs.area.sharedBottomOpacity ?? def.area.sharedBottomOpacity), 0, 1);
       }
@@ -732,22 +740,33 @@
     // Gradient only works if globally enabled
     if (!ar.gradientEnabled) return null;
 
-    const grad = slot.areaGradient || {};
     const baseColor = getSlotBaseColor(slot);
+    const isShared = ar.gradientMode === "shared";
 
-    // Top color: use specified or slot color
-    const topHex = grad.topColor || baseColor;
+    let topHex, topOpacity, bottomHex, bottomOpacity, gradAngle;
+
+    if (isShared) {
+      // Use shared settings from chart settings
+      topHex = ar.sharedTopColor || baseColor;
+      topOpacity = ar.sharedTopOpacity ?? 1;
+      bottomHex = ar.sharedBottomColor || baseColor;
+      bottomOpacity = ar.sharedBottomOpacity ?? 0.1;
+      gradAngle = ar.sharedAngle ?? 90;
+    } else {
+      // Use individual slot settings
+      const grad = slot.areaGradient || {};
+      topHex = grad.topColor || baseColor;
+      topOpacity = grad.topOpacity ?? 1;
+      bottomHex = grad.bottomColor || baseColor;
+      bottomOpacity = grad.bottomOpacity ?? 0.1;
+      gradAngle = grad.angle ?? 90;
+    }
+
     const topRgb = hexToRgb(topHex);
-    const topOpacity = grad.topOpacity ?? 1;
-
-    // Bottom color: use shared settings or per-slot settings
-    const bottomHex = ar.sharedBottomColor || grad.bottomColor || baseColor;
-    const bottomOpacity = ar.sharedBottomOpacity ?? grad.bottomOpacity ?? 0.1;
     const bottomRgb = hexToRgb(bottomHex);
 
     // Calculate x1, y1, x2, y2 from angle
     // angle 0 = left to right, 90 = top to bottom, 180 = right to left, 270 = bottom to top
-    const gradAngle = grad.angle ?? 90;
     const angleRad = (gradAngle * Math.PI) / 180;
     const x1 = 0.5 - Math.cos(angleRad) * 0.5;
     const y1 = 0.5 - Math.sin(angleRad) * 0.5;
@@ -1311,6 +1330,7 @@
             startAngle: pi.startAngle,
             slicedOffset: pi.slicedOffset,
             borderWidth: pi.borderWidth,
+            borderRadius: 0,
             borderColor: state.ui.darkTheme ? "#0f1a2f" : "#f8fafc",
             dataLabels: { 
               enabled: g.dataLabels,
@@ -1346,6 +1366,7 @@
             startAngle: pi.startAngle,
             slicedOffset: pi.slicedOffset,
             borderWidth: pi.borderWidth,
+            borderRadius: 0,
             borderColor: state.ui.darkTheme ? "#0f1a2f" : "#f8fafc",
             dataLabels: { 
               enabled: g.dataLabels,
@@ -1490,6 +1511,7 @@
                 startAngle: pi.startAngle,
                 slicedOffset: pi.slicedOffset,
                 borderWidth: pi.borderWidth,
+                borderRadius: 0,
                 borderColor: state.ui.darkTheme ? "#0f1a2f" : "#f8fafc",
                 dataLabels: { 
                   enabled: g.dataLabels,
@@ -2407,35 +2429,75 @@
       if (el) el.textContent = txt;
     });
 
-    // Update area sync controls visibility
-    const syncControls = document.getElementById("gradientSyncControls");
-    if (syncControls) {
-      syncControls.style.display = ar.gradientEnabled ? "" : "none";
-    }
-
-    // Update shared bottom color swatch
-    const sharedSwatch = document.getElementById("cs-area-sharedBottomColor-swatch");
-    if (sharedSwatch) {
-      if (ar.sharedBottomColor) {
-        sharedSwatch.style.background = ar.sharedBottomColor;
-        sharedSwatch.classList.remove("transparent");
-      } else {
-        sharedSwatch.style.background = "";
-        sharedSwatch.classList.add("transparent");
-      }
-    }
-    const sharedInput = document.getElementById("cs-area-sharedBottomColor");
-    if (sharedInput && document.activeElement !== sharedInput) {
-      sharedInput.value = ar.sharedBottomColor ? ar.sharedBottomColor.slice(1) : "";
-    }
-    const sharedOpacity = document.getElementById("cs-area-sharedBottomOpacity");
-    if (sharedOpacity) sharedOpacity.value = String(ar.sharedBottomOpacity);
-    const sharedOpacityNum = document.getElementById("cs-area-sharedBottomOpacityNum");
-    if (sharedOpacityNum && document.activeElement !== sharedOpacityNum) {
-      sharedOpacityNum.value = Math.round(ar.sharedBottomOpacity * 100);
-    }
+    // Gradient controls visibility
     const gradientToggle = document.getElementById("cs-area-gradientEnabled");
     if (gradientToggle) gradientToggle.checked = ar.gradientEnabled;
+    
+    const gradientModeSelect = document.getElementById("cs-area-gradientMode");
+    if (gradientModeSelect) gradientModeSelect.value = ar.gradientMode;
+    
+    const globalControls = document.getElementById("gradientGlobalControls");
+    if (globalControls) {
+      globalControls.style.display = ar.gradientEnabled ? "" : "none";
+    }
+    
+    const sharedControls = document.getElementById("gradientSharedControls");
+    const individualHint = document.getElementById("gradientIndividualHint");
+    const isShared = ar.gradientMode === "shared";
+    if (sharedControls) sharedControls.style.display = isShared ? "" : "none";
+    if (individualHint) individualHint.style.display = isShared ? "none" : "";
+
+    // Shared angle
+    const sharedAngleEl = document.getElementById("cs-area-sharedAngle");
+    if (sharedAngleEl) sharedAngleEl.value = String(ar.sharedAngle);
+    const sharedAngleNum = document.getElementById("cs-area-sharedAngleNum");
+    if (sharedAngleNum && document.activeElement !== sharedAngleNum) {
+      sharedAngleNum.value = ar.sharedAngle;
+    }
+
+    // Shared top color
+    const sharedTopSwatch = document.getElementById("cs-area-sharedTopColor-swatch");
+    if (sharedTopSwatch) {
+      if (ar.sharedTopColor) {
+        sharedTopSwatch.style.background = ar.sharedTopColor;
+        sharedTopSwatch.classList.remove("transparent");
+      } else {
+        sharedTopSwatch.style.background = "";
+        sharedTopSwatch.classList.add("transparent");
+      }
+    }
+    const sharedTopInput = document.getElementById("cs-area-sharedTopColor");
+    if (sharedTopInput && document.activeElement !== sharedTopInput) {
+      sharedTopInput.value = ar.sharedTopColor ? ar.sharedTopColor.slice(1) : "";
+    }
+    const sharedTopOpacity = document.getElementById("cs-area-sharedTopOpacity");
+    if (sharedTopOpacity) sharedTopOpacity.value = String(ar.sharedTopOpacity);
+    const sharedTopOpacityNum = document.getElementById("cs-area-sharedTopOpacityNum");
+    if (sharedTopOpacityNum && document.activeElement !== sharedTopOpacityNum) {
+      sharedTopOpacityNum.value = Math.round(ar.sharedTopOpacity * 100);
+    }
+
+    // Shared bottom color
+    const sharedBottomSwatch = document.getElementById("cs-area-sharedBottomColor-swatch");
+    if (sharedBottomSwatch) {
+      if (ar.sharedBottomColor) {
+        sharedBottomSwatch.style.background = ar.sharedBottomColor;
+        sharedBottomSwatch.classList.remove("transparent");
+      } else {
+        sharedBottomSwatch.style.background = "";
+        sharedBottomSwatch.classList.add("transparent");
+      }
+    }
+    const sharedBottomInput = document.getElementById("cs-area-sharedBottomColor");
+    if (sharedBottomInput && document.activeElement !== sharedBottomInput) {
+      sharedBottomInput.value = ar.sharedBottomColor ? ar.sharedBottomColor.slice(1) : "";
+    }
+    const sharedBottomOpacity = document.getElementById("cs-area-sharedBottomOpacity");
+    if (sharedBottomOpacity) sharedBottomOpacity.value = String(ar.sharedBottomOpacity);
+    const sharedBottomOpacityNum = document.getElementById("cs-area-sharedBottomOpacityNum");
+    if (sharedBottomOpacityNum && document.activeElement !== sharedBottomOpacityNum) {
+      sharedBottomOpacityNum.value = Math.round(ar.sharedBottomOpacity * 100);
+    }
   }
 
   // Gradient controls rendering
@@ -2446,20 +2508,14 @@
     const baseColor = getSlotBaseColor(slot);
     const ar = state.chartSettings.area;
 
-    // Disable per-slot gradient section when global gradient is disabled
+    // Show per-slot gradient section only when:
+    // 1. Global gradients are enabled AND
+    // 2. Mode is "individual"
     const gradientSection = document.getElementById("gradientSection");
     if (gradientSection) {
-      const isGlobalEnabled = ar.gradientEnabled;
-      gradientSection.classList.toggle("disabled", !isGlobalEnabled);
-      // Update the summary text to indicate status
-      const summary = gradientSection.querySelector("summary");
-      if (summary) {
-        summary.textContent = isGlobalEnabled ? "Area Gradient" : "Area Gradient (enable in Chart Settings)";
-      }
+      const showSlotGradient = ar.gradientEnabled && ar.gradientMode === "individual";
+      gradientSection.style.display = showSlotGradient ? "" : "none";
     }
-
-    const enabledEl = document.getElementById("grad-enabled");
-    if (enabledEl) enabledEl.checked = !!grad.enabled;
 
     const angleEl = document.getElementById("grad-angle");
     if (angleEl) angleEl.value = String(grad.angle ?? 90);
@@ -2587,18 +2643,6 @@
       const i = s.ui.selectedSlot;
       return s.ui.activeVersions[i] === "b" ? s.paletteB[i] : s.palette[i];
     };
-
-    // Enabled toggle
-    const enabledEl = document.getElementById("grad-enabled");
-    if (enabledEl) {
-      enabledEl.addEventListener("change", () => {
-        setState((s) => {
-          const slot = getEditSlot(s);
-          if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
-          slot.areaGradient.enabled = enabledEl.checked;
-        });
-      });
-    }
 
     // Angle slider + number input
     const angleEl = document.getElementById("grad-angle");
@@ -2764,6 +2808,109 @@
         applyChartSettings();
         updateCharts();
       });
+    }
+
+    // Gradient mode selector
+    const gradientModeSelect = document.getElementById("cs-area-gradientMode");
+    if (gradientModeSelect) {
+      gradientModeSelect.addEventListener("change", () => {
+        setState((s) => {
+          s.chartSettings.area.gradientMode = gradientModeSelect.value;
+        });
+        applyChartSettings();
+        updateCharts();
+      });
+    }
+
+    // Shared angle + number input
+    const sharedAngleEl = document.getElementById("cs-area-sharedAngle");
+    const sharedAngleNum = document.getElementById("cs-area-sharedAngleNum");
+    const handleSharedAngleChange = (val) => {
+      setState((s) => {
+        s.chartSettings.area.sharedAngle = clamp(val, 0, 360);
+      });
+      applyChartSettings();
+      updateCharts();
+    };
+    if (sharedAngleEl) {
+      sharedAngleEl.addEventListener("input", () => {
+        if (sharedAngleNum) sharedAngleNum.value = sharedAngleEl.value;
+        handleSharedAngleChange(Number(sharedAngleEl.value));
+      });
+    }
+    if (sharedAngleNum) {
+      sharedAngleNum.addEventListener("input", () => {
+        const val = clamp(Number(sharedAngleNum.value) || 0, 0, 360);
+        if (sharedAngleEl) sharedAngleEl.value = val;
+        handleSharedAngleChange(val);
+      });
+      sharedAngleNum.addEventListener("blur", () => {
+        const val = clamp(Number(sharedAngleNum.value) || 0, 0, 360);
+        sharedAngleNum.value = val;
+        if (sharedAngleEl) sharedAngleEl.value = val;
+      });
+      sharedAngleNum.addEventListener("keydown", handleNumInputKeydown);
+    }
+
+    // Shared top color swatch
+    const sharedTopSwatch = document.getElementById("cs-area-sharedTopColor-swatch");
+    if (sharedTopSwatch) {
+      sharedTopSwatch.addEventListener("click", (e) => {
+        e.preventDefault();
+        const current = state.chartSettings.area.sharedTopColor;
+        showColorPicker(sharedTopSwatch, current, (color) => {
+          setState((s) => {
+            s.chartSettings.area.sharedTopColor = color;
+          });
+          applyChartSettings();
+          updateCharts();
+        });
+      });
+    }
+
+    // Shared top color input
+    const sharedTopInput = document.getElementById("cs-area-sharedTopColor");
+    if (sharedTopInput) {
+      sharedTopInput.addEventListener("input", () => {
+        const val = sharedTopInput.value.trim();
+        const color = val ? normalizeHexColor("#" + val, null) : null;
+        setState((s) => {
+          s.chartSettings.area.sharedTopColor = color;
+        });
+        applyChartSettings();
+        updateCharts();
+      });
+    }
+
+    // Shared top opacity + number input
+    const sharedTopOpacity = document.getElementById("cs-area-sharedTopOpacity");
+    const sharedTopOpacityNum = document.getElementById("cs-area-sharedTopOpacityNum");
+    const handleSharedTopOpacityChange = (val) => {
+      setState((s) => {
+        s.chartSettings.area.sharedTopOpacity = clamp(val, 0, 1);
+      });
+      applyChartSettings();
+      updateCharts();
+    };
+    if (sharedTopOpacity) {
+      sharedTopOpacity.addEventListener("input", () => {
+        if (sharedTopOpacityNum) sharedTopOpacityNum.value = Math.round(Number(sharedTopOpacity.value) * 100);
+        handleSharedTopOpacityChange(Number(sharedTopOpacity.value));
+      });
+    }
+    if (sharedTopOpacityNum) {
+      sharedTopOpacityNum.addEventListener("input", () => {
+        const pct = clamp(Number(sharedTopOpacityNum.value) || 0, 0, 100);
+        const val = pct / 100;
+        if (sharedTopOpacity) sharedTopOpacity.value = val;
+        handleSharedTopOpacityChange(val);
+      });
+      sharedTopOpacityNum.addEventListener("blur", () => {
+        const pct = clamp(Number(sharedTopOpacityNum.value) || 0, 0, 100);
+        sharedTopOpacityNum.value = pct;
+        if (sharedTopOpacity) sharedTopOpacity.value = pct / 100;
+      });
+      sharedTopOpacityNum.addEventListener("keydown", handleNumInputKeydown);
     }
 
     // Shared bottom color swatch

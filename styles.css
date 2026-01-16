@@ -831,7 +831,7 @@ textarea:focus-visible,
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 8px;
-  margin: 0;
+  margin: 0 0 8px 0;
 }
 
 .cs-fieldset legend {
@@ -1014,11 +1014,30 @@ textarea:focus-visible,
   max-width: 100px;
 }
 
-/* Gradient sync controls */
-.gradient-sync-controls {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed var(--border);
+/* Global gradient controls in Chart Settings */
+.gradient-global-controls {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gradient-shared-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.gradient-mode-hint {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
 }
 
 /* Color Picker Popover */
