@@ -40,7 +40,7 @@ function renderRadialStroke(props, strokeColor, strokeWidth, pieInnerRadius) {
 }
 
 // Custom label renderer for data labels
-function renderDataLabel(props) {
+function renderDataLabel(props, labelColor) {
   const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = props;
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -51,7 +51,7 @@ function renderDataLabel(props) {
     <text
       x={x}
       y={y}
-      fill="#333"
+      fill={labelColor}
       textAnchor="middle"
       dominantBaseline="central"
       fontSize={10}
@@ -64,7 +64,14 @@ function renderDataLabel(props) {
 
 export function PieChartComponent() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, pie, legend } = state.chartSettings;
+  const { global, gap, pie, legend, animation, tooltip } = state.chartSettings;
+  const labelColor = global.labelColor ?? '#333333';
+  const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Animation configuration
+  const animDuration = animation?.duration ?? 1500;
+  const animEasing = animation?.easing ?? 'ease';
+  const animDelay = animation?.delay ?? 0;
 
   const data = CATEGORIES.map((name, i) => ({
     name,
@@ -93,13 +100,36 @@ export function PieChartComponent() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-        {global.tooltip && <Tooltip />}
+        {global.tooltip && (
+          <Tooltip 
+            trigger={tooltip?.trigger ?? 'hover'}
+            separator={tooltip?.separator ?? ' : '}
+            offset={tooltip?.offset ?? 10}
+            animationDuration={tooltip?.animationDuration ?? 200}
+            animationEasing={tooltip?.animationEasing ?? 'ease'}
+            contentStyle={{
+              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
+              borderColor: tooltip?.borderColor ?? '#cccccc',
+              borderRadius: tooltip?.borderRadius ?? 4,
+              borderWidth: tooltip?.borderWidth ?? 1,
+              borderStyle: 'solid',
+            }}
+            labelStyle={{
+              color: tooltip?.labelColor ?? '#333333',
+              fontWeight: tooltip?.labelFontWeight ?? 'bold',
+            }}
+            itemStyle={{
+              color: tooltip?.itemColor ?? '#666666',
+            }}
+          />
+        )}
         {global.legend && (
           <Legend 
             verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
             align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
             layout={legendLayout}
             iconType={legendIconType}
+            wrapperStyle={{ color: legendTextColor }}
           />
         )}
         <Pie
@@ -114,9 +144,12 @@ export function PieChartComponent() {
           endAngle={450 - pie.startAngle}
           paddingAngle={paddingAngle}
           isAnimationActive={global.animation}
+          animationDuration={animDuration}
+          animationEasing={animEasing}
+          animationBegin={animDelay}
           label={useRadialStroke 
             ? (props) => renderRadialStroke(props, strokeColor, strokeThickness, innerRadius) 
-            : (global.dataLabels ? renderDataLabel : false)}
+            : (global.dataLabels ? (props) => renderDataLabel(props, labelColor) : false)}
           labelLine={false}
         >
           {data.map((entry, index) => {

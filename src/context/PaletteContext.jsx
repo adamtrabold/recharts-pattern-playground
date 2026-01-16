@@ -175,6 +175,10 @@ export function PaletteProvider({ children }) {
     dispatch({ type: ACTIONS.UPDATE_UI, payload: { activeVersions: newVersions } });
   }, [state.ui.activeVersions]);
   
+  const triggerAnimationPreview = useCallback(() => {
+    dispatch({ type: ACTIONS.UPDATE_UI, payload: { animationKey: (state.ui.animationKey ?? 0) + 1 } });
+  }, [state.ui.animationKey]);
+  
   const value = {
     state,
     dispatch,
@@ -190,6 +194,7 @@ export function PaletteProvider({ children }) {
     shareState,
     getActiveSlot,
     setActiveVersion,
+    triggerAnimationPreview,
   };
   
   return (

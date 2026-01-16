@@ -11,6 +11,7 @@ export const DEFAULT_STATE = {
     lowContrast: false,
     selectedSlot: 0,
     activeVersions: ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
+    animationKey: 0,
   },
   palette: [
     { type: 'solid', label: 'Slot 1', color: '#00478F', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
@@ -97,6 +98,7 @@ export const DEFAULT_STATE = {
       axisLabels: true,
       dataLabels: false,
       markersEnabled: false,
+      labelColor: '#333333',
     },
     gap: {
       enabled: false,
@@ -118,7 +120,7 @@ export const DEFAULT_STATE = {
     columnBar: {
       borderRadius: 4,
       barGap: 4,
-      hoverEnabled: true,
+      hoverEnabled: false,
       hoverColor: '#000000',
       hoverOpacity: 0.1,
     },
@@ -179,6 +181,7 @@ export const DEFAULT_STATE = {
       align: 'center', // left, center, right (for top/bottom), or top, middle, bottom (for left/right)
       layout: 'horizontal', // horizontal, vertical
       iconType: 'square', // line, square, rect, circle, cross, diamond, star, triangle, wye
+      textColor: '#333333',
     },
     referenceLine: {
       enabled: false,
@@ -187,6 +190,45 @@ export const DEFAULT_STATE = {
       strokeWidth: 1,
       dashStyle: 'dashed', // solid, dashed, dotted
       label: '',
+    },
+    brush: {
+      enabled: false,
+      height: 30,
+      stroke: '#8884d8',
+      startIndex: 0,
+      endIndex: null, // null = auto (data length - 1)
+    },
+    animation: {
+      enabled: false, // master toggle (also global.animation for backwards compat)
+      duration: 1500,
+      easing: 'ease', // ease, linear, ease-in, ease-out, ease-in-out
+      delay: 0,
+    },
+    grid: {
+      horizontal: true,
+      vertical: true,
+      stroke: '#ccc',
+      strokeDasharray: '3 3', // solid, dashed, dotted, or custom
+      strokeOpacity: 1,
+    },
+    tooltip: {
+      trigger: 'hover', // hover, click
+      separator: ' : ',
+      offset: 10,
+      cursor: true,
+      cursorStyle: 'default', // default, line, cross, none
+      animationDuration: 200,
+      animationEasing: 'ease',
+      // Content styling
+      backgroundColor: '#ffffff',
+      borderColor: '#cccccc',
+      borderRadius: 4,
+      borderWidth: 1,
+      // Label styling
+      labelColor: '#333333',
+      labelFontWeight: 'bold', // normal, bold
+      // Item styling
+      itemColor: '#666666',
     },
   },
 };

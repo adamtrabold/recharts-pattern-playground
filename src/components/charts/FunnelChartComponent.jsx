@@ -37,7 +37,13 @@ function renderHorizontalDivider(props, strokeColor, strokeWidth, totalSegments)
 
 export function FunnelChartComponent() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, funnel } = state.chartSettings;
+  const { global, gap, funnel, animation, tooltip } = state.chartSettings;
+  const labelColor = global.labelColor ?? '#333333';
+  
+  // Animation configuration
+  const animDuration = animation?.duration ?? 1500;
+  const animEasing = animation?.easing ?? 'ease';
+  const animDelay = animation?.delay ?? 0;
 
   let data = CATEGORIES.map((name, i) => ({
     name,
@@ -58,11 +64,36 @@ export function FunnelChartComponent() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <FunnelChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-        {global.tooltip && <Tooltip />}
+        {global.tooltip && (
+          <Tooltip 
+            trigger={tooltip?.trigger ?? 'hover'}
+            separator={tooltip?.separator ?? ' : '}
+            offset={tooltip?.offset ?? 10}
+            animationDuration={tooltip?.animationDuration ?? 200}
+            animationEasing={tooltip?.animationEasing ?? 'ease'}
+            contentStyle={{
+              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
+              borderColor: tooltip?.borderColor ?? '#cccccc',
+              borderRadius: tooltip?.borderRadius ?? 4,
+              borderWidth: tooltip?.borderWidth ?? 1,
+              borderStyle: 'solid',
+            }}
+            labelStyle={{
+              color: tooltip?.labelColor ?? '#333333',
+              fontWeight: tooltip?.labelFontWeight ?? 'bold',
+            }}
+            itemStyle={{
+              color: tooltip?.itemColor ?? '#666666',
+            }}
+          />
+        )}
         <Funnel
           data={data}
           dataKey="value"
           isAnimationActive={global.animation}
+          animationDuration={animDuration}
+          animationEasing={animEasing}
+          animationBegin={animDelay}
           labelLine={false}
         >
           {data.map((entry, index) => {
@@ -75,7 +106,7 @@ export function FunnelChartComponent() {
             );
           })}
           {global.dataLabels && (
-            <LabelList position="right" dataKey="name" fill="#000" stroke="none" />
+            <LabelList position="right" dataKey="name" fill={labelColor} stroke="none" />
           )}
           {useGap && (
             <LabelList 

@@ -9,8 +9,12 @@ import StackedAreaChart from './charts/StackedAreaChart';
 import PieChartComponent from './charts/PieChartComponent';
 import DonutChart from './charts/DonutChart';
 import FunnelChartComponent from './charts/FunnelChartComponent';
+import { usePalette } from '../context/PaletteContext';
 
 export function ChartGrid() {
+  const { state } = usePalette();
+  const animationKey = state.ui.animationKey ?? 0;
+  
   return (
     <section className="charts-panel">
       {/* Hidden SVG with pattern definitions - referenced by all charts */}
@@ -20,63 +24,63 @@ export function ChartGrid() {
         <div className="chart-card">
           <h3 className="chart-card-title">Column</h3>
           <div className="chart">
-            <ColumnChart />
+            <ColumnChart key={`column-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Bar</h3>
           <div className="chart">
-            <BarChartHorizontal />
+            <BarChartHorizontal key={`bar-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Stacked Bar</h3>
           <div className="chart">
-            <StackedBarChart />
+            <StackedBarChart key={`stacked-bar-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Line</h3>
           <div className="chart">
-            <LineChartComponent />
+            <LineChartComponent key={`line-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Area</h3>
           <div className="chart">
-            <AreaChartComponent />
+            <AreaChartComponent key={`area-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Stacked Area</h3>
           <div className="chart">
-            <StackedAreaChart />
+            <StackedAreaChart key={`stacked-area-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Pie</h3>
           <div className="chart">
-            <PieChartComponent />
+            <PieChartComponent key={`pie-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Donut</h3>
           <div className="chart">
-            <DonutChart />
+            <DonutChart key={`donut-${animationKey}`} />
           </div>
         </div>
 
         <div className="chart-card">
           <h3 className="chart-card-title">Funnel</h3>
           <div className="chart">
-            <FunnelChartComponent />
+            <FunnelChartComponent key={`funnel-${animationKey}`} />
           </div>
         </div>
       </div>

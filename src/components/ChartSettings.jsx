@@ -3,9 +3,28 @@ import { usePalette } from '../context/PaletteContext';
 import { clamp } from '../utils/helpers';
 import ColorPicker from './ColorPicker';
 
+// Reusable toggle switch component
+function ToggleSwitch({ id, checked, onChange, label }) {
+  return (
+    <label className="cs-switch" htmlFor={id}>
+      <span className="cs-switch-label">{label}</span>
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span className="cs-switch-track">
+        <span className="cs-switch-thumb" />
+      </span>
+      <span className="cs-switch-state">{checked ? 'On' : 'Off'}</span>
+    </label>
+  );
+}
+
 export function ChartSettings() {
-  const { state, updateChartSettings } = usePalette();
-  const { global, gap, columnBar, line, area, pie, donut, funnel, stacked, axis, legend, referenceLine } = state.chartSettings;
+  const { state, updateChartSettings, triggerAnimationPreview } = usePalette();
+  const { global, gap, columnBar, line, area, pie, donut, funnel, stacked, axis, legend, referenceLine, brush, animation, grid, tooltip } = state.chartSettings;
 
   // Helper to update nested applyTo object
   const updateGapApplyTo = (chartType, value) => {
@@ -105,247 +124,573 @@ export function ChartSettings() {
     return override ? 'on' : 'off';
   };
 
+  // Derived states for cleaner conditionals
+  const animationEnabled = global.animation;
+  const legendEnabled = global.legend;
+  const gridEnabled = global.gridLines;
+  const referenceLineEnabled = referenceLine?.enabled ?? false;
+  const brushEnabled = brush?.enabled ?? false;
+  const gapEnabled = gap?.enabled ?? false;
+
   return (
-    <details className="chart-settings-card">
-      <summary className="chart-settings-header">Chart Settings</summary>
+    <div className="chart-settings-container">
+      {/* ===== GLOBAL SETTINGS GROUP ===== */}
+      <details className="chart-settings-card" open>
+        <summary className="chart-settings-header">Global</summary>
 
-      {/* Global Settings */}
-      <fieldset className="cs-fieldset">
-        <legend>Global</legend>
-        <div className="cs-toggles">
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
-              checked={global.animation}
-              onChange={(e) => updateChartSettings('global', { animation: e.target.checked })}
+        {/* Global Toggles */}
+        <details className="cs-type-section" open>
+          <summary>Toggles</summary>
+        <div className="cs-type-body">
+          <div className="cs-switch-list">
+            <ToggleSwitch
+              id="cs-toggle-animation"
+              checked={animationEnabled}
+              onChange={(v) => updateChartSettings('global', { animation: v })}
+              label="Animation"
             />
-            Animation
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
-              checked={global.legend}
-              onChange={(e) => updateChartSettings('global', { legend: e.target.checked })}
+            <ToggleSwitch
+              id="cs-toggle-legend"
+              checked={legendEnabled}
+              onChange={(v) => updateChartSettings('global', { legend: v })}
+              label="Legend"
             />
-            Legend
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
+            <ToggleSwitch
+              id="cs-toggle-tooltip"
               checked={global.tooltip}
-              onChange={(e) => updateChartSettings('global', { tooltip: e.target.checked })}
+              onChange={(v) => updateChartSettings('global', { tooltip: v })}
+              label="Tooltips"
             />
-            Tooltip
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
-              checked={global.gridLines}
-              onChange={(e) => updateChartSettings('global', { gridLines: e.target.checked })}
+            <ToggleSwitch
+              id="cs-toggle-grid"
+              checked={gridEnabled}
+              onChange={(v) => updateChartSettings('global', { gridLines: v })}
+              label="Grid"
             />
-            Grid lines
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
+            <ToggleSwitch
+              id="cs-toggle-axisLabels"
               checked={global.axisLabels}
-              onChange={(e) => updateChartSettings('global', { axisLabels: e.target.checked })}
+              onChange={(v) => updateChartSettings('global', { axisLabels: v })}
+              label="Axis Labels"
             />
-            Axis labels
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
+            <ToggleSwitch
+              id="cs-toggle-dataLabels"
               checked={global.dataLabels}
-              onChange={(e) => updateChartSettings('global', { dataLabels: e.target.checked })}
+              onChange={(v) => updateChartSettings('global', { dataLabels: v })}
+              label="Data Labels"
             />
-            Data labels
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
+            <ToggleSwitch
+              id="cs-toggle-markers"
               checked={global.markersEnabled}
-              onChange={(e) => updateChartSettings('global', { markersEnabled: e.target.checked })}
+              onChange={(v) => updateChartSettings('global', { markersEnabled: v })}
+              label="Markers"
             />
-            Show markers
-          </label>
-          <label className="cs-toggle">
-            <input
-              type="checkbox"
-              checked={isMarkerSyncEnabled}
-              onChange={(e) => {
-                updateChartSettings('gap', { syncMarkers: e.target.checked });
-                // When enabling sync, sync area markers to line markers
-                if (e.target.checked) {
-                  updateChartSettings('area', { 
-                    markerOverride: line.markerOverride,
-                    markerRadius: line.markerRadius
-                  });
-                }
-              }}
+            {global.markersEnabled && (
+              <label className="cs-toggle cs-toggle-indent">
+                <input
+                  type="checkbox"
+                  checked={isMarkerSyncEnabled}
+                  onChange={(e) => {
+                    updateChartSettings('gap', { syncMarkers: e.target.checked });
+                    if (e.target.checked) {
+                      updateChartSettings('area', { 
+                        markerOverride: line.markerOverride,
+                        markerRadius: line.markerRadius
+                      });
+                    }
+                  }}
+                />
+                Sync Line/Area markers
+              </label>
+            )}
+            <ToggleSwitch
+              id="cs-toggle-referenceLine"
+              checked={referenceLineEnabled}
+              onChange={(v) => updateChartSettings('referenceLine', { enabled: v })}
+              label="Reference Line"
             />
-            Sync markers (Line/Area)
-          </label>
-        </div>
-      </fieldset>
+            <ToggleSwitch
+              id="cs-toggle-brush"
+              checked={brushEnabled}
+              onChange={(v) => updateChartSettings('brush', { enabled: v })}
+              label="Brush"
+            />
+            <ToggleSwitch
+              id="cs-toggle-gaps"
+              checked={gapEnabled}
+              onChange={(v) => updateChartSettings('gap', { enabled: v })}
+              label="Gaps"
+            />
+          </div>
+          
+          {/* Label color picker - shown when data labels enabled */}
+          {global.dataLabels && (
+            <div className="field" style={{ marginTop: '12px' }}>
+              <label htmlFor="cs-global-labelColor">Label text color</label>
+              <ColorPicker
+                id="cs-global-labelColor"
+                value={global.labelColor ?? '#333333'}
+                onChange={(color) => updateChartSettings('global', { labelColor: color })}
+              />
+            </div>
+          )}
 
-      {/* Legend Settings */}
-      {global.legend && (
-        <fieldset className="cs-fieldset">
-          <legend>Legend</legend>
-          <div className="field">
-            <label htmlFor="cs-legend-position">Position</label>
-            <select
-              id="cs-legend-position"
-              value={legend?.position ?? 'bottom'}
-              onChange={(e) => updateChartSettings('legend', { position: e.target.value })}
-            >
-              <option value="top">Top</option>
-              <option value="bottom">Bottom</option>
-              <option value="left">Left</option>
-              <option value="right">Right</option>
-            </select>
+        </div>
+      </details>
+
+      {/* Tooltip Settings */}
+      {global.tooltip && (
+        <details className="cs-type-section">
+          <summary>Tooltip</summary>
+          <div className="cs-type-body">
+            <div className="field">
+              <label htmlFor="cs-tooltip-trigger">Trigger</label>
+              <select
+                id="cs-tooltip-trigger"
+                value={tooltip?.trigger ?? 'hover'}
+                onChange={(e) => updateChartSettings('tooltip', { trigger: e.target.value })}
+              >
+                <option value="hover">Hover</option>
+                <option value="click">Click</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-separator">Separator</label>
+              <input
+                id="cs-tooltip-separator"
+                type="text"
+                className="text-input"
+                value={tooltip?.separator ?? ' : '}
+                onChange={(e) => updateChartSettings('tooltip', { separator: e.target.value })}
+                style={{ width: '60px' }}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-offset">Offset</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-tooltip-offset"
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value={tooltip?.offset ?? 10}
+                  onChange={(e) => updateChartSettings('tooltip', { offset: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={30}
+                  step={1}
+                  value={tooltip?.offset ?? 10}
+                  onChange={(e) => updateChartSettings('tooltip', { offset: clamp(Number(e.target.value), 0, 30) })}
+                />
+                <span className="unit">px</span>
+              </div>
+            </div>
+            <label className="cs-toggle">
+              <input
+                type="checkbox"
+                checked={tooltip?.cursor ?? true}
+                onChange={(e) => updateChartSettings('tooltip', { cursor: e.target.checked })}
+              />
+              Show cursor
+            </label>
+            {(tooltip?.cursor ?? true) && (
+              <div className="field">
+                <label htmlFor="cs-tooltip-cursorStyle">Cursor style</label>
+                <select
+                  id="cs-tooltip-cursorStyle"
+                  value={tooltip?.cursorStyle ?? 'default'}
+                  onChange={(e) => updateChartSettings('tooltip', { cursorStyle: e.target.value })}
+                >
+                  <option value="default">Default</option>
+                  <option value="line">Line</option>
+                  <option value="cross">Cross</option>
+                </select>
+              </div>
+            )}
+            <div className="field">
+              <label htmlFor="cs-tooltip-animDuration">Animation duration</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-tooltip-animDuration"
+                  type="range"
+                  min="0"
+                  max="500"
+                  step="50"
+                  value={tooltip?.animationDuration ?? 200}
+                  onChange={(e) => updateChartSettings('tooltip', { animationDuration: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={500}
+                  step={50}
+                  value={tooltip?.animationDuration ?? 200}
+                  onChange={(e) => updateChartSettings('tooltip', { animationDuration: clamp(Number(e.target.value), 0, 500) })}
+                />
+                <span className="unit">ms</span>
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-animEasing">Animation easing</label>
+              <select
+                id="cs-tooltip-animEasing"
+                value={tooltip?.animationEasing ?? 'ease'}
+                onChange={(e) => updateChartSettings('tooltip', { animationEasing: e.target.value })}
+              >
+                <option value="ease">Ease</option>
+                <option value="linear">Linear</option>
+                <option value="ease-in">Ease In</option>
+                <option value="ease-out">Ease Out</option>
+                <option value="ease-in-out">Ease In Out</option>
+              </select>
+            </div>
+
+            {/* Content Styling */}
+            <h4 className="cs-subsection-title">Content Style</h4>
+            <div className="field">
+              <label htmlFor="cs-tooltip-bgColor">Background</label>
+              <ColorPicker
+                id="cs-tooltip-bgColor"
+                value={tooltip?.backgroundColor ?? '#ffffff'}
+                onChange={(color) => updateChartSettings('tooltip', { backgroundColor: color })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-borderColor">Border color</label>
+              <ColorPicker
+                id="cs-tooltip-borderColor"
+                value={tooltip?.borderColor ?? '#cccccc'}
+                onChange={(color) => updateChartSettings('tooltip', { borderColor: color })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-borderWidth">Border width</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-tooltip-borderWidth"
+                  type="range"
+                  min="0"
+                  max="4"
+                  step="1"
+                  value={tooltip?.borderWidth ?? 1}
+                  onChange={(e) => updateChartSettings('tooltip', { borderWidth: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={4}
+                  step={1}
+                  value={tooltip?.borderWidth ?? 1}
+                  onChange={(e) => updateChartSettings('tooltip', { borderWidth: clamp(Number(e.target.value), 0, 4) })}
+                />
+                <span className="unit">px</span>
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-borderRadius">Border radius</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-tooltip-borderRadius"
+                  type="range"
+                  min="0"
+                  max="12"
+                  step="1"
+                  value={tooltip?.borderRadius ?? 4}
+                  onChange={(e) => updateChartSettings('tooltip', { borderRadius: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={12}
+                  step={1}
+                  value={tooltip?.borderRadius ?? 4}
+                  onChange={(e) => updateChartSettings('tooltip', { borderRadius: clamp(Number(e.target.value), 0, 12) })}
+                />
+                <span className="unit">px</span>
+              </div>
+            </div>
+
+            {/* Label Styling */}
+            <h4 className="cs-subsection-title">Label Style</h4>
+            <div className="field">
+              <label htmlFor="cs-tooltip-labelColor">Label color</label>
+              <ColorPicker
+                id="cs-tooltip-labelColor"
+                value={tooltip?.labelColor ?? '#333333'}
+                onChange={(color) => updateChartSettings('tooltip', { labelColor: color })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-tooltip-labelFontWeight">Label weight</label>
+              <select
+                id="cs-tooltip-labelFontWeight"
+                value={tooltip?.labelFontWeight ?? 'bold'}
+                onChange={(e) => updateChartSettings('tooltip', { labelFontWeight: e.target.value })}
+              >
+                <option value="normal">Normal</option>
+                <option value="bold">Bold</option>
+              </select>
+            </div>
+
+            {/* Item Styling */}
+            <h4 className="cs-subsection-title">Item Style</h4>
+            <div className="field">
+              <label htmlFor="cs-tooltip-itemColor">Item color</label>
+              <ColorPicker
+                id="cs-tooltip-itemColor"
+                value={tooltip?.itemColor ?? '#666666'}
+                onChange={(color) => updateChartSettings('tooltip', { itemColor: color })}
+              />
+            </div>
           </div>
-          <div className="field">
-            <label htmlFor="cs-legend-align">Align</label>
-            <select
-              id="cs-legend-align"
-              value={legend?.align ?? 'center'}
-              onChange={(e) => updateChartSettings('legend', { align: e.target.value })}
-            >
-              {(legend?.position === 'left' || legend?.position === 'right') ? (
-                <>
-                  <option value="top">Top</option>
-                  <option value="middle">Middle</option>
-                  <option value="bottom">Bottom</option>
-                </>
-              ) : (
-                <>
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                </>
-              )}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="cs-legend-layout">Layout</label>
-            <select
-              id="cs-legend-layout"
-              value={legend?.layout ?? 'horizontal'}
-              onChange={(e) => updateChartSettings('legend', { layout: e.target.value })}
-            >
-              <option value="horizontal">Horizontal</option>
-              <option value="vertical">Vertical</option>
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="cs-legend-iconType">Icon type</label>
-            <select
-              id="cs-legend-iconType"
-              value={legend?.iconType ?? 'square'}
-              onChange={(e) => updateChartSettings('legend', { iconType: e.target.value })}
-            >
-              <option value="line">Line</option>
-              <option value="square">Square</option>
-              <option value="rect">Rectangle</option>
-              <option value="circle">Circle</option>
-              <option value="cross">Cross</option>
-              <option value="diamond">Diamond</option>
-              <option value="star">Star</option>
-              <option value="triangle">Triangle</option>
-              <option value="wye">Wye</option>
-            </select>
-          </div>
-        </fieldset>
+        </details>
       )}
 
-      {/* Axis Settings */}
-      <fieldset className="cs-fieldset">
-        <legend>Axis</legend>
-        <div className="field">
-          <label htmlFor="cs-axis-yScale">Y Scale</label>
-          <select
-            id="cs-axis-yScale"
-            value={axis?.yScale ?? 'linear'}
-            onChange={(e) => updateChartSettings('axis', { yScale: e.target.value })}
-          >
-            <option value="linear">Linear</option>
-            <option value="log">Logarithmic</option>
-            <option value="sqrt">Square Root</option>
-          </select>
-        </div>
-        <label className="cs-toggle">
-          <input
-            type="checkbox"
-            checked={axis?.yDomainAuto ?? true}
-            onChange={(e) => updateChartSettings('axis', { yDomainAuto: e.target.checked })}
-          />
-          Auto Y domain
-        </label>
-        {!(axis?.yDomainAuto ?? true) && (
-          <>
+      {/* Animation Settings */}
+      {animationEnabled && (
+        <details className="cs-type-section">
+          <summary>Animation</summary>
+          <div className="cs-type-body">
             <div className="field">
-              <label htmlFor="cs-axis-yMin">Y Min</label>
-              <input
-                id="cs-axis-yMin"
-                type="number"
-                className="num-input"
-                value={axis?.yDomainMin ?? 0}
-                onChange={(e) => updateChartSettings('axis', { yDomainMin: Number(e.target.value) })}
-              />
+              <label htmlFor="cs-animation-duration">Duration</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-animation-duration"
+                  type="range"
+                  min="0"
+                  max="3000"
+                  step="100"
+                  value={animation?.duration ?? 1500}
+                  onChange={(e) => updateChartSettings('animation', { duration: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={3000}
+                  step={100}
+                  value={animation?.duration ?? 1500}
+                  onChange={(e) => updateChartSettings('animation', { duration: clamp(Number(e.target.value), 0, 3000) })}
+                />
+                <span className="unit">ms</span>
+              </div>
             </div>
             <div className="field">
-              <label htmlFor="cs-axis-yMax">Y Max</label>
-              <input
-                id="cs-axis-yMax"
-                type="number"
-                className="num-input"
-                value={axis?.yDomainMax ?? 10}
-                onChange={(e) => updateChartSettings('axis', { yDomainMax: Number(e.target.value) })}
-              />
+              <label htmlFor="cs-animation-easing">Easing</label>
+              <select
+                id="cs-animation-easing"
+                value={animation?.easing ?? 'ease'}
+                onChange={(e) => updateChartSettings('animation', { easing: e.target.value })}
+              >
+                <option value="ease">Ease</option>
+                <option value="linear">Linear</option>
+                <option value="ease-in">Ease In</option>
+                <option value="ease-out">Ease Out</option>
+                <option value="ease-in-out">Ease In Out</option>
+              </select>
             </div>
-          </>
-        )}
-        <div className="field">
-          <label htmlFor="cs-axis-yTickCount">Y Tick count</label>
-          <div className="range-input-combo">
-            <input
-              id="cs-axis-yTickCount"
-              type="range"
-              min="0"
-              max="15"
-              step="1"
-              value={axis?.yTickCount ?? 0}
-              onChange={(e) => updateChartSettings('axis', { yTickCount: Number(e.target.value) })}
-            />
-            <input
-              type="number"
-              className="num-input"
-              min={0}
-              max={15}
-              step={1}
-              value={axis?.yTickCount ?? 0}
-              onChange={(e) => updateChartSettings('axis', { yTickCount: clamp(Number(e.target.value), 0, 15) })}
-            />
-            <span className="unit">{(axis?.yTickCount ?? 0) === 0 ? 'auto' : ''}</span>
+            <div className="field">
+              <label htmlFor="cs-animation-delay">Delay</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-animation-delay"
+                  type="range"
+                  min="0"
+                  max="1000"
+                  step="50"
+                  value={animation?.delay ?? 0}
+                  onChange={(e) => updateChartSettings('animation', { delay: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={0}
+                  max={1000}
+                  step={50}
+                  value={animation?.delay ?? 0}
+                  onChange={(e) => updateChartSettings('animation', { delay: clamp(Number(e.target.value), 0, 1000) })}
+                />
+                <span className="unit">ms</span>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              className="cs-preview-btn"
+              onClick={triggerAnimationPreview}
+            >
+              ▶ Preview
+            </button>
           </div>
-        </div>
-      </fieldset>
+        </details>
+      )}
+
+      {/* Legend Settings */}
+      {legendEnabled && (
+        <details className="cs-type-section">
+          <summary>Legend</summary>
+          <div className="cs-type-body">
+            <div className="field">
+              <label htmlFor="cs-legend-position">Position</label>
+              <select
+                id="cs-legend-position"
+                value={legend?.position ?? 'bottom'}
+                onChange={(e) => updateChartSettings('legend', { position: e.target.value })}
+              >
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-legend-align">Align</label>
+              <select
+                id="cs-legend-align"
+                value={legend?.align ?? 'center'}
+                onChange={(e) => updateChartSettings('legend', { align: e.target.value })}
+              >
+                {(legend?.position === 'left' || legend?.position === 'right') ? (
+                  <>
+                    <option value="top">Top</option>
+                    <option value="middle">Middle</option>
+                    <option value="bottom">Bottom</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </>
+                )}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-legend-layout">Layout</label>
+              <select
+                id="cs-legend-layout"
+                value={legend?.layout ?? 'horizontal'}
+                onChange={(e) => updateChartSettings('legend', { layout: e.target.value })}
+              >
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-legend-iconType">Icon type</label>
+              <select
+                id="cs-legend-iconType"
+                value={legend?.iconType ?? 'square'}
+                onChange={(e) => updateChartSettings('legend', { iconType: e.target.value })}
+              >
+                <option value="line">Line</option>
+                <option value="square">Square</option>
+                <option value="rect">Rectangle</option>
+                <option value="circle">Circle</option>
+                <option value="cross">Cross</option>
+                <option value="diamond">Diamond</option>
+                <option value="star">Star</option>
+                <option value="triangle">Triangle</option>
+                <option value="wye">Wye</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-legend-textColor">Text color</label>
+              <ColorPicker
+                id="cs-legend-textColor"
+                value={legend?.textColor ?? '#333333'}
+                onChange={(color) => updateChartSettings('legend', { textColor: color })}
+              />
+            </div>
+          </div>
+        </details>
+      )}
+
+      {/* Grid Settings */}
+      {gridEnabled && (
+        <details className="cs-type-section">
+          <summary>Grid</summary>
+          <div className="cs-type-body">
+            <div className="cs-toggles">
+              <label className="cs-toggle">
+                <input
+                  type="checkbox"
+                  checked={grid?.horizontal ?? true}
+                  onChange={(e) => updateChartSettings('grid', { horizontal: e.target.checked })}
+                />
+                Horizontal lines
+              </label>
+              <label className="cs-toggle">
+                <input
+                  type="checkbox"
+                  checked={grid?.vertical ?? true}
+                  onChange={(e) => updateChartSettings('grid', { vertical: e.target.checked })}
+                />
+                Vertical lines
+              </label>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-grid-stroke">Line color</label>
+              <ColorPicker
+                id="cs-grid-stroke"
+                value={grid?.stroke ?? '#ccc'}
+                onChange={(color) => updateChartSettings('grid', { stroke: color })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-grid-dashStyle">Dash style</label>
+              <select
+                id="cs-grid-dashStyle"
+                value={grid?.strokeDasharray ?? '3 3'}
+                onChange={(e) => updateChartSettings('grid', { strokeDasharray: e.target.value })}
+              >
+                <option value="">Solid</option>
+                <option value="3 3">Dashed (3 3)</option>
+                <option value="5 5">Dashed (5 5)</option>
+                <option value="2 2">Dotted</option>
+                <option value="5 2 2 2">Dash-Dot</option>
+                <option value="10 5">Long Dash</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-grid-opacity">Opacity</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-grid-opacity"
+                  type="range"
+                  min="0.1"
+                  max="1"
+                  step="0.05"
+                  value={grid?.strokeOpacity ?? 1}
+                  onChange={(e) => updateChartSettings('grid', { strokeOpacity: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={10}
+                  max={100}
+                  step={5}
+                  value={Math.round((grid?.strokeOpacity ?? 1) * 100)}
+                  onChange={(e) => updateChartSettings('grid', { strokeOpacity: clamp(Number(e.target.value) / 100, 0.1, 1) })}
+                />
+                <span className="unit">%</span>
+              </div>
+            </div>
+          </div>
+        </details>
+      )}
 
       {/* Reference Line Settings */}
-      <fieldset className="cs-fieldset">
-        <legend>Reference Line</legend>
-        <label className="cs-toggle">
-          <input
-            type="checkbox"
-            checked={referenceLine?.enabled ?? false}
-            onChange={(e) => updateChartSettings('referenceLine', { enabled: e.target.checked })}
-          />
-          Enable reference line
-        </label>
-        {(referenceLine?.enabled ?? false) && (
-          <>
+      {referenceLineEnabled && (
+        <details className="cs-type-section">
+          <summary>Reference Line</summary>
+          <div className="cs-type-body">
             <div className="field">
               <label htmlFor="cs-refline-yValue">Y Value</label>
               <input
@@ -411,23 +756,59 @@ export function ChartSettings() {
                 placeholder="Optional label"
               />
             </div>
-          </>
-        )}
-      </fieldset>
+          </div>
+        </details>
+      )}
+
+      {/* Brush Settings */}
+      {brushEnabled && (
+        <details className="cs-type-section">
+          <summary>Brush</summary>
+          <div className="cs-type-body">
+            <div className="field">
+              <label htmlFor="cs-brush-height">Height</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-brush-height"
+                  type="range"
+                  min="20"
+                  max="60"
+                  step="5"
+                  value={brush?.height ?? 30}
+                  onChange={(e) => updateChartSettings('brush', { height: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={20}
+                  max={60}
+                  step={5}
+                  value={brush?.height ?? 30}
+                  onChange={(e) => updateChartSettings('brush', { height: clamp(Number(e.target.value), 20, 60) })}
+                />
+                <span className="unit">px</span>
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-brush-stroke">Stroke color</label>
+              <ColorPicker
+                id="cs-brush-stroke"
+                value={brush?.stroke ?? '#8884d8'}
+                onChange={(color) => updateChartSettings('brush', { stroke: color })}
+              />
+            </div>
+            <p className="cs-hint">
+              Applies to Column, Line, and Area charts. Drag handles to zoom.
+            </p>
+          </div>
+        </details>
+      )}
 
       {/* Gap Settings */}
-      <fieldset className="cs-fieldset">
-        <legend>Gap</legend>
-        <label className="cs-toggle">
-          <input
-            type="checkbox"
-            checked={gap?.enabled ?? false}
-            onChange={(e) => updateChartSettings('gap', { enabled: e.target.checked })}
-          />
-          Enable gaps
-        </label>
-        {(gap?.enabled ?? false) && (
-          <div className="cs-gap-options">
+      {gapEnabled && (
+        <details className="cs-type-section">
+          <summary>Gaps</summary>
+          <div className="cs-type-body">
             <label className="cs-toggle">
               <input
                 type="checkbox"
@@ -493,7 +874,6 @@ export function ChartSettings() {
                     checked={isSyncEnabled}
                     onChange={(e) => {
                       updateChartSettings('gap', { syncThickness: e.target.checked });
-                      // When enabling sync, sync all values to current gap thickness
                       if (e.target.checked) {
                         const currentThickness = clamp(gap?.thickness ?? 2, 1, 8);
                         updateChartSettings('gap', { thickness: currentThickness });
@@ -568,8 +948,88 @@ export function ChartSettings() {
               </div>
             </div>
           </div>
+        </details>
+      )}
+      </details>
+
+      {/* ===== CHART TYPES GROUP ===== */}
+      <details className="chart-settings-card">
+        <summary className="chart-settings-header">Chart Types</summary>
+
+        {/* Axis Settings */}
+        <details className="cs-type-section">
+          <summary>Axis</summary>
+        <div className="cs-type-body">
+          <div className="field">
+            <label htmlFor="cs-axis-yScale">Y Scale</label>
+            <select
+              id="cs-axis-yScale"
+              value={axis?.yScale ?? 'linear'}
+              onChange={(e) => updateChartSettings('axis', { yScale: e.target.value })}
+            >
+              <option value="linear">Linear</option>
+              <option value="log">Logarithmic</option>
+              <option value="sqrt">Square Root</option>
+            </select>
+          </div>
+          <label className="cs-toggle" style={{ marginTop: '8px' }}>
+            <input
+              type="checkbox"
+              checked={axis?.yDomainAuto ?? true}
+              onChange={(e) => updateChartSettings('axis', { yDomainAuto: e.target.checked })}
+            />
+            Auto Y domain
+          </label>
+        {!(axis?.yDomainAuto ?? true) && (
+          <>
+            <div className="field">
+              <label htmlFor="cs-axis-yMin">Y Min</label>
+              <input
+                id="cs-axis-yMin"
+                type="number"
+                className="num-input"
+                value={axis?.yDomainMin ?? 0}
+                onChange={(e) => updateChartSettings('axis', { yDomainMin: Number(e.target.value) })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-axis-yMax">Y Max</label>
+              <input
+                id="cs-axis-yMax"
+                type="number"
+                className="num-input"
+                value={axis?.yDomainMax ?? 10}
+                onChange={(e) => updateChartSettings('axis', { yDomainMax: Number(e.target.value) })}
+              />
+            </div>
+          </>
         )}
-      </fieldset>
+          <div className="field">
+            <label htmlFor="cs-axis-yTickCount">Y Tick count</label>
+            <div className="range-input-combo">
+              <input
+                id="cs-axis-yTickCount"
+                type="range"
+                min="0"
+                max="15"
+                step="1"
+                value={axis?.yTickCount ?? 0}
+                onChange={(e) => updateChartSettings('axis', { yTickCount: Number(e.target.value) })}
+              />
+              <input
+                type="number"
+                className="num-input"
+                min={0}
+                max={15}
+                step={1}
+                value={axis?.yTickCount ?? 0}
+                onChange={(e) => updateChartSettings('axis', { yTickCount: clamp(Number(e.target.value), 0, 15) })}
+              />
+              <span className="unit">{(axis?.yTickCount ?? 0) === 0 ? 'auto' : ''}</span>
+            </div>
+          </div>
+        </div>
+      </details>
 
       {/* Column/Bar Settings */}
       <details className="cs-type-section">
@@ -1295,7 +1755,8 @@ export function ChartSettings() {
           </label>
         </div>
       </details>
-    </details>
+      </details>
+    </div>
   );
 }
 

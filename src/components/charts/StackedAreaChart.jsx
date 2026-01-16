@@ -8,7 +8,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Customized,
   LabelList,
   ReferenceLine,
 } from 'recharts';
@@ -22,26 +21,6 @@ const getRefLineDashArray = (style) => {
     case 'dotted': return '2 2';
     default: return undefined;
   }
-};
-
-// Cursor overlay component - renders on top of chart content
-const CursorOverlay = ({ xAxisMap, offset, activeCoordinate, stroke, strokeWidth, strokeDasharray, show }) => {
-  if (!show || !activeCoordinate) return null;
-  const { x } = activeCoordinate;
-  const top = offset?.top ?? 0;
-  const height = offset?.height ?? 0;
-  return (
-    <line
-      x1={x}
-      y1={top}
-      x2={x}
-      y2={top + height}
-      stroke={stroke}
-      strokeWidth={strokeWidth}
-      strokeDasharray={strokeDasharray}
-      style={{ pointerEvents: 'none' }}
-    />
-  );
 };
 
 // Helper to convert angle to gradient coordinates
@@ -70,7 +49,9 @@ const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
 
 export function StackedAreaChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, area, stacked, axis, legend, referenceLine } = state.chartSettings;
+  const { global, gap, area, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
+  const labelColor = global.labelColor ?? '#333333';
+  const legendTextColor = legend?.textColor ?? '#333333';
 
   // Determine if markers are enabled (override or global)
   const markersEnabled = area.markerOverride !== null && area.markerOverride !== undefined
@@ -129,6 +110,11 @@ export function StackedAreaChart() {
   // Stack offset configuration
   const stackOffset = stacked?.stackOffset ?? 'none';
 
+  // Animation configuration
+  const animDuration = animation?.duration ?? 1500;
+  const animEasing = animation?.easing ?? 'ease';
+  const animDelay = animation?.delay ?? 0;
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart 
@@ -156,7 +142,15 @@ export function StackedAreaChart() {
             );
           })}
         </defs>
-        {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
+        {global.gridLines && (
+          <CartesianGrid 
+            horizontal={grid?.horizontal ?? true}
+            vertical={grid?.vertical ?? true}
+            stroke={grid?.stroke ?? '#ccc'}
+            strokeDasharray={grid?.strokeDasharray ?? '3 3'}
+            strokeOpacity={grid?.strokeOpacity ?? 1}
+          />
+        )}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && (
           <YAxis 
@@ -169,7 +163,30 @@ export function StackedAreaChart() {
         )}
         {(global.tooltip || showCursor) && (
           <Tooltip 
-            cursor={false}
+            trigger={tooltip?.trigger ?? 'hover'}
+            separator={tooltip?.separator ?? ' : '}
+            offset={tooltip?.offset ?? 10}
+            cursor={showCursor ? {
+              stroke: cursorStroke,
+              strokeWidth: cursorStrokeWidth,
+              strokeDasharray: cursorDashArray,
+            } : (tooltip?.cursor ?? true)}
+            animationDuration={tooltip?.animationDuration ?? 200}
+            animationEasing={tooltip?.animationEasing ?? 'ease'}
+            contentStyle={global.tooltip ? {
+              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
+              borderColor: tooltip?.borderColor ?? '#cccccc',
+              borderRadius: tooltip?.borderRadius ?? 4,
+              borderWidth: tooltip?.borderWidth ?? 1,
+              borderStyle: 'solid',
+            } : undefined}
+            labelStyle={global.tooltip ? {
+              color: tooltip?.labelColor ?? '#333333',
+              fontWeight: tooltip?.labelFontWeight ?? 'bold',
+            } : undefined}
+            itemStyle={global.tooltip ? {
+              color: tooltip?.itemColor ?? '#666666',
+            } : undefined}
             content={global.tooltip ? undefined : () => null}
             wrapperStyle={!global.tooltip ? { display: 'none' } : undefined}
           />
@@ -180,6 +197,7 @@ export function StackedAreaChart() {
             align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
             layout={legendLayout}
             iconType={legendIconType}
+            wrapperStyle={{ color: legendTextColor }}
           />
         )}
         {(referenceLine?.enabled ?? false) && (
@@ -215,25 +233,16 @@ export function StackedAreaChart() {
               connectNulls={area.connectNulls ?? false}
               name={slot.label}
               isAnimationActive={global.animation}
+              animationDuration={animDuration}
+              animationEasing={animEasing}
+              animationBegin={animDelay}
             >
               {global.dataLabels && slotIndex === 7 && (
-                <LabelList dataKey={`slot${slotIndex}`} position="top" fill="#333" fontSize={9} />
+                <LabelList dataKey={`slot${slotIndex}`} position="top" fill={labelColor} fontSize={9} />
               )}
             </Area>
           );
         })}
-        {/* Cursor overlay rendered on top */}
-        <Customized
-          component={(props) => (
-            <CursorOverlay
-              {...props}
-              stroke={cursorStroke}
-              strokeWidth={cursorStrokeWidth}
-              strokeDasharray={cursorDashArray}
-              show={showCursor}
-            />
-          )}
-        />
       </AreaChart>
     </ResponsiveContainer>
   );

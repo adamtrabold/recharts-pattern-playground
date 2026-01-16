@@ -63,7 +63,9 @@ function StackedBarShape(props) {
 
 export function StackedBarChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, columnBar, gap, stacked, axis, legend, referenceLine } = state.chartSettings;
+  const { global, columnBar, gap, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
+  const labelColor = global.labelColor ?? '#333333';
+  const legendTextColor = legend?.textColor ?? '#333333';
 
   // Gap settings for stacked bar
   const useGap = gap?.enabled && gap?.applyTo?.stackedBar;
@@ -75,7 +77,13 @@ export function StackedBarChart() {
   const hoverColor = columnBar.hoverColor ?? '#000000';
   const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
 
-  const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
+  // Native activeBar prop for bar hover styling
+  const activeBarConfig = hoverEnabled ? { 
+    fill: hoverColor, 
+    fillOpacity: hoverOpacity + 0.3,
+    stroke: hoverColor,
+    strokeWidth: 1,
+  } : false;
 
   // Axis configuration (for horizontal stacked bar, X is the value axis)
   const xDomain = (axis?.yDomainAuto ?? true) 
@@ -93,6 +101,11 @@ export function StackedBarChart() {
   // Stack offset configuration
   const stackOffset = stacked?.stackOffset ?? 'none';
 
+  // Animation configuration
+  const animDuration = animation?.duration ?? 1500;
+  const animEasing = animation?.easing ?? 'ease';
+  const animDelay = animation?.delay ?? 0;
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
@@ -101,7 +114,15 @@ export function StackedBarChart() {
         margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         stackOffset={stackOffset}
       >
-        {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
+        {global.gridLines && (
+          <CartesianGrid 
+            horizontal={grid?.horizontal ?? true}
+            vertical={grid?.vertical ?? true}
+            stroke={grid?.stroke ?? '#ccc'}
+            strokeDasharray={grid?.strokeDasharray ?? '3 3'}
+            strokeOpacity={grid?.strokeOpacity ?? 1}
+          />
+        )}
         {global.axisLabels && <YAxis dataKey="name" type="category" width={28} />}
         {global.axisLabels && (
           <XAxis 
@@ -112,16 +133,37 @@ export function StackedBarChart() {
             allowDataOverflow={!(axis?.yDomainAuto ?? true)}
           />
         )}
-        <Tooltip 
-          cursor={cursorConfig} 
-          content={global.tooltip ? undefined : () => null}
-        />
+        {global.tooltip && (
+          <Tooltip 
+            trigger={tooltip?.trigger ?? 'hover'}
+            separator={tooltip?.separator ?? ' : '}
+            offset={tooltip?.offset ?? 10}
+            cursor={tooltip?.cursor ?? true}
+            animationDuration={tooltip?.animationDuration ?? 200}
+            animationEasing={tooltip?.animationEasing ?? 'ease'}
+            contentStyle={{
+              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
+              borderColor: tooltip?.borderColor ?? '#cccccc',
+              borderRadius: tooltip?.borderRadius ?? 4,
+              borderWidth: tooltip?.borderWidth ?? 1,
+              borderStyle: 'solid',
+            }}
+            labelStyle={{
+              color: tooltip?.labelColor ?? '#333333',
+              fontWeight: tooltip?.labelFontWeight ?? 'bold',
+            }}
+            itemStyle={{
+              color: tooltip?.itemColor ?? '#666666',
+            }}
+          />
+        )}
         {global.legend && (
           <Legend 
             verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
             align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
             layout={legendLayout}
             iconType={legendIconType}
+            wrapperStyle={{ color: legendTextColor }}
           />
         )}
         {(referenceLine?.enabled ?? false) && (
@@ -147,6 +189,10 @@ export function StackedBarChart() {
                 fill={fill}
                 name={slot.label}
                 isAnimationActive={global.animation}
+                animationDuration={animDuration}
+                animationEasing={animEasing}
+                animationBegin={animDelay}
+                activeBar={activeBarConfig}
                 shape={(props) => (
                   <StackedBarShape
                     {...props}
@@ -158,7 +204,7 @@ export function StackedBarChart() {
                 )}
               >
                 {global.dataLabels && isLast && (
-                  <LabelList dataKey={`slot${slotIndex}`} position="right" fill="#333" fontSize={11} />
+                  <LabelList dataKey={`slot${slotIndex}`} position="right" fill={labelColor} fontSize={11} />
                 )}
               </Bar>
             );
@@ -172,9 +218,13 @@ export function StackedBarChart() {
               fill={fill}
               name={slot.label}
               isAnimationActive={global.animation}
+              animationDuration={animDuration}
+              animationEasing={animEasing}
+              animationBegin={animDelay}
+              activeBar={activeBarConfig}
             >
               {global.dataLabels && isLast && (
-                <LabelList dataKey={`slot${slotIndex}`} position="right" fill="#333" fontSize={11} />
+                <LabelList dataKey={`slot${slotIndex}`} position="right" fill={labelColor} fontSize={11} />
               )}
             </Bar>
           );

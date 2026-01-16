@@ -885,6 +885,12 @@ textarea:focus-visible,
 }
 
 /* Chart Settings Card */
+.chart-settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .chart-settings-card {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -917,8 +923,6 @@ textarea:focus-visible,
 
 .chart-settings-card[open] > .chart-settings-header {
   margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
 }
 
 .cs-fieldset {
@@ -953,6 +957,96 @@ textarea:focus-visible,
 
 .cs-toggle input {
   margin: 0;
+}
+
+/* Toggle Switch List */
+.cs-switch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Toggle Switch Component */
+.cs-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 4px 0;
+}
+
+.cs-switch-label {
+  flex: 1;
+  min-width: 80px;
+  color: var(--fg);
+}
+
+.cs-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cs-switch-track {
+  position: relative;
+  width: 28px;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--border);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.cs-switch input:checked + .cs-switch-track {
+  background: var(--focus);
+}
+
+.cs-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.cs-switch input:checked + .cs-switch-track .cs-switch-thumb {
+  transform: translateX(14px);
+}
+
+.cs-switch-state {
+  width: 20px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.cs-switch input:checked ~ .cs-switch-state {
+  color: var(--focus);
+}
+
+.cs-switch:hover .cs-switch-track {
+  background: var(--muted);
+}
+
+.cs-switch input:checked:hover + .cs-switch-track {
+  filter: brightness(1.1);
+}
+
+/* Indented toggle for sub-options */
+.cs-toggle-indent {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cs-sync-options {
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
 }
 
 .cs-gap-options {
@@ -1002,11 +1096,53 @@ textarea:focus-visible,
   padding: 2px 0;
 }
 
+.cs-subsection-title {
+  margin: 10px 0 4px 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .sync-indicator {
   color: var(--focus);
   font-size: 11px;
   margin-left: 4px;
   cursor: help;
+}
+
+.cs-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 4px 0;
+  font-style: italic;
+}
+
+.cs-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--focus);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.cs-preview-btn:hover {
+  background: var(--accent);
+}
+
+.cs-preview-btn:active {
+  transform: scale(0.97);
 }
 
 /* Range + Number input combo */
