@@ -1082,6 +1082,7 @@ textarea:focus-visible,
   font-weight: 500;
   letter-spacing: 0.01em;
   margin-left: 40px; /* Align with # symbol (swatch 28px + gap 6px + hash left padding 6px) */
+  min-height: 14px; /* Reserve space even when empty to prevent layout shift */
 }
 
 /* Color Picker Dropdown */

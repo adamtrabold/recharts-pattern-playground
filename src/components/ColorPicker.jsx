@@ -137,10 +137,8 @@ export function ColorPicker({ value, onChange, id, label }) {
         </div>
       </div>
 
-      {/* Design system name display */}
-      {colorName && (
-        <span className="color-token-name">{colorName}</span>
-      )}
+      {/* Design system name display - always render to maintain consistent height */}
+      <span className="color-token-name">{colorName || '\u00A0'}</span>
 
       {/* Color dropdown */}
       {isOpen && (
