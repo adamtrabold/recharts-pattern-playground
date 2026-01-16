@@ -18,6 +18,18 @@ export function getSlotFill(slot, slotIndex) {
 }
 
 /**
+ * Get the primary color for a slot (solid color or pattern background)
+ * Useful for gradients, strokes, and other color-based styling
+ */
+export function getSlotColor(slot) {
+  if (!slot) return '#999999';
+  if (slot.type === 'solid') {
+    return slot.color || '#999999';
+  }
+  return slot.backgroundColor || '#999999';
+}
+
+/**
  * Generate SVG pattern definition for a slot
  * Returns null for solid colors (no pattern needed)
  */

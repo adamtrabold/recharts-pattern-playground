@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
@@ -32,9 +33,11 @@ export function ColumnChart() {
 
   const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
 
+  const barGap = columnBar.barGap ?? 4;
+
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && <YAxis />}
@@ -57,6 +60,9 @@ export function ColumnChart() {
               />
             );
           })}
+          {global.dataLabels && (
+            <LabelList dataKey="value" position="top" fill="#333" fontSize={11} />
+          )}
         </Bar>
       </BarChart>
     </ResponsiveContainer>

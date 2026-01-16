@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
   Rectangle,
+  LabelList,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
@@ -85,6 +86,7 @@ export function StackedBarChart() {
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const fill = getSlotFill(slot, slotIndex);
+          const isLast = slotIndex === 7;
           
           if (useGap) {
             return (
@@ -104,7 +106,11 @@ export function StackedBarChart() {
                     isFirst={slotIndex === 0}
                   />
                 )}
-              />
+              >
+                {global.dataLabels && isLast && (
+                  <LabelList dataKey={`slot${slotIndex}`} position="right" fill="#333" fontSize={11} />
+                )}
+              </Bar>
             );
           }
           
@@ -116,7 +122,11 @@ export function StackedBarChart() {
               fill={fill}
               name={slot.label}
               isAnimationActive={global.animation}
-            />
+            >
+              {global.dataLabels && isLast && (
+                <LabelList dataKey={`slot${slotIndex}`} position="right" fill="#333" fontSize={11} />
+              )}
+            </Bar>
           );
         })}
       </BarChart>

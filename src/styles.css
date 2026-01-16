@@ -1086,11 +1086,8 @@ textarea:focus-visible,
 
 /* Color Picker Dropdown */
 .color-picker-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
-  z-index: 100;
+  position: fixed;
+  z-index: 9999;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);

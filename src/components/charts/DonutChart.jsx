@@ -39,6 +39,29 @@ function renderRadialStroke(props, strokeColor, strokeWidth) {
   );
 }
 
+// Custom label renderer for data labels
+function renderDataLabel(props) {
+  const { cx, cy, midAngle, innerRadius, outerRadius, name } = props;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#333"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={10}
+      fontWeight="bold"
+    >
+      {name}
+    </text>
+  );
+}
+
 export function DonutChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, donut } = state.chartSettings;
@@ -81,7 +104,9 @@ export function DonutChart() {
           endAngle={450 - startAngleOffset}
           paddingAngle={paddingAngle}
           isAnimationActive={global.animation}
-          label={useRadialStroke ? (props) => renderRadialStroke(props, strokeColor, strokeThickness) : false}
+          label={useRadialStroke 
+            ? (props) => renderRadialStroke(props, strokeColor, strokeThickness) 
+            : (global.dataLabels ? renderDataLabel : false)}
           labelLine={false}
         >
           {data.map((entry, index) => {

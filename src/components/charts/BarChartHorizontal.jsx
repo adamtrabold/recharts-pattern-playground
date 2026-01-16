@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
@@ -32,12 +33,15 @@ export function BarChartHorizontal() {
 
   const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
 
+  const barGap = columnBar.barGap ?? 4;
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
         data={data} 
         layout="vertical"
-        margin={{ top: 10, right: 10, left: 20, bottom: 0 }}
+        margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+        barGap={`${barGap}%`}
       >
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <YAxis dataKey="name" type="category" />}
@@ -61,6 +65,9 @@ export function BarChartHorizontal() {
               />
             );
           })}
+          {global.dataLabels && (
+            <LabelList dataKey="value" position="right" fill="#333" fontSize={11} />
+          )}
         </Bar>
       </BarChart>
     </ResponsiveContainer>

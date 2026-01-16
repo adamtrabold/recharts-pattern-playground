@@ -9,9 +9,10 @@ import {
   Legend,
   ResponsiveContainer,
   Customized,
+  LabelList,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
-import { getSlotFill } from '../../utils/patternGenerator';
+import { getSlotFill, getSlotColor } from '../../utils/patternGenerator';
 
 // Cursor overlay component - renders on top of chart content
 const CursorOverlay = ({ xAxisMap, offset, activeCoordinate, stroke, strokeWidth, strokeDasharray, show }) => {
@@ -32,6 +33,16 @@ const CursorOverlay = ({ xAxisMap, offset, activeCoordinate, stroke, strokeWidth
     />
   );
 };
+
+// Helper to convert angle to gradient coordinates
+function angleToCoords(angle) {
+  const rad = (angle * Math.PI) / 180;
+  const x1 = 50 - 50 * Math.sin(rad);
+  const y1 = 50 - 50 * Math.cos(rad);
+  const x2 = 50 + 50 * Math.sin(rad);
+  const y2 = 50 + 50 * Math.cos(rad);
+  return { x1: `${x1}%`, y1: `${y1}%`, x2: `${x2}%`, y2: `${y2}%` };
+}
 
 const CATEGORIES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
@@ -77,9 +88,44 @@ export function StackedAreaChart() {
   const gapThickness = useGap ? gap.thickness : 0;
   const gapColor = gap?.color ?? '#ffffff';
 
+  // Gradient settings
+  const gradientEnabled = area.gradientEnabled ?? false;
+  const sharedAngle = area.sharedAngle ?? 90;
+  const topOpacity = area.sharedTopOpacity ?? 1;
+  const bottomOpacity = area.sharedBottomOpacity ?? 0.1;
+  const gradientCoords = angleToCoords(sharedAngle);
+
+  // Helper to get fill value (with gradient support)
+  const getFillForSlot = (slot, slotIndex) => {
+    if (gradientEnabled) {
+      return `url(#stacked-area-gradient-${slotIndex})`;
+    }
+    return getSlotFill(slot, slotIndex);
+  };
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart data={STATIC_DATA} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        {/* Gradient definitions */}
+        <defs>
+          {gradientEnabled && [0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
+            const slot = getActiveSlot(slotIndex);
+            const color = getSlotColor(slot);
+            return (
+              <linearGradient 
+                key={`gradient-${slotIndex}`}
+                id={`stacked-area-gradient-${slotIndex}`}
+                x1={gradientCoords.x1}
+                y1={gradientCoords.y1}
+                x2={gradientCoords.x2}
+                y2={gradientCoords.y2}
+              >
+                <stop offset="0%" stopColor={color} stopOpacity={topOpacity} />
+                <stop offset="100%" stopColor={color} stopOpacity={bottomOpacity} />
+              </linearGradient>
+            );
+          })}
+        </defs>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && <YAxis />}
@@ -93,8 +139,8 @@ export function StackedAreaChart() {
         {global.legend && <Legend />}
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);
-          const fillValue = getSlotFill(slot, slotIndex);
-          const strokeColor = slot.type === 'solid' ? slot.color : slot.backgroundColor;
+          const fillValue = getFillForSlot(slot, slotIndex);
+          const strokeColor = getSlotColor(slot);
           // For stacked areas, only show dots on hover (activeDot) since static dots get covered by layers above
           const activeDotProps = showMarkers 
             ? { r: area.markerRadius + 1, fill: strokeColor, stroke: '#fff', strokeWidth: 2 }
@@ -107,14 +153,18 @@ export function StackedAreaChart() {
               dataKey={`slot${slotIndex}`}
               stackId="stack"
               fill={fillValue}
-              fillOpacity={area.fillOpacity}
+              fillOpacity={gradientEnabled ? 1 : area.fillOpacity}
               stroke={useGap ? gapColor : strokeColor}
               strokeWidth={useGap ? gapThickness : area.lineWidth}
               dot={false}
               activeDot={activeDotProps}
               name={slot.label}
               isAnimationActive={global.animation}
-            />
+            >
+              {global.dataLabels && slotIndex === 7 && (
+                <LabelList dataKey={`slot${slotIndex}`} position="top" fill="#333" fontSize={9} />
+              )}
+            </Area>
           );
         })}
         {/* Cursor overlay rendered on top */}

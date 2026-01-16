@@ -373,6 +373,30 @@ export function ChartSettings() {
               <span className="unit">px</span>
             </div>
           </div>
+          <div className="field">
+            <label htmlFor="cs-cb-barGap">Bar gap</label>
+            <div className="range-input-combo">
+              <input
+                id="cs-cb-barGap"
+                type="range"
+                min="0"
+                max="20"
+                step="1"
+                value={columnBar.barGap ?? 4}
+                onChange={(e) => updateChartSettings('columnBar', { barGap: Number(e.target.value) })}
+              />
+              <input
+                type="number"
+                className="num-input"
+                min={0}
+                max={20}
+                step={1}
+                value={columnBar.barGap ?? 4}
+                onChange={(e) => updateChartSettings('columnBar', { barGap: clamp(Number(e.target.value), 0, 20) })}
+              />
+              <span className="unit">%</span>
+            </div>
+          </div>
           <label className="cs-toggle">
             <input
               type="checkbox"
@@ -729,28 +753,42 @@ export function ChartSettings() {
               </div>
               {area.gradientMode === 'shared' && (
                 <>
-                  <div className="field">
+                  <div className="field field-full">
                     <label htmlFor="cs-area-sharedAngle">Gradient angle</label>
-                    <div className="range-input-combo">
-                      <input
-                        id="cs-area-sharedAngle"
-                        type="range"
-                        min="0"
-                        max="360"
-                        step="15"
-                        value={area.sharedAngle}
-                        onChange={(e) => updateChartSettings('area', { sharedAngle: Number(e.target.value) })}
-                      />
-                      <input
-                        type="number"
-                        className="num-input"
-                        min={0}
-                        max={360}
-                        step={15}
-                        value={area.sharedAngle}
-                        onChange={(e) => updateChartSettings('area', { sharedAngle: clamp(Number(e.target.value), 0, 360) })}
-                      />
-                      <span className="unit">°</span>
+                    <div className="angle-control">
+                      <div className="range-input-combo">
+                        <input
+                          id="cs-area-sharedAngle"
+                          type="range"
+                          min="0"
+                          max="360"
+                          step="15"
+                          value={area.sharedAngle}
+                          onChange={(e) => updateChartSettings('area', { sharedAngle: Number(e.target.value) })}
+                        />
+                        <input
+                          type="number"
+                          className="num-input"
+                          min={0}
+                          max={360}
+                          step={15}
+                          value={area.sharedAngle}
+                          onChange={(e) => updateChartSettings('area', { sharedAngle: clamp(Number(e.target.value), 0, 360) })}
+                        />
+                        <span className="unit">°</span>
+                      </div>
+                      <div className="snap-buttons">
+                        {[0, 45, 90, 135, 180, 270].map((val) => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => updateChartSettings('area', { sharedAngle: val })}
+                            className={area.sharedAngle === val ? 'active' : ''}
+                          >
+                            {val}°
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="field">

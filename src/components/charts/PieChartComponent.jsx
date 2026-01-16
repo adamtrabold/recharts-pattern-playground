@@ -39,6 +39,29 @@ function renderRadialStroke(props, strokeColor, strokeWidth, pieInnerRadius) {
   );
 }
 
+// Custom label renderer for data labels
+function renderDataLabel(props) {
+  const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = props;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#333"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={10}
+      fontWeight="bold"
+    >
+      {name}
+    </text>
+  );
+}
+
 export function PieChartComponent() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, pie } = state.chartSettings;
@@ -76,7 +99,9 @@ export function PieChartComponent() {
           endAngle={450 - pie.startAngle}
           paddingAngle={paddingAngle}
           isAnimationActive={global.animation}
-          label={useRadialStroke ? (props) => renderRadialStroke(props, strokeColor, strokeThickness, innerRadius) : false}
+          label={useRadialStroke 
+            ? (props) => renderRadialStroke(props, strokeColor, strokeThickness, innerRadius) 
+            : (global.dataLabels ? renderDataLabel : false)}
           labelLine={false}
         >
           {data.map((entry, index) => {

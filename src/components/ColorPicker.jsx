@@ -8,8 +8,10 @@ import { DESIGN_SYSTEM_COLORS, COLOR_FAMILIES, findColorName } from '../utils/de
 export function ColorPicker({ value, onChange, id, label }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
+  const swatchRef = useRef(null);
 
   // Normalize the hex value
   const normalizedValue = (value || '').replace('#', '').toUpperCase();
@@ -32,6 +34,37 @@ export function ColorPicker({ value, onChange, id, label }) {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isOpen && swatchRef.current) {
+      const rect = swatchRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const dropdownHeight = 320; // max-height
+      const dropdownWidth = 300; // approximate width
+      
+      let top = rect.bottom + 4;
+      let left = rect.left;
+      
+      // If dropdown would go below viewport, position above
+      if (top + dropdownHeight > viewportHeight - 10) {
+        top = rect.top - dropdownHeight - 4;
+      }
+      
+      // If dropdown would go past right edge, align to right
+      if (left + dropdownWidth > viewportWidth - 10) {
+        left = viewportWidth - dropdownWidth - 10;
+      }
+      
+      // Ensure we don't go past left edge
+      if (left < 10) {
+        left = 10;
+      }
+      
+      setDropdownPos({ top, left });
     }
   }, [isOpen]);
 
@@ -76,6 +109,7 @@ export function ColorPicker({ value, onChange, id, label }) {
       <div className="color-picker-input-row">
         {/* Clickable color swatch */}
         <button
+          ref={swatchRef}
           type="button"
           className="color-swatch-btn"
           onClick={() => setIsOpen(!isOpen)}
@@ -110,7 +144,12 @@ export function ColorPicker({ value, onChange, id, label }) {
 
       {/* Color dropdown */}
       {isOpen && (
-        <div className="color-picker-dropdown" ref={dropdownRef} role="listbox">
+        <div 
+          className="color-picker-dropdown" 
+          ref={dropdownRef} 
+          role="listbox"
+          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+        >
           {Object.entries(COLOR_FAMILIES).map(([familyName, colors]) => (
             <div key={familyName} className="color-family">
               <div className="color-family-name">{familyName}</div>
