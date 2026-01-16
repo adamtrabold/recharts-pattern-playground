@@ -398,6 +398,10 @@ export function ExportPanel() {
             {/* Clip at top */}
             <path d="M6 3V2C6 1.45 6.45 1 7 1H9C9.55 1 10 1.45 10 2V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             <rect x="5" y="2" width="6" height="2" rx="0.5" fill="currentColor"/>
+            {/* Image icon inside clipboard */}
+            <rect x="4" y="6" width="8" height="6" rx="0.5" stroke="currentColor" strokeWidth="1" fill="none"/>
+            <circle cx="6" cy="8" r="0.75" fill="currentColor"/>
+            <path d="M5 11L6.5 9.5L7.5 10.5L9.5 8.5L11 10V11H5Z" fill="currentColor" opacity="0.5"/>
           </svg>
         </button>
         <button
