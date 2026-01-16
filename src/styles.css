@@ -902,3 +902,173 @@ textarea:focus-visible,
 .recharts-tooltip-wrapper {
   font-size: 11px;
 }
+
+/* Color Picker Component */
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.color-picker > label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.color-picker-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-swatch-btn {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.color-swatch-btn:hover {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2), 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.color-swatch-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.color-swatch-btn:active {
+  transform: scale(0.95);
+}
+
+.color-token-name {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin-left: 40px; /* Align with # symbol (swatch 28px + gap 6px + hash left padding 6px) */
+}
+
+/* Color Picker Dropdown */
+.color-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  z-index: 100;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+  padding: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  min-width: 280px;
+  max-width: 340px;
+}
+
+.color-family {
+  margin-bottom: 8px;
+}
+
+.color-family:last-child {
+  margin-bottom: 0;
+}
+
+.color-family-name {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 4px 2px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.color-family-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 3px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.1s ease, border-color 0.1s ease;
+  min-width: 0;
+}
+
+.color-option:hover {
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+.color-option.selected {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: var(--focus);
+}
+
+.color-option-swatch {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.color-option-name {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Color picker inside .field (for consistent layout) */
+.field .color-picker {
+  gap: 3px;
+}
+
+.field .color-picker > label {
+  display: none; /* Label is provided by parent .field */
+}
+
+/* Inline color input with swatch (for hex-input replacement) */
+.color-input-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-input-inline .color-swatch-btn {
+  flex-shrink: 0;
+}

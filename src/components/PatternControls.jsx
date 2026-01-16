@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePalette } from '../context/PaletteContext';
 import { clamp } from '../utils/helpers';
+import ColorPicker from './ColorPicker';
 
 export function PatternControls() {
   const { state, updateSlot, updateSlotB, getActiveSlot, setActiveVersion, resetSlot, copySlot } = usePalette();
@@ -74,45 +75,30 @@ export function PatternControls() {
         {!isPattern && (
           <div className="field">
             <label htmlFor="solidColor">Color</label>
-            <div className="hex-input">
-              <span className="hash">#</span>
-              <input
-                id="solidColor"
-                type="text"
-                maxLength={6}
-                value={(slot.color || '').replace('#', '')}
-                onChange={(e) => handleUpdate({ color: '#' + e.target.value })}
-              />
-            </div>
+            <ColorPicker
+              id="solidColor"
+              value={slot.color || '#999999'}
+              onChange={(color) => handleUpdate({ color })}
+            />
           </div>
         )}
         {isPattern && (
           <>
             <div className="field">
               <label htmlFor="backgroundColor">Background</label>
-              <div className="hex-input">
-                <span className="hash">#</span>
-                <input
-                  id="backgroundColor"
-                  type="text"
-                  maxLength={6}
-                  value={(slot.backgroundColor || '').replace('#', '')}
-                  onChange={(e) => handleUpdate({ backgroundColor: '#' + e.target.value })}
-                />
-              </div>
+              <ColorPicker
+                id="backgroundColor"
+                value={slot.backgroundColor || '#ffffff'}
+                onChange={(color) => handleUpdate({ backgroundColor: color })}
+              />
             </div>
             <div className="field">
               <label htmlFor="inkColor">Ink</label>
-              <div className="hex-input">
-                <span className="hash">#</span>
-                <input
-                  id="inkColor"
-                  type="text"
-                  maxLength={6}
-                  value={(slot.inkColor || '').replace('#', '')}
-                  onChange={(e) => handleUpdate({ inkColor: '#' + e.target.value })}
-                />
-              </div>
+              <ColorPicker
+                id="inkColor"
+                value={slot.inkColor || '#000000'}
+                onChange={(color) => handleUpdate({ inkColor: color })}
+              />
             </div>
           </>
         )}

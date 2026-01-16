@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePalette } from '../context/PaletteContext';
 import { clamp } from '../utils/helpers';
+import ColorPicker from './ColorPicker';
 
 export function ChartSettings() {
   const { state, updateChartSettings } = usePalette();
@@ -279,11 +280,10 @@ export function ChartSettings() {
                 </label>
                 <div className="field">
                   <label htmlFor="cs-gap-color">Color</label>
-                  <input
+                  <ColorPicker
                     id="cs-gap-color"
-                    type="color"
                     value={gap?.color ?? '#ffffff'}
-                    onChange={(e) => updateChartSettings('gap', { color: e.target.value })}
+                    onChange={(color) => updateChartSettings('gap', { color })}
                   />
                 </div>
               </>
@@ -599,11 +599,10 @@ export function ChartSettings() {
                   </div>
                   <div className="field">
                     <label htmlFor="cs-area-cursorColor">Cursor color</label>
-                    <input
+                    <ColorPicker
                       id="cs-area-cursorColor"
-                      type="color"
                       value={area.cursorColor}
-                      onChange={(e) => updateChartSettings('area', { cursorColor: e.target.value })}
+                      onChange={(color) => updateChartSettings('area', { cursorColor: color })}
                     />
                   </div>
                   <div className="field">
