@@ -10,9 +10,18 @@ import {
   ResponsiveContainer,
   Customized,
   LabelList,
+  ReferenceLine,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill, getSlotColor } from '../../utils/patternGenerator';
+
+const getRefLineDashArray = (style) => {
+  switch (style) {
+    case 'dashed': return '5 5';
+    case 'dotted': return '2 2';
+    default: return undefined;
+  }
+};
 
 // Cursor overlay component - renders on top of chart content
 const CursorOverlay = ({ xAxisMap, offset, activeCoordinate, stroke, strokeWidth, strokeDasharray, show }) => {
@@ -60,7 +69,7 @@ const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
 
 export function StackedAreaChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, area } = state.chartSettings;
+  const { global, gap, area, axis, legend, referenceLine } = state.chartSettings;
 
   // Determine if markers are enabled (override or global)
   const markersEnabled = area.markerOverride !== null && area.markerOverride !== undefined
@@ -103,6 +112,19 @@ export function StackedAreaChart() {
     return getSlotFill(slot, slotIndex);
   };
 
+  // Axis configuration
+  const yDomain = (axis?.yDomainAuto ?? true) 
+    ? ['auto', 'auto'] 
+    : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
+  const yTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
+  const yScale = axis?.yScale ?? 'linear';
+
+  // Legend configuration
+  const legendPosition = legend?.position ?? 'bottom';
+  const legendAlign = legend?.align ?? 'center';
+  const legendLayout = legend?.layout ?? 'horizontal';
+  const legendIconType = legend?.iconType ?? 'square';
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart data={STATIC_DATA} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -128,7 +150,14 @@ export function StackedAreaChart() {
         </defs>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
-        {global.axisLabels && <YAxis />}
+        {global.axisLabels && (
+          <YAxis 
+            domain={yDomain} 
+            tickCount={yTickCount}
+            scale={yScale}
+            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          />
+        )}
         {(global.tooltip || showCursor) && (
           <Tooltip 
             cursor={false}
@@ -136,7 +165,23 @@ export function StackedAreaChart() {
             wrapperStyle={!global.tooltip ? { display: 'none' } : undefined}
           />
         )}
-        {global.legend && <Legend />}
+        {global.legend && (
+          <Legend 
+            verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
+            align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
+            layout={legendLayout}
+            iconType={legendIconType}
+          />
+        )}
+        {(referenceLine?.enabled ?? false) && (
+          <ReferenceLine 
+            y={referenceLine?.yValue ?? 5}
+            stroke={referenceLine?.color ?? '#ff0000'}
+            strokeWidth={referenceLine?.strokeWidth ?? 1}
+            strokeDasharray={getRefLineDashArray(referenceLine?.dashStyle)}
+            label={referenceLine?.label || undefined}
+          />
+        )}
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const fillValue = getFillForSlot(slot, slotIndex);

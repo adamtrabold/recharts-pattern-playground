@@ -5,7 +5,7 @@ import ColorPicker from './ColorPicker';
 
 export function ChartSettings() {
   const { state, updateChartSettings } = usePalette();
-  const { global, gap, columnBar, line, area, pie, donut, funnel } = state.chartSettings;
+  const { global, gap, columnBar, line, area, pie, donut, funnel, axis, legend, referenceLine } = state.chartSettings;
 
   // Helper to update nested applyTo object
   const updateGapApplyTo = (chartType, value) => {
@@ -187,6 +187,232 @@ export function ChartSettings() {
             Sync markers (Line/Area)
           </label>
         </div>
+      </fieldset>
+
+      {/* Legend Settings */}
+      {global.legend && (
+        <fieldset className="cs-fieldset">
+          <legend>Legend</legend>
+          <div className="field">
+            <label htmlFor="cs-legend-position">Position</label>
+            <select
+              id="cs-legend-position"
+              value={legend?.position ?? 'bottom'}
+              onChange={(e) => updateChartSettings('legend', { position: e.target.value })}
+            >
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="cs-legend-align">Align</label>
+            <select
+              id="cs-legend-align"
+              value={legend?.align ?? 'center'}
+              onChange={(e) => updateChartSettings('legend', { align: e.target.value })}
+            >
+              {(legend?.position === 'left' || legend?.position === 'right') ? (
+                <>
+                  <option value="top">Top</option>
+                  <option value="middle">Middle</option>
+                  <option value="bottom">Bottom</option>
+                </>
+              ) : (
+                <>
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </>
+              )}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="cs-legend-layout">Layout</label>
+            <select
+              id="cs-legend-layout"
+              value={legend?.layout ?? 'horizontal'}
+              onChange={(e) => updateChartSettings('legend', { layout: e.target.value })}
+            >
+              <option value="horizontal">Horizontal</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="cs-legend-iconType">Icon type</label>
+            <select
+              id="cs-legend-iconType"
+              value={legend?.iconType ?? 'square'}
+              onChange={(e) => updateChartSettings('legend', { iconType: e.target.value })}
+            >
+              <option value="line">Line</option>
+              <option value="square">Square</option>
+              <option value="rect">Rectangle</option>
+              <option value="circle">Circle</option>
+              <option value="cross">Cross</option>
+              <option value="diamond">Diamond</option>
+              <option value="star">Star</option>
+              <option value="triangle">Triangle</option>
+              <option value="wye">Wye</option>
+            </select>
+          </div>
+        </fieldset>
+      )}
+
+      {/* Axis Settings */}
+      <fieldset className="cs-fieldset">
+        <legend>Axis</legend>
+        <div className="field">
+          <label htmlFor="cs-axis-yScale">Y Scale</label>
+          <select
+            id="cs-axis-yScale"
+            value={axis?.yScale ?? 'linear'}
+            onChange={(e) => updateChartSettings('axis', { yScale: e.target.value })}
+          >
+            <option value="linear">Linear</option>
+            <option value="log">Logarithmic</option>
+            <option value="sqrt">Square Root</option>
+          </select>
+        </div>
+        <label className="cs-toggle">
+          <input
+            type="checkbox"
+            checked={axis?.yDomainAuto ?? true}
+            onChange={(e) => updateChartSettings('axis', { yDomainAuto: e.target.checked })}
+          />
+          Auto Y domain
+        </label>
+        {!(axis?.yDomainAuto ?? true) && (
+          <>
+            <div className="field">
+              <label htmlFor="cs-axis-yMin">Y Min</label>
+              <input
+                id="cs-axis-yMin"
+                type="number"
+                className="num-input"
+                value={axis?.yDomainMin ?? 0}
+                onChange={(e) => updateChartSettings('axis', { yDomainMin: Number(e.target.value) })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-axis-yMax">Y Max</label>
+              <input
+                id="cs-axis-yMax"
+                type="number"
+                className="num-input"
+                value={axis?.yDomainMax ?? 10}
+                onChange={(e) => updateChartSettings('axis', { yDomainMax: Number(e.target.value) })}
+              />
+            </div>
+          </>
+        )}
+        <div className="field">
+          <label htmlFor="cs-axis-yTickCount">Y Tick count</label>
+          <div className="range-input-combo">
+            <input
+              id="cs-axis-yTickCount"
+              type="range"
+              min="0"
+              max="15"
+              step="1"
+              value={axis?.yTickCount ?? 0}
+              onChange={(e) => updateChartSettings('axis', { yTickCount: Number(e.target.value) })}
+            />
+            <input
+              type="number"
+              className="num-input"
+              min={0}
+              max={15}
+              step={1}
+              value={axis?.yTickCount ?? 0}
+              onChange={(e) => updateChartSettings('axis', { yTickCount: clamp(Number(e.target.value), 0, 15) })}
+            />
+            <span className="unit">{(axis?.yTickCount ?? 0) === 0 ? 'auto' : ''}</span>
+          </div>
+        </div>
+      </fieldset>
+
+      {/* Reference Line Settings */}
+      <fieldset className="cs-fieldset">
+        <legend>Reference Line</legend>
+        <label className="cs-toggle">
+          <input
+            type="checkbox"
+            checked={referenceLine?.enabled ?? false}
+            onChange={(e) => updateChartSettings('referenceLine', { enabled: e.target.checked })}
+          />
+          Enable reference line
+        </label>
+        {(referenceLine?.enabled ?? false) && (
+          <>
+            <div className="field">
+              <label htmlFor="cs-refline-yValue">Y Value</label>
+              <input
+                id="cs-refline-yValue"
+                type="number"
+                className="num-input"
+                value={referenceLine?.yValue ?? 5}
+                onChange={(e) => updateChartSettings('referenceLine', { yValue: Number(e.target.value) })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-refline-color">Color</label>
+              <ColorPicker
+                id="cs-refline-color"
+                value={referenceLine?.color ?? '#ff0000'}
+                onChange={(color) => updateChartSettings('referenceLine', { color })}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="cs-refline-strokeWidth">Stroke width</label>
+              <div className="range-input-combo">
+                <input
+                  id="cs-refline-strokeWidth"
+                  type="range"
+                  min="1"
+                  max="5"
+                  step="1"
+                  value={referenceLine?.strokeWidth ?? 1}
+                  onChange={(e) => updateChartSettings('referenceLine', { strokeWidth: Number(e.target.value) })}
+                />
+                <input
+                  type="number"
+                  className="num-input"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={referenceLine?.strokeWidth ?? 1}
+                  onChange={(e) => updateChartSettings('referenceLine', { strokeWidth: clamp(Number(e.target.value), 1, 5) })}
+                />
+                <span className="unit">px</span>
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-refline-dashStyle">Dash style</label>
+              <select
+                id="cs-refline-dashStyle"
+                value={referenceLine?.dashStyle ?? 'dashed'}
+                onChange={(e) => updateChartSettings('referenceLine', { dashStyle: e.target.value })}
+              >
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="cs-refline-label">Label</label>
+              <input
+                id="cs-refline-label"
+                type="text"
+                className="text-input"
+                value={referenceLine?.label ?? ''}
+                onChange={(e) => updateChartSettings('referenceLine', { label: e.target.value })}
+                placeholder="Optional label"
+              />
+            </div>
+          </>
+        )}
       </fieldset>
 
       {/* Gap Settings */}
@@ -874,6 +1100,30 @@ export function ChartSettings() {
               <span className="unit">°</span>
             </div>
           </div>
+          <div className="field">
+            <label htmlFor="cs-pie-cornerRadius">Corner radius</label>
+            <div className="range-input-combo">
+              <input
+                id="cs-pie-cornerRadius"
+                type="range"
+                min="0"
+                max="20"
+                step="1"
+                value={pie.cornerRadius ?? 0}
+                onChange={(e) => updateChartSettings('pie', { cornerRadius: Number(e.target.value) })}
+              />
+              <input
+                type="number"
+                className="num-input"
+                min={0}
+                max={20}
+                step={1}
+                value={pie.cornerRadius ?? 0}
+                onChange={(e) => updateChartSettings('pie', { cornerRadius: clamp(Number(e.target.value), 0, 20) })}
+              />
+              <span className="unit">px</span>
+            </div>
+          </div>
         </div>
       </details>
 
@@ -925,6 +1175,30 @@ export function ChartSettings() {
                 step={5}
                 value={donut.thickness}
                 onChange={(e) => updateChartSettings('donut', { thickness: clamp(Number(e.target.value), 10, 60) })}
+              />
+              <span className="unit">px</span>
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="cs-donut-cornerRadius">Corner radius</label>
+            <div className="range-input-combo">
+              <input
+                id="cs-donut-cornerRadius"
+                type="range"
+                min="0"
+                max="20"
+                step="1"
+                value={donut.cornerRadius ?? 0}
+                onChange={(e) => updateChartSettings('donut', { cornerRadius: Number(e.target.value) })}
+              />
+              <input
+                type="number"
+                className="num-input"
+                min={0}
+                max={20}
+                step={1}
+                value={donut.cornerRadius ?? 0}
+                onChange={(e) => updateChartSettings('donut', { cornerRadius: clamp(Number(e.target.value), 0, 20) })}
               />
               <span className="unit">px</span>
             </div>

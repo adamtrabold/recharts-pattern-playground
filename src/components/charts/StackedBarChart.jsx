@@ -10,9 +10,18 @@ import {
   ResponsiveContainer,
   Rectangle,
   LabelList,
+  ReferenceLine,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
+
+const getRefLineDashArray = (style) => {
+  switch (style) {
+    case 'dashed': return '5 5';
+    case 'dotted': return '2 2';
+    default: return undefined;
+  }
+};
 
 const CATEGORIES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
@@ -54,7 +63,7 @@ function StackedBarShape(props) {
 
 export function StackedBarChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, columnBar, gap } = state.chartSettings;
+  const { global, columnBar, gap, axis, legend, referenceLine } = state.chartSettings;
 
   // Gap settings for stacked bar
   const useGap = gap?.enabled && gap?.applyTo?.stackedBar;
@@ -68,6 +77,19 @@ export function StackedBarChart() {
 
   const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
 
+  // Axis configuration (for horizontal stacked bar, X is the value axis)
+  const xDomain = (axis?.yDomainAuto ?? true) 
+    ? ['auto', 'auto'] 
+    : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
+  const xTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
+  const xScale = axis?.yScale ?? 'linear';
+
+  // Legend configuration
+  const legendPosition = legend?.position ?? 'bottom';
+  const legendAlign = legend?.align ?? 'center';
+  const legendLayout = legend?.layout ?? 'horizontal';
+  const legendIconType = legend?.iconType ?? 'square';
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
@@ -77,12 +99,36 @@ export function StackedBarChart() {
       >
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <YAxis dataKey="name" type="category" />}
-        {global.axisLabels && <XAxis type="number" />}
+        {global.axisLabels && (
+          <XAxis 
+            type="number"
+            domain={xDomain}
+            tickCount={xTickCount}
+            scale={xScale}
+            allowDataOverflow={!(axis?.yDomainAuto ?? true)}
+          />
+        )}
         <Tooltip 
           cursor={cursorConfig} 
           content={global.tooltip ? undefined : () => null}
         />
-        {global.legend && <Legend />}
+        {global.legend && (
+          <Legend 
+            verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
+            align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
+            layout={legendLayout}
+            iconType={legendIconType}
+          />
+        )}
+        {(referenceLine?.enabled ?? false) && (
+          <ReferenceLine 
+            x={referenceLine?.yValue ?? 5}
+            stroke={referenceLine?.color ?? '#ff0000'}
+            strokeWidth={referenceLine?.strokeWidth ?? 1}
+            strokeDasharray={getRefLineDashArray(referenceLine?.dashStyle)}
+            label={referenceLine?.label || undefined}
+          />
+        )}
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const fill = getSlotFill(slot, slotIndex);

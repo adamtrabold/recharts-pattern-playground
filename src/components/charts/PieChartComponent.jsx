@@ -64,7 +64,7 @@ function renderDataLabel(props) {
 
 export function PieChartComponent() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, pie } = state.chartSettings;
+  const { global, gap, pie, legend } = state.chartSettings;
 
   const data = CATEGORIES.map((name, i) => ({
     name,
@@ -82,12 +82,26 @@ export function PieChartComponent() {
 
   const outerRadius = 70;
   const innerRadius = 0; // Pie has no inner radius
+  const cornerRadius = pie?.cornerRadius ?? 0;
+
+  // Legend configuration
+  const legendPosition = legend?.position ?? 'bottom';
+  const legendAlign = legend?.align ?? 'center';
+  const legendLayout = legend?.layout ?? 'horizontal';
+  const legendIconType = legend?.iconType ?? 'square';
 
   return (
     <ResponsiveContainer width="100%" height={200}>
       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
         {global.tooltip && <Tooltip />}
-        {global.legend && <Legend />}
+        {global.legend && (
+          <Legend 
+            verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
+            align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
+            layout={legendLayout}
+            iconType={legendIconType}
+          />
+        )}
         <Pie
           data={data}
           dataKey="value"
@@ -95,6 +109,7 @@ export function PieChartComponent() {
           cx="50%"
           cy="50%"
           outerRadius={outerRadius}
+          cornerRadius={cornerRadius}
           startAngle={90 - pie.startAngle}
           endAngle={450 - pie.startAngle}
           paddingAngle={paddingAngle}

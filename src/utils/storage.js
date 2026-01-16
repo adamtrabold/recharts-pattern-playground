@@ -145,13 +145,37 @@ export const DEFAULT_STATE = {
     },
     pie: {
       startAngle: 0,
+      cornerRadius: 0,
     },
     donut: {
       startAngle: 0,
       thickness: 30,
+      cornerRadius: 0,
     },
     funnel: {
       reversed: false,
+    },
+    axis: {
+      yDomainAuto: true,
+      yDomainMin: 0,
+      yDomainMax: 10,
+      xTickCount: 0, // 0 = auto
+      yTickCount: 0, // 0 = auto
+      yScale: 'linear', // linear, log, sqrt
+    },
+    legend: {
+      position: 'bottom', // top, bottom, left, right
+      align: 'center', // left, center, right (for top/bottom), or top, middle, bottom (for left/right)
+      layout: 'horizontal', // horizontal, vertical
+      iconType: 'square', // line, square, rect, circle, cross, diamond, star, triangle, wye
+    },
+    referenceLine: {
+      enabled: false,
+      yValue: 5,
+      color: '#ff0000',
+      strokeWidth: 1,
+      dashStyle: 'dashed', // solid, dashed, dotted
+      label: '',
     },
   },
 };

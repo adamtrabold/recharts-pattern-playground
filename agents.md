@@ -24,12 +24,16 @@ These features have been fixed:
 | Data Labels | Only works on Funnel, ignored by 8 other charts | ✅ Fixed |
 | barGap | State exists, no UI control, never passed to components | ✅ Fixed |
 
-### High Priority (New Features)
+### High Priority (New Features) - ALL COMPLETE ✅
 
-- Axis configuration (domain, tick count, scale)
-- Legend positioning and styling
-- Pie/Donut corner radius
-- Reference lines for annotations
+These features have been implemented:
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Axis configuration | Y domain (auto/manual min/max), Y tick count, Y scale (linear/log/sqrt) | ✅ Complete |
+| Legend styling | Position (top/bottom/left/right), align, layout (horizontal/vertical), icon type | ✅ Complete |
+| Pie/Donut corner radius | Configurable corner radius for rounded segment edges | ✅ Complete |
+| Reference lines | Y-axis reference line with color, width, dash style, and optional label | ✅ Complete |
 
 ### Medium Priority (Polish)
 
@@ -77,6 +81,33 @@ These features have been fixed:
    - FunnelChartComponent: Already working
 
 3. **barGap** - Added UI control slider (0-20%) in Chart Settings > Column/Bar section. Passed `barGap` prop to ColumnChart and BarChartHorizontal components.
+
+### High Priority Features Added (Jan 2026) ✅
+
+1. **Axis Configuration** - Added new `axis` settings in state:
+   - `yDomainAuto`: Toggle between auto and manual Y domain
+   - `yDomainMin`/`yDomainMax`: Manual Y axis bounds
+   - `yTickCount`: Control number of Y axis ticks (0 = auto)
+   - `yScale`: Linear, logarithmic, or square root scale
+   - Applied to: ColumnChart, BarChartHorizontal, StackedBarChart, LineChart, AreaChart, StackedAreaChart
+
+2. **Legend Positioning & Styling** - Added new `legend` settings (visible when Legend is enabled):
+   - `position`: Top, bottom, left, or right
+   - `align`: Alignment within position (left/center/right for top/bottom, top/middle/bottom for left/right)
+   - `layout`: Horizontal or vertical
+   - `iconType`: Line, square, rect, circle, cross, diamond, star, triangle, wye
+   - Applied to all chart types
+
+3. **Pie/Donut Corner Radius** - Added `cornerRadius` setting to both pie and donut chart settings. Creates rounded edges on segments.
+
+4. **Reference Lines** - Added `referenceLine` settings:
+   - `enabled`: Toggle reference line visibility
+   - `yValue`: Y-axis position of the line
+   - `color`: Line color (with color picker)
+   - `strokeWidth`: Line thickness (1-5px)
+   - `dashStyle`: Solid, dashed, or dotted
+   - `label`: Optional text label
+   - Applied to: ColumnChart, BarChartHorizontal, StackedBarChart, LineChart, AreaChart, StackedAreaChart
 
 ## How to Run
 

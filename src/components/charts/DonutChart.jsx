@@ -64,7 +64,7 @@ function renderDataLabel(props) {
 
 export function DonutChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, donut } = state.chartSettings;
+  const { global, gap, donut, legend } = state.chartSettings;
 
   const data = CATEGORIES.map((name, i) => ({
     name,
@@ -76,6 +76,7 @@ export function DonutChart() {
   // thickness controls the ring width, so innerRadius = outerRadius - thickness
   const thickness = donut?.thickness ?? 30;
   const innerRadius = Math.max(0, outerRadius - thickness);
+  const cornerRadius = donut?.cornerRadius ?? 0;
 
   // Use global gap settings if enabled and applied to donut
   const useGap = gap?.enabled && gap?.applyTo?.donut;
@@ -87,11 +88,24 @@ export function DonutChart() {
 
   const startAngleOffset = donut?.startAngle ?? 0;
 
+  // Legend configuration
+  const legendPosition = legend?.position ?? 'bottom';
+  const legendAlign = legend?.align ?? 'center';
+  const legendLayout = legend?.layout ?? 'horizontal';
+  const legendIconType = legend?.iconType ?? 'square';
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
         {global.tooltip && <Tooltip />}
-        {global.legend && <Legend />}
+        {global.legend && (
+          <Legend 
+            verticalAlign={legendPosition === 'left' || legendPosition === 'right' ? legendAlign : legendPosition}
+            align={legendPosition === 'left' || legendPosition === 'right' ? legendPosition : legendAlign}
+            layout={legendLayout}
+            iconType={legendIconType}
+          />
+        )}
         <Pie
           data={data}
           dataKey="value"
@@ -100,6 +114,7 @@ export function DonutChart() {
           cy="50%"
           innerRadius={innerRadius}
           outerRadius={outerRadius}
+          cornerRadius={cornerRadius}
           startAngle={90 - startAngleOffset}
           endAngle={450 - startAngleOffset}
           paddingAngle={paddingAngle}
