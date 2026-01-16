@@ -60,6 +60,13 @@ export function StackedBarChart() {
   const strokeThickness = gap?.thickness ?? 2;
   const strokeColor = gap?.color ?? '#ffffff';
 
+  // Hover settings
+  const hoverEnabled = columnBar.hoverEnabled ?? true;
+  const hoverColor = columnBar.hoverColor ?? '#000000';
+  const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
+
+  const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
@@ -70,7 +77,10 @@ export function StackedBarChart() {
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <YAxis dataKey="name" type="category" />}
         {global.axisLabels && <XAxis type="number" />}
-        {global.tooltip && <Tooltip />}
+        <Tooltip 
+          cursor={cursorConfig} 
+          content={global.tooltip ? undefined : () => null}
+        />
         {global.legend && <Legend />}
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);

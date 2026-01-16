@@ -373,6 +373,50 @@ export function ChartSettings() {
               <span className="unit">px</span>
             </div>
           </div>
+          <label className="cs-toggle">
+            <input
+              type="checkbox"
+              checked={columnBar.hoverEnabled ?? true}
+              onChange={(e) => updateChartSettings('columnBar', { hoverEnabled: e.target.checked })}
+            />
+            Hover highlight
+          </label>
+          {(columnBar.hoverEnabled ?? true) && (
+            <>
+              <div className="field">
+                <label htmlFor="cs-cb-hoverColor">Hover color</label>
+                <ColorPicker
+                  id="cs-cb-hoverColor"
+                  value={columnBar.hoverColor ?? '#000000'}
+                  onChange={(color) => updateChartSettings('columnBar', { hoverColor: color })}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="cs-cb-hoverOpacity">Hover opacity</label>
+                <div className="range-input-combo">
+                  <input
+                    id="cs-cb-hoverOpacity"
+                    type="range"
+                    min="0.05"
+                    max="0.5"
+                    step="0.05"
+                    value={columnBar.hoverOpacity ?? 0.1}
+                    onChange={(e) => updateChartSettings('columnBar', { hoverOpacity: Number(e.target.value) })}
+                  />
+                  <input
+                    type="number"
+                    className="num-input"
+                    min={5}
+                    max={50}
+                    step={5}
+                    value={Math.round((columnBar.hoverOpacity ?? 0.1) * 100)}
+                    onChange={(e) => updateChartSettings('columnBar', { hoverOpacity: clamp(Number(e.target.value) / 100, 0.05, 0.5) })}
+                  />
+                  <span className="unit">%</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </details>
 

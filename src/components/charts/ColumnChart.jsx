@@ -20,11 +20,17 @@ export function ColumnChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, columnBar } = state.chartSettings;
 
+  const hoverEnabled = columnBar.hoverEnabled ?? true;
+  const hoverColor = columnBar.hoverColor ?? '#000000';
+  const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
+
   const data = CATEGORIES.map((name, i) => ({
     name,
     value: VALUES[i],
     slotIndex: i,
   }));
+
+  const cursorConfig = hoverEnabled ? { fill: hoverColor, fillOpacity: hoverOpacity } : false;
 
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -32,7 +38,10 @@ export function ColumnChart() {
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && <YAxis />}
-        {global.tooltip && <Tooltip />}
+        <Tooltip 
+          cursor={cursorConfig} 
+          content={global.tooltip ? undefined : () => null}
+        />
         {global.legend && <Legend />}
         <Bar 
           dataKey="value" 

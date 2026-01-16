@@ -114,6 +114,9 @@ export const DEFAULT_STATE = {
     columnBar: {
       borderRadius: 4,
       barGap: 4,
+      hoverEnabled: true,
+      hoverColor: '#000000',
+      hoverOpacity: 0.1,
     },
     line: {
       lineWidth: 2,
