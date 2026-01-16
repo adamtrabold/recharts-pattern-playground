@@ -9,7 +9,7 @@
   --radius: 8px;
 }
 
-body.theme-dark {
+body.dark {
   --bg: #0b1220;
   --fg: #e2e8f0;
   --muted: #94a3b8;
@@ -32,12 +32,16 @@ body {
   font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-body.preview-grayscale .charts-panel {
+body.grayscale .charts-panel {
   filter: grayscale(1);
 }
 
-body.preview-low-contrast .charts-panel {
+body.low-contrast .charts-panel {
   filter: contrast(0.8) saturate(0.7);
+}
+
+#root {
+  height: 100%;
 }
 
 .wrap {
@@ -142,6 +146,7 @@ body.preview-low-contrast .charts-panel {
 .charts-panel {
   overflow-y: auto;
   height: 100%;
+  position: relative;
 }
 
 @media (max-width: 900px) {
@@ -213,28 +218,13 @@ body.preview-low-contrast .charts-panel {
   background: var(--bg);
   cursor: pointer;
   text-align: center;
+  position: relative;
 }
 
-.slot-option[aria-selected="true"] {
+.slot-option[aria-selected="true"],
+.slot-option.selected {
   border-color: var(--focus);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-.slot-option.dragging {
-  opacity: 0.5;
-}
-
-.slot-option.drag-over {
-  border-color: var(--focus);
-  background: rgba(37, 99, 235, 0.1);
-}
-
-.slot-option[draggable="true"] {
-  cursor: grab;
-}
-
-.slot-option[draggable="true"]:active {
-  cursor: grabbing;
 }
 
 .slot-swatch {
@@ -245,27 +235,34 @@ body.preview-low-contrast .charts-panel {
   background: #fff;
 }
 
+.slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
 .slot-label {
   font-size: 10px;
   font-weight: 600;
   color: var(--muted);
 }
 
-.slot-version {
+.slot-description {
+  font-size: 8px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.slot-version-badge {
   position: absolute;
   top: 2px;
   right: 2px;
   font-size: 8px;
   font-weight: 700;
-  color: var(--muted);
-  background: var(--bg);
+  color: #fff;
+  background: var(--focus);
   padding: 1px 3px;
   border-radius: 3px;
-  opacity: 0.8;
-}
-
-.slot-option {
-  position: relative;
 }
 
 /* A/B Controls */
@@ -575,24 +572,6 @@ input[type="range"] {
   display: block;
 }
 
-/* Editor row spacing improvements */
-.editor-row + .editor-row {
-  margin-top: 2px;
-}
-
-.editor-row + .editor-section,
-.offset-section + .gradient-section,
-.editor-row + .offset-section {
-  margin-top: 6px;
-}
-
-/* Ensure hidden elements are properly hidden on load */
-[data-only][style*="display: none"],
-[data-show][style*="display: none"],
-[data-hide][style*="display: none"] {
-  display: none !important;
-}
-
 /* Buttons */
 button {
   font: inherit;
@@ -635,38 +614,7 @@ textarea:focus-visible,
   outline-offset: 1px;
 }
 
-/* Import section */
-.import-section {
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-
-.import-section summary {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.import-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.import-body textarea {
-  font-size: 11px;
-  font-family: monospace;
-}
-
-.import-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
-/* Import Card (separate from controls panel) */
+/* Import Card */
 .import-card {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -711,14 +659,18 @@ textarea:focus-visible,
   font-family: monospace;
 }
 
+.import-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
 /* Charts Panel */
 .charts-panel {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
-  container-type: inline-size;
-  container-name: charts;
 }
 
 .chart-grid {
@@ -744,40 +696,6 @@ textarea:focus-visible,
 }
 
 .chart {
-  aspect-ratio: 16 / 10;
-  width: 100%;
-}
-
-/* Map */
-.map-panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px;
-}
-
-.map-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.map-header h3 {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-
-.map-status {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.map-chart {
-  aspect-ratio: 16 / 9;
   width: 100%;
   min-height: 200px;
 }
@@ -819,14 +737,6 @@ textarea:focus-visible,
   border-bottom: 1px solid var(--border);
 }
 
-.chart-settings-card > *:not(summary) {
-  margin-top: 10px;
-}
-
-.chart-settings-card > *:not(summary):first-of-type {
-  margin-top: 0;
-}
-
 .cs-fieldset {
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -861,10 +771,20 @@ textarea:focus-visible,
   margin: 0;
 }
 
+.cs-gap-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
 .cs-type-section {
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
+  margin-bottom: 6px;
 }
 
 .cs-type-section > summary {
@@ -898,236 +818,11 @@ textarea:focus-visible,
   padding: 2px 0;
 }
 
-.cs-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 6px 0;
-}
-
-/* Gradient Section */
-.gradient-section {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-
-.gradient-section > summary {
+.sync-indicator {
+  color: var(--focus);
   font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  list-style: none;
-}
-
-.gradient-section > summary::-webkit-details-marker {
-  display: none;
-}
-
-.gradient-section > summary::before {
-  content: "▸ ";
-  font-size: 11px;
-  color: var(--muted);
-  margin-right: 4px;
-}
-
-.gradient-section[open] > summary::before {
-  content: "▾ ";
-}
-
-.gradient-section.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.gradient-section.disabled > summary {
-  pointer-events: auto;
-  cursor: default;
-}
-
-.gradient-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.gradient-color-row {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-
-.gradient-color-field {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.gradient-color-field label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.color-input-group {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  padding: 0;
-  background: var(--bg);
-  position: relative;
-}
-
-.color-swatch:hover {
-  border-color: var(--focus);
-}
-
-.color-swatch.transparent {
-  background: linear-gradient(45deg, #ccc 25%, transparent 25%),
-    linear-gradient(-45deg, #ccc 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #ccc 75%),
-    linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 8px 8px;
-  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
-}
-
-.hex-input-sm {
-  flex: 1;
-}
-
-.hex-input-sm input {
-  font-size: 11px;
-}
-
-.field-sm {
-  min-width: 80px;
-  max-width: 100px;
-}
-
-/* Global gradient controls in Chart Settings */
-.gradient-global-controls {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.gradient-shared-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  margin-top: 4px;
-}
-
-.gradient-mode-hint {
-  margin: 4px 0 0 0;
-  font-size: 11px;
-  color: var(--muted);
-  font-style: italic;
-}
-
-/* Color Picker Popover */
-.color-picker-popover {
-  position: fixed;
-  z-index: 1000;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  min-width: 180px;
-}
-
-.color-picker-header {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 6px;
-}
-
-.color-picker-swatches {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.color-picker-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-}
-
-.color-picker-swatch:hover {
-  border-color: var(--focus);
-}
-
-.color-picker-swatch.selected {
-  border-color: var(--fg);
-}
-
-.color-picker-actions {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.color-picker-actions .btn-sm {
-  flex: 1;
-  font-size: 10px;
-  padding: 4px 6px;
-}
-
-/* Range with snap buttons */
-.range-with-snaps {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.snap-buttons {
-  display: flex;
-  gap: 2px;
-}
-
-.snap-buttons button {
-  flex: 1;
-  padding: 2px 4px;
-  font-size: 9px;
-  font-weight: 600;
-  border-radius: 3px;
-  min-width: 0;
-}
-
-.snap-buttons button:hover {
-  background: var(--focus);
-  border-color: var(--focus);
-  color: #fff;
-}
-
-.snap-buttons button.active {
-  background: var(--focus);
-  border-color: var(--focus);
-  color: #fff;
+  margin-left: 4px;
+  cursor: help;
 }
 
 /* Range + Number input combo */
@@ -1173,31 +868,37 @@ textarea:focus-visible,
   min-width: 14px;
 }
 
-/* Compact variant for smaller spaces */
-.range-input-combo.compact input[type="range"] {
-  min-width: 30px;
+/* Snap buttons */
+.snap-buttons {
+  display: flex;
+  gap: 2px;
 }
 
-.range-input-combo.compact .num-input {
-  width: 44px;
-  padding: 3px 1px 3px 4px;
+.snap-buttons button {
+  flex: 1;
+  padding: 2px 4px;
+  font-size: 9px;
+  font-weight: 600;
+  border-radius: 3px;
+  min-width: 0;
+}
+
+.snap-buttons button:hover,
+.snap-buttons button.active {
+  background: var(--focus);
+  border-color: var(--focus);
+  color: #fff;
+}
+
+/* Recharts overrides */
+.recharts-wrapper {
   font-size: 11px;
 }
 
-/* With snaps variant - keep slider and input on same row, snaps below */
-.range-input-combo.with-snaps {
-  margin-bottom: 0;
+.recharts-legend-wrapper {
+  font-size: 10px;
 }
 
-/* Utilities */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.recharts-tooltip-wrapper {
+  font-size: 11px;
 }

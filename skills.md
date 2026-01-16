@@ -1,64 +1,82 @@
-# Skills for Claude-in-Cursor (Highcharts Pattern Playground)
+# Skills for Claude-in-Cursor (Recharts Pattern Playground)
 
 This document describes the **capabilities/behaviors** the agent should apply while building and iterating on this playground in Cursor.
 
 ## Product skills (what the agent must be good at)
 
-- **Highcharts pattern fills**
-  - Correctly use Highcharts `pattern-fill` module when available.
-  - Model pattern parameters as a stable JSON schema and generate Highcharts-compatible color/pattern objects from it.
-  - Provide multiple pattern families (lines, crosshatch, dots, etc.) with tunable spacing/width/angle/opacity.
+- **SVG Pattern Generation for Recharts**
+  - Generate dynamic SVG `<pattern>` elements that tile correctly
+  - Support multiple pattern families (lines, crosshatch, dots) with tunable spacing/width/angle/opacity
+  - Handle pattern transforms (rotation) and special cases (staggered dots)
+  - Reference patterns in Recharts via `fill="url(#pattern-id)"`
 
-- **Live, reactive updates (without frameworks)**
-  - Centralize palette state in JS and update all charts in realtime on control changes.
-  - Prefer efficient updates (e.g., updating series/points) over full teardown/recreate when feasible.
+- **React + Recharts Integration**
+  - Use React Context for centralized state management
+  - Efficient re-renders when palette changes (Recharts handles this well)
+  - Inject pattern definitions into a shared SVG that all charts reference
+  - Map slot data to Recharts Cell/series props correctly
+
+- **Live, reactive updates**
+  - Centralize palette state in React Context and update all charts on control changes
+  - Debounced persistence to localStorage
+  - Immediate visual feedback on slider/input changes
 
 - **Accessible UI design**
-  - Semantic form controls with proper labels/fieldset/legend.
-  - Keyboard operability for slot selection and all controls.
-  - Strong visible focus, large hit targets, readable text on light/dark backgrounds.
-  - Avoid “color-only” communication: include slot names and pattern descriptors.
+  - Semantic form controls with proper labels
+  - Keyboard operability for slot selection (arrow keys, Home/End)
+  - Strong visible focus states
+  - Avoid "color-only" communication: include slot names and pattern descriptors
 
 - **Comparison tooling**
-  - Swatch gallery + multi-chart context preview.
-  - Light/dark background toggle and grayscale toggle (CSS filter is fine).
+  - Swatch gallery with pattern previews (CSS gradient approximation)
+  - Multi-chart context preview (9 chart types)
+  - Light/dark background toggle and grayscale/low-contrast filters
 
 - **Persistence + sharing**
-  - Debounced autosave to `localStorage`.
-  - URL-shareable state encoding/decoding (hash or query).
-  - Clear/reset actions; versioned storage key and `schemaVersion`.
+  - Debounced autosave to `localStorage`
+  - URL-shareable state encoding/decoding (base64 in hash)
+  - Clear/reset actions; versioned storage key and `schemaVersion`
 
-- **Static-site discipline**
-  - No build tools required; runs via `index.html` open or static server.
-  - Use **relative paths** and avoid environment-specific assumptions so it can deploy cleanly to GitHub Pages later.
+- **Build tooling with Vite**
+  - Fast HMR development experience
+  - Production builds output to `dist/`
+  - Relative paths (`base: './'`) for GitHub Pages compatibility
 
 ## Cursor workflow skills (how the agent should operate here)
 
 - **Codebase navigation**
-  - Use search to locate and refactor state, chart creation, and pattern generation cleanly as the playground grows.
+  - Use search to locate components, context, and utility functions
+  - Understand the React component hierarchy
 
 - **Incremental implementation**
-  - Implement the smallest end-to-end slice first (palette → one chart → live updates), then expand to the full chart grid.
+  - Test changes in one chart before applying to all
+  - Verify pattern rendering in browser dev tools SVG inspector
 
 - **Run + verify quickly**
-  - When testing, use a simple static server and manual smoke checks:
-    - slot selection works via keyboard
-    - changing a slider updates all charts
-    - export/import round-trips
-    - persistence restores state after reload
+  - `npm run dev` for hot-reloading development
+  - Manual smoke checks:
+    - Slot selection works via keyboard
+    - Changing a slider updates all charts
+    - Export/import round-trips correctly
+    - Persistence restores state after reload
+    - Patterns render correctly (check SVG in devtools)
 
 - **Safety/robustness**
-  - Clamp inputs; avoid invalid pattern geometry; handle module load failures gracefully (especially map).
+  - Clamp all numeric inputs to valid ranges
+  - Validate hex color inputs
+  - Handle edge cases (empty patterns, zero spacing)
 
-## Optional “nice-to-have” skills (if time permits)
+## Optional "nice-to-have" skills (if time permits)
 
-- **Preset library**: named saved palettes stored in `localStorage`.
-- **Contrast heuristics**: warn when label text becomes unreadable on a swatch/background.
-- **Small-multiples grid**: generate “8+ tiles” previews for side-by-side comparisons.
+- **Preset library**: Named saved palettes stored in `localStorage`
+- **Contrast heuristics**: Warn when label text becomes unreadable on a swatch/background
+- **Additional pattern types**: Chevrons, waves, zigzags, custom SVG paths
+- **Gradient overlays**: Combine patterns with gradients for area charts
 
-## Non-goals (avoid)
+## Technology stack
 
-- No React/Vue/Next.
-- No heavy dependencies beyond Highcharts CDN modules.
-- No complicated a11y “modes”; just build the page accessibly by default.
-
+- **React 18** - Component framework
+- **Recharts** - React charting library (wraps D3)
+- **Vite** - Build tool and dev server
+- **No additional state libraries** - React Context + useReducer is sufficient
+- **No CSS frameworks** - Plain CSS with custom properties (CSS variables)

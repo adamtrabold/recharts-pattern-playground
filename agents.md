@@ -1,150 +1,106 @@
-# Highcharts Pattern Playground (Agent Instructions)
+# Recharts Pattern Playground - Migration Status
 
-This repo will contain a **single-page, accessible playground** for experimenting with **color + pattern fills** in Highcharts visualizations.
+## What Was Done
 
-Use the prompt below with your coding AI to generate the playground implementation when you’re ready.
+The project uses Recharts (React) for all charting functionality. Here's what's complete:
 
-## What we’re building
+### Completed Tasks
 
-- Plain **HTML/CSS/vanilla JS** (no frameworks, no bundlers)
-- Loads **Highcharts via CDN**
-- Has an **8-slot palette**:
-  - Slots **1–4** = your **base solid colors**
-  - Slots **5–8** = **patterned fills** (pattern ink color + pattern parameters)
-- Includes **live interactive controls** to build/tweak patterns in real time
-- Shows **many options next to each other** (swatches + chart context)
-- Lets you **apply Slot N** across **all chart previews** so you can evaluate in context
-- Adds **persistence** so your work is there when you come back
-- Later: deploy to **GitHub Pages** (share with others)
+1. **React + Vite scaffold** - `package.json`, `vite.config.js`, `index.html` updated
+2. **Dependencies installed** - React 18, Recharts, Vite
+3. **State management** - `src/context/PaletteContext.jsx` with full reducer
+4. **Utilities** - `src/utils/helpers.js`, `src/utils/storage.js`, `src/utils/patternGenerator.js`
+5. **Pattern system** - `src/components/PatternDefs.jsx`, `src/components/charts/ChartWrapper.jsx`
+6. **UI Components**:
+   - `src/components/App.jsx`
+   - `src/components/Header.jsx`
+   - `src/components/PaletteEditor.jsx`
+   - `src/components/SlotList.jsx`
+   - `src/components/PatternControls.jsx`
+   - `src/components/ChartSettings.jsx`
+   - `src/components/ChartGrid.jsx`
+7. **Chart Components** (all in `src/components/charts/`):
+   - `ColumnChart.jsx`
+   - `BarChartHorizontal.jsx`
+   - `StackedBarChart.jsx`
+   - `LineChartComponent.jsx`
+   - `AreaChartComponent.jsx`
+   - `StackedAreaChart.jsx`
+   - `PieChartComponent.jsx`
+   - `DonutChart.jsx`
+   - `FunnelChartComponent.jsx`
+8. **Styles** - `src/styles.css` (ported from original)
+9. **Documentation** - `agents.md` and `skills.md` updated
 
-## Paste-ready AI build prompt
+### Remaining Tasks
 
-Copy/paste this whole prompt into your AI coding assistant:
+All tasks completed!
 
-```text
-Build me a minimal, accessible, single-page “Highcharts Pattern Playground” using plain HTML/CSS/vanilla JS (no frameworks, no bundlers). It must run by just opening `index.html` (CDN scripts allowed).
+1. ~~**Create GitHub Actions workflow**~~ - DONE: `.github/workflows/deploy-pages.yml` created
+2. ~~**Test the app**~~ - DONE
+3. ~~**Clean up old files**~~ - DONE: Removed old `app.js` and root `styles.css`
 
-Goal
-- I have 4 base (solid) colors.
-- I need to design at least 4 additional, highly-distinguishable pattern styles (using a pattern “ink” color I define) to create 8 total fill options.
-- I want interactive controls to tweak pattern options on-the-fly and see changes applied in realtime.
-- I want to compare many options next to each other (swatches + chart context).
-- I want to “apply” a selected fill option to a specific color slot, and have that slot propagate across preview charts (all chart types on the page), so I can see the effect in context.
+### Bug Fixes Applied (Jan 2026)
 
-Hard requirements
-1) Tech constraints
-- Use only: `index.html`, `styles.css`, `app.js` (or a single `index.html` if you prefer, but keep it simple).
-- Load Highcharts via CDN.
-- Use Highcharts pattern support (prefer `modules/pattern-fill.js`). If that module isn’t available, fall back to custom SVG pattern defs via renderer, but try pattern-fill first.
-- Include `modules/accessibility.js` (no “fancy settings”, but basic keyboard/ARIA support should just work).
+1. **Fixed stacked bar/area charts changing data** - Data was using `Math.random()` on every render, now uses static deterministic data
+2. **Restored gradient controls for area charts** - Added gradient enable, mode, angle, and opacity controls
+3. **Added gap controls** - Pie, donut, and funnel now have gap controls
+4. **Added gap control for area charts** - Area and stacked area have gap setting (default 0)
+5. **Fixed donut thickness** - Now controls ring thickness, not hole size (`innerRadius = outerRadius - thickness`)
+6. **Separated Pie and Donut settings** - Each chart type now has its own settings section
 
-2) UI: Palette + Pattern Builder
-- Show an “8-slot palette” editor (Slot 1–8) with visible swatches and labels.
-  - Slots 1–4 start as solid base colors (editable via color input).
-  - Slots 5–8 start as patterned fills (editable via pattern builder controls).
-- Clicking a slot selects it for editing. Changes update that slot immediately and update charts in realtime.
-- Pattern builder controls (at minimum):
-  - Mode: Solid vs Pattern
-  - Background color (for solid: the color; for pattern: background fill)
-  - Pattern ink color (foreground)
-  - Pattern type selector: diagonal lines, crosshatch, dots, vertical lines, horizontal lines (at least 4 distinct usable patterns, more is fine)
-  - Density/spacing slider
-  - Stroke width slider
-  - Opacity slider (pattern and/or background)
-  - Angle/rotation slider (where applicable)
-  - Optional but nice: “invert” toggle, “round linecaps” toggle
-- Provide “Reset slot”, and “Duplicate slot to…” actions.
+## How to Run
 
-3) Comparison views
-- Swatch gallery: display all 8 slots as large swatches with readable text labels.
-- Add quick viewing toggles that help evaluate distinguishability:
-  - Light/Dark page background toggle
-  - “Grayscale preview” toggle (CSS filter is fine)
-  - Optional: “low contrast simulation” (simple filter is fine)
-
-4) Chart preview grid (context)
-Create a grid of Highcharts previews on the same page that all share the same 8-slot palette mapping (slot index maps to point/series color):
-- Column
-- Bar
-- Stacked bar
-- Line
-- Area
-- Stacked area
-- Pie
-- Donut (pie with innerSize)
-- Funnel
-- Map (if feasible via CDN). If map is too heavy, include it behind a “Load map preview” button and handle failure gracefully.
-
-Chart data rules
-- Use a consistent dataset with 8 categories so all 8 fills appear at once.
-- For stacked charts, ensure 8 distinct fills appear in the legend and in the stacks.
-- For pie/donut, use 8 slices.
-- For funnel, use 8 steps.
-- For map, color at least 8 regions (or bucket regions into 8 values) so palette slots show up.
-
-“Apply across chart types”
-- Palette slots drive all charts. When I edit Slot N, every chart that uses Slot N updates live.
-
-5) Export/Import + Sharing
-- Add “Export palette” button that copies a JSON blob to clipboard (and/or downloads a file).
-- Add “Import palette” file picker or textarea paste that loads JSON and updates everything.
-- Bonus: encode palette state in URL hash so I can share a link.
-
-6) Persistence (must-have)
-- Automatically persist the full palette state (all 8 slots + UI toggles like light/dark + grayscale mode + selected chart type, etc.) to `localStorage` on every change (debounced, e.g., 150–300ms).
-- On page load, if a saved state exists, restore it automatically.
-- Include buttons:
-  - “Reset to defaults” (clears localStorage + resets state)
-  - “Clear saved state” (clears localStorage)
-- Use a versioned key, e.g. `highchartsPatternPlayground:v1`, and store a `schemaVersion` in the JSON so future changes can migrate cleanly.
-- Persistence priority order:
-  1) If URL hash contains state, load that (so shared links win)
-  2) Else load from localStorage
-  3) Else load defaults
-
-Accessibility / usability (important)
-- The page itself must be accessible: semantic labels, fieldset/legend for control groups, good focus styles, keyboard operability for slot selection and sliders, no mouse-only interactions.
-- Ensure text is readable on both light/dark backgrounds.
-- Avoid tiny click targets; make swatches selectable via keyboard (e.g., roving tabindex listbox pattern is fine).
-- Don’t rely on color alone in the UI: label slots clearly (Slot 1–8), and show a small “pattern icon” or short descriptor (e.g., “dots 12px @ 45°”).
-
-CDN scripts to use (suggested)
-- Highcharts core: https://code.highcharts.com/highcharts.js
-- Pattern fill: https://code.highcharts.com/modules/pattern-fill.js
-- Accessibility: https://code.highcharts.com/modules/accessibility.js
-- Funnel: https://code.highcharts.com/modules/funnel.js
-- Map (if implementing): https://code.highcharts.com/maps/highmaps.js plus mapdata like https://code.highcharts.com/mapdata/custom/world.js (or a smaller map)
-
-Implementation notes (what I expect you to do)
-- Centralize palette state in JS (an array of 8 slot objects).
-- Each slot object should support either:
-  - solid: `{ type: "solid", color: "#RRGGBB" }`
-  - pattern: `{ type: "pattern", backgroundColor, inkColor, patternType, spacing, strokeWidth, opacity, angle, ... }`
-- Convert each slot to a Highcharts “color” compatible value:
-  - solid => string color
-  - pattern => pattern-fill object (e.g., `{ pattern: { path, width, height, color, backgroundColor, opacity } }`)
-- Re-render or update series/points efficiently on every edit (live updates should feel immediate).
-- Add guardrails: clamp sliders, sane defaults, prevent unreadable label colors if possible.
-
-Deliverables
-- Provide the final code for `index.html`, `styles.css`, `app.js`.
-- Include short run instructions (open the HTML file, or run a simple static server).
-- Include a brief explanation of where to add more pattern types.
-
-If you need to simplify map support, do it last and make the rest excellent.
+```bash
+cd "/Users/adam.trabold/Cursor Projects/recharts-pattern-playground"
+npm install   # if not done
+npm run dev   # starts dev server at localhost:5173
 ```
 
-## GitHub Pages (when you’re ready to share)
+## File Structure
 
-When the playground files exist, publish via GitHub Pages using **GitHub Actions** (deploy to Pages on each push to `main`).
-
-Add this requirement to the AI prompt at that time:
-
-```text
-GitHub Pages deployment
-- Add a workflow at `/.github/workflows/deploy-pages.yml` that deploys the static site (repo root) to GitHub Pages via GitHub Actions.
-- The site must use only relative paths (so it works at `https://<user>.github.io/<repo>/`).
+```
+/
+├── index.html              # Vite entry (updated for React)
+├── package.json            # React + Recharts deps
+├── vite.config.js          # Vite config with relative paths
+├── src/
+│   ├── main.jsx            # React entry point
+│   ├── styles.css          # All CSS
+│   ├── components/
+│   │   ├── App.jsx
+│   │   ├── Header.jsx
+│   │   ├── PaletteEditor.jsx
+│   │   ├── SlotList.jsx
+│   │   ├── PatternControls.jsx
+│   │   ├── ChartSettings.jsx
+│   │   ├── ChartGrid.jsx
+│   │   ├── PatternDefs.jsx
+│   │   └── charts/
+│   │       ├── ChartWrapper.jsx
+│   │       ├── ColumnChart.jsx
+│   │       ├── BarChartHorizontal.jsx
+│   │       ├── StackedBarChart.jsx
+│   │       ├── LineChartComponent.jsx
+│   │       ├── AreaChartComponent.jsx
+│   │       ├── StackedAreaChart.jsx
+│   │       ├── PieChartComponent.jsx
+│   │       ├── DonutChart.jsx
+│   │       └── FunnelChartComponent.jsx
+│   ├── context/
+│   │   └── PaletteContext.jsx
+│   └── utils/
+│       ├── helpers.js
+│       ├── storage.js
+│       └── patternGenerator.js
+└── .github/workflows/
+    └── deploy-pages.yml    # DONE - GitHub Pages deployment
 ```
 
-In GitHub repo settings: Settings → Pages → Source = **GitHub Actions**.
+## Key Pattern Implementation
 
+Patterns work by:
+1. `patternGenerator.js` creates SVG pattern definitions from slot data
+2. `ChartWrapper.jsx` renders a hidden `<svg>` with `<defs>` containing all patterns
+3. Charts reference patterns via `fill="url(#pattern-slot-0)"` etc.
+4. Each slot can be solid (`color`) or pattern (`backgroundColor`, `inkColor`, `patternType`, etc.)
