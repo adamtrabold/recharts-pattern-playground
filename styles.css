@@ -424,36 +424,65 @@ input[type="range"] {
   color: #fff;
 }
 
-.editor-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 6px;
-  border-top: 1px solid var(--border);
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.actions-left {
-  display: flex;
-  align-items: center;
+/* Labeled icon toggles */
+.icon-toggle.labeled {
+  width: auto;
+  height: auto;
+  padding: 4px 8px;
   gap: 4px;
 }
 
-.copy-to {
+.icon-toggle.labeled svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.icon-toggle.labeled span {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Editor sections */
+.editor-section {
   display: flex;
-  gap: 6px;
   align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+
+.version-section {
+  margin-top: 4px;
+}
+
+.version-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.version-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.copy-section {
+  padding-top: 6px;
+  padding-bottom: 2px;
 }
 
 .copy-label {
   font-size: 11px;
   color: var(--muted);
+  flex-shrink: 0;
 }
 
 .copy-targets {
   display: flex;
   gap: 2px;
+  flex-wrap: wrap;
 }
 
 .copy-btn {
@@ -477,6 +506,91 @@ input[type="range"] {
   background: var(--focus);
   border-color: var(--focus);
   color: #fff;
+}
+
+/* Field modifiers */
+.field-grow {
+  flex: 1;
+  min-width: 100px;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+/* Angle control with inline snaps */
+.angle-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.angle-control .range-input-combo {
+  flex: 1;
+}
+
+.angle-control .snap-buttons {
+  margin-top: 2px;
+}
+
+/* Offset section for dots */
+.offset-section {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
+
+.offset-section > summary {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  padding: 2px 0;
+}
+
+.offset-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.offset-section > summary::before {
+  content: "▸ ";
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.offset-section[open] > summary::before {
+  content: "▾ ";
+}
+
+.offset-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Editor row for angle - full width */
+.editor-row-angle {
+  display: block;
+}
+
+/* Editor row spacing improvements */
+.editor-row + .editor-row {
+  margin-top: 2px;
+}
+
+.editor-row + .editor-section,
+.offset-section + .gradient-section,
+.editor-row + .offset-section {
+  margin-top: 6px;
+}
+
+/* Ensure hidden elements are properly hidden on load */
+[data-only][style*="display: none"],
+[data-show][style*="display: none"],
+[data-hide][style*="display: none"] {
+  display: none !important;
 }
 
 /* Buttons */

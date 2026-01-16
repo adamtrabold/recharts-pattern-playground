@@ -82,6 +82,7 @@
             </div>
           </div>
 
+          <!-- Pattern Type & Options Row -->
           <div class="editor-row" data-only="pattern">
             <div class="field">
               <label for="patternType">Pattern</label>
@@ -91,6 +92,31 @@
                 <option value="dots">Dots</option>
               </select>
             </div>
+            <div class="field field-grow" data-hide="dots">
+              <label for="opacity">Opacity</label>
+              <div class="range-input-combo">
+                <input id="opacity" name="opacity" type="range" min="0.05" max="1" step="0.05" tabindex="-1" />
+                <input id="opacityNum" type="number" class="num-input" min="5" max="100" step="5" aria-label="Opacity percentage" />
+                <span class="unit">%</span>
+              </div>
+            </div>
+            <div class="field icon-toggles" data-hide="dots">
+              <label>Style</label>
+              <div class="toggle-row">
+                <button type="button" id="invert" class="icon-toggle labeled" title="Invert colors">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/></svg>
+                  <span>Invert</span>
+                </button>
+                <button type="button" id="roundCaps" class="icon-toggle labeled" title="Round line caps">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span>Round</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spacing & Stroke Row (Lines/Crosshatch) -->
+          <div class="editor-row" data-only="pattern" data-hide="dots">
             <div class="field">
               <label for="spacing">Spacing</label>
               <div class="range-input-combo">
@@ -109,43 +135,28 @@
             </div>
           </div>
 
-          <div class="editor-row" data-only="pattern">
-            <div class="field">
-              <label for="opacity">Opacity</label>
-              <div class="range-input-combo">
-                <input id="opacity" name="opacity" type="range" min="0.05" max="1" step="0.05" tabindex="-1" />
-                <input id="opacityNum" type="number" class="num-input" min="5" max="100" step="5" aria-label="Opacity percentage" />
-                <span class="unit">%</span>
-              </div>
-            </div>
-            <div class="field" data-hide="dots">
+          <!-- Angle Row (Lines/Crosshatch only) -->
+          <div class="editor-row editor-row-angle" data-only="pattern" data-hide="dots">
+            <div class="field field-full">
               <label for="angle">Angle</label>
-              <div class="range-input-combo with-snaps">
-                <input id="angle" name="angle" type="range" min="0" max="180" step="5" tabindex="-1" />
-                <input id="angleNum" type="number" class="num-input" min="0" max="180" step="5" aria-label="Angle in degrees" />
-                <span class="unit">°</span>
-              </div>
-              <div class="snap-buttons" data-target="angle">
-                <button type="button" data-value="0" tabindex="-1">0</button>
-                <button type="button" data-value="45" tabindex="-1">45</button>
-                <button type="button" data-value="90" tabindex="-1">90</button>
-                <button type="button" data-value="135" tabindex="-1">135</button>
-                <button type="button" data-value="180" tabindex="-1">180</button>
-              </div>
-            </div>
-            <div class="field icon-toggles" data-hide="dots">
-              <label>Options</label>
-              <div class="toggle-row">
-                <button type="button" id="invert" class="icon-toggle" title="Invert colors">
-                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/></svg>
-                </button>
-                <button type="button" id="roundCaps" class="icon-toggle" title="Round line caps">
-                  <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                </button>
+              <div class="angle-control">
+                <div class="range-input-combo">
+                  <input id="angle" name="angle" type="range" min="0" max="180" step="5" tabindex="-1" />
+                  <input id="angleNum" type="number" class="num-input" min="0" max="180" step="5" aria-label="Angle in degrees" />
+                  <span class="unit">°</span>
+                </div>
+                <div class="snap-buttons" data-target="angle">
+                  <button type="button" data-value="0" tabindex="-1">0°</button>
+                  <button type="button" data-value="45" tabindex="-1">45°</button>
+                  <button type="button" data-value="90" tabindex="-1">90°</button>
+                  <button type="button" data-value="135" tabindex="-1">135°</button>
+                  <button type="button" data-value="180" tabindex="-1">180°</button>
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- Dots: Shape & Spacing Row -->
           <div class="editor-row" data-only="pattern" data-show="dots">
             <div class="field">
               <label for="dotShape">Shape</label>
@@ -156,36 +167,70 @@
               </select>
             </div>
             <div class="field">
-              <label for="dotOffsetX">X offset</label>
+              <label for="spacing-dots">Spacing</label>
               <div class="range-input-combo">
-                <input id="dotOffsetX" name="dotOffsetX" type="range" min="0" max="100" step="5" tabindex="-1" />
-                <input id="dotOffsetXNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="X offset percentage" />
-                <span class="unit">%</span>
+                <input id="spacing-dots" name="spacing" type="range" min="4" max="40" step="1" tabindex="-1" />
+                <input id="spacingNum-dots" type="number" class="num-input" min="4" max="40" step="1" aria-label="Spacing value" />
+                <span class="unit">px</span>
               </div>
             </div>
             <div class="field">
-              <label for="dotOffsetY">Y offset</label>
+              <label for="strokeWidth-dots">Size</label>
               <div class="range-input-combo">
-                <input id="dotOffsetY" name="dotOffsetY" type="range" min="0" max="100" step="5" tabindex="-1" />
-                <input id="dotOffsetYNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Y offset percentage" />
-                <span class="unit">%</span>
+                <input id="strokeWidth-dots" name="strokeWidth" type="range" min="1" max="12" step="1" tabindex="-1" />
+                <input id="strokeWidthNum-dots" type="number" class="num-input" min="1" max="12" step="1" aria-label="Dot size value" />
+                <span class="unit">px</span>
               </div>
             </div>
           </div>
 
+          <!-- Dots: Opacity & Options Row -->
           <div class="editor-row" data-only="pattern" data-show="dots">
+            <div class="field field-grow">
+              <label for="opacity-dots">Opacity</label>
+              <div class="range-input-combo">
+                <input id="opacity-dots" name="opacity" type="range" min="0.05" max="1" step="0.05" tabindex="-1" />
+                <input id="opacityNum-dots" type="number" class="num-input" min="5" max="100" step="5" aria-label="Opacity percentage" />
+                <span class="unit">%</span>
+              </div>
+            </div>
             <div class="field icon-toggles">
-              <label>Options</label>
+              <label>Style</label>
               <div class="toggle-row">
-                <button type="button" id="dotStaggered" class="icon-toggle" title="Staggered pattern">
+                <button type="button" id="dotStaggered" class="icon-toggle labeled" title="Staggered pattern">
                   <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="8" cy="10" r="2"/></svg>
+                  <span>Stagger</span>
                 </button>
-                <button type="button" id="invertDots" class="icon-toggle" title="Invert colors">
+                <button type="button" id="invertDots" class="icon-toggle labeled" title="Invert colors">
                   <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/></svg>
+                  <span>Invert</span>
                 </button>
               </div>
             </div>
           </div>
+
+          <!-- Dots: Offset Controls (collapsible for less clutter) -->
+          <details class="offset-section" data-only="pattern" data-show="dots">
+            <summary>Offset</summary>
+            <div class="offset-body">
+              <div class="field">
+                <label for="dotOffsetX">X offset</label>
+                <div class="range-input-combo">
+                  <input id="dotOffsetX" name="dotOffsetX" type="range" min="0" max="100" step="5" tabindex="-1" />
+                  <input id="dotOffsetXNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="X offset percentage" />
+                  <span class="unit">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="dotOffsetY">Y offset</label>
+                <div class="range-input-combo">
+                  <input id="dotOffsetY" name="dotOffsetY" type="range" min="0" max="100" step="5" tabindex="-1" />
+                  <input id="dotOffsetYNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Y offset percentage" />
+                  <span class="unit">%</span>
+                </div>
+              </div>
+            </div>
+          </details>
 
           <!-- Area Gradient Section -->
           <details class="gradient-section" id="gradientSection">
@@ -253,28 +298,33 @@
             </div>
           </details>
 
-          <div class="editor-row editor-actions">
-            <div class="actions-left">
+          <!-- Version Controls -->
+          <div class="editor-section version-section">
+            <div class="version-controls">
               <div class="ab-toggle">
                 <button type="button" id="btnVersionA" class="ab-btn active">A</button>
                 <button type="button" id="btnVersionB" class="ab-btn">B</button>
               </div>
-              <button type="button" id="btnCopyAtoB" class="btn-sm ghost" title="Copy A to B">A→B</button>
-              <button type="button" id="btnCopyBtoA" class="btn-sm ghost" title="Copy B to A">B→A</button>
-              <button id="btnResetSlot" type="button" class="btn-sm ghost">Reset</button>
-            </div>
-            <div class="copy-to">
-              <span class="copy-label">Copy to</span>
-              <div class="copy-targets" role="group" aria-label="Copy to slot">
-                <button type="button" class="copy-btn" data-slot="0">1</button>
-                <button type="button" class="copy-btn" data-slot="1">2</button>
-                <button type="button" class="copy-btn" data-slot="2">3</button>
-                <button type="button" class="copy-btn" data-slot="3">4</button>
-                <button type="button" class="copy-btn" data-slot="4">5</button>
-                <button type="button" class="copy-btn" data-slot="5">6</button>
-                <button type="button" class="copy-btn" data-slot="6">7</button>
-                <button type="button" class="copy-btn" data-slot="7">8</button>
+              <div class="version-actions">
+                <button type="button" id="btnCopyAtoB" class="btn-sm ghost" title="Copy version A to B">A→B</button>
+                <button type="button" id="btnCopyBtoA" class="btn-sm ghost" title="Copy version B to A">B→A</button>
               </div>
+            </div>
+            <button id="btnResetSlot" type="button" class="btn-sm ghost">Reset</button>
+          </div>
+
+          <!-- Copy to Other Slots -->
+          <div class="editor-section copy-section">
+            <span class="copy-label">Copy to</span>
+            <div class="copy-targets" role="group" aria-label="Copy to slot">
+              <button type="button" class="copy-btn" data-slot="0">1</button>
+              <button type="button" class="copy-btn" data-slot="1">2</button>
+              <button type="button" class="copy-btn" data-slot="2">3</button>
+              <button type="button" class="copy-btn" data-slot="3">4</button>
+              <button type="button" class="copy-btn" data-slot="4">5</button>
+              <button type="button" class="copy-btn" data-slot="5">6</button>
+              <button type="button" class="copy-btn" data-slot="6">7</button>
+              <button type="button" class="copy-btn" data-slot="7">8</button>
             </div>
           </div>
         </form>

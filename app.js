@@ -45,6 +45,14 @@
   const $dotOffsetXNum = document.getElementById("dotOffsetXNum");
   const $dotOffsetYNum = document.getElementById("dotOffsetYNum");
 
+  // Dots-specific duplicates (shown when dots pattern selected)
+  const $spacingDots = document.getElementById("spacing-dots");
+  const $spacingNumDots = document.getElementById("spacingNum-dots");
+  const $strokeWidthDots = document.getElementById("strokeWidth-dots");
+  const $strokeWidthNumDots = document.getElementById("strokeWidthNum-dots");
+  const $opacityDots = document.getElementById("opacity-dots");
+  const $opacityNumDots = document.getElementById("opacityNum-dots");
+
   const $btnVersionA = document.getElementById("btnVersionA");
   const $btnVersionB = document.getElementById("btnVersionB");
   const $btnCopyAtoB = document.getElementById("btnCopyAtoB");
@@ -943,6 +951,14 @@
       if (activeEl !== $dotOffsetXNum) $dotOffsetXNum.value = slot.dotOffsetX || 0;
       if (activeEl !== $dotOffsetYNum) $dotOffsetYNum.value = slot.dotOffsetY || 0;
 
+      // Sync dots-specific duplicate inputs
+      if ($spacingDots) $spacingDots.value = String(slot.spacing);
+      if ($spacingNumDots && activeEl !== $spacingNumDots) $spacingNumDots.value = slot.spacing;
+      if ($strokeWidthDots) $strokeWidthDots.value = String(slot.strokeWidth);
+      if ($strokeWidthNumDots && activeEl !== $strokeWidthNumDots) $strokeWidthNumDots.value = slot.strokeWidth;
+      if ($opacityDots) $opacityDots.value = String(slot.opacity);
+      if ($opacityNumDots && activeEl !== $opacityNumDots) $opacityNumDots.value = Math.round(slot.opacity * 100);
+
       setEditorVisibilityForMode("pattern", slot.patternType);
     }
 
@@ -1718,6 +1734,25 @@
     });
     $spacingNum.addEventListener("keydown", handleNumInputKeydown);
 
+    // Wire dots-specific spacing controls
+    if ($spacingDots && $spacingNumDots) {
+      $spacingDots.addEventListener("input", () => {
+        $spacingNumDots.value = $spacingDots.value;
+        handleSpacingChange(Number($spacingDots.value));
+      });
+      $spacingNumDots.addEventListener("input", () => {
+        const val = clamp(Number($spacingNumDots.value) || 4, 4, 40);
+        $spacingDots.value = val;
+        handleSpacingChange(val);
+      });
+      $spacingNumDots.addEventListener("blur", () => {
+        const val = clamp(Number($spacingNumDots.value) || 4, 4, 40);
+        $spacingNumDots.value = val;
+        $spacingDots.value = val;
+      });
+      $spacingNumDots.addEventListener("keydown", handleNumInputKeydown);
+    }
+
     // Wire strokeWidth range + number input pair
     const handleStrokeWidthChange = (val) => {
       setState((s) => {
@@ -1741,6 +1776,25 @@
       $strokeWidth.value = val;
     });
     $strokeWidthNum.addEventListener("keydown", handleNumInputKeydown);
+
+    // Wire dots-specific stroke width (labeled "Size" in UI)
+    if ($strokeWidthDots && $strokeWidthNumDots) {
+      $strokeWidthDots.addEventListener("input", () => {
+        $strokeWidthNumDots.value = $strokeWidthDots.value;
+        handleStrokeWidthChange(Number($strokeWidthDots.value));
+      });
+      $strokeWidthNumDots.addEventListener("input", () => {
+        const val = clamp(Number($strokeWidthNumDots.value) || 1, 1, 12);
+        $strokeWidthDots.value = val;
+        handleStrokeWidthChange(val);
+      });
+      $strokeWidthNumDots.addEventListener("blur", () => {
+        const val = clamp(Number($strokeWidthNumDots.value) || 1, 1, 12);
+        $strokeWidthNumDots.value = val;
+        $strokeWidthDots.value = val;
+      });
+      $strokeWidthNumDots.addEventListener("keydown", handleNumInputKeydown);
+    }
 
     // Wire opacity range + number input pair (converts between 0-1 and 0-100%)
     const handleOpacityChange = (val) => {
@@ -1766,6 +1820,26 @@
       $opacity.value = pct / 100;
     });
     $opacityNum.addEventListener("keydown", handleNumInputKeydown);
+
+    // Wire dots-specific opacity
+    if ($opacityDots && $opacityNumDots) {
+      $opacityDots.addEventListener("input", () => {
+        $opacityNumDots.value = Math.round(Number($opacityDots.value) * 100);
+        handleOpacityChange(Number($opacityDots.value));
+      });
+      $opacityNumDots.addEventListener("input", () => {
+        const pct = clamp(Number($opacityNumDots.value) || 5, 5, 100);
+        const val = pct / 100;
+        $opacityDots.value = val;
+        handleOpacityChange(val);
+      });
+      $opacityNumDots.addEventListener("blur", () => {
+        const pct = clamp(Number($opacityNumDots.value) || 5, 5, 100);
+        $opacityNumDots.value = pct;
+        $opacityDots.value = pct / 100;
+      });
+      $opacityNumDots.addEventListener("keydown", handleNumInputKeydown);
+    }
 
     // Wire angle range + number input pair
     const handleAngleChange = (val) => {
