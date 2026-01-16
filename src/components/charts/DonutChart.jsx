@@ -96,7 +96,7 @@ export function DonutChart() {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+      <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
         {global.tooltip && <Tooltip />}
         {global.legend && (
           <Legend 

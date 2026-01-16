@@ -10,9 +10,27 @@ import {
   ResponsiveContainer,
   LabelList,
   ReferenceLine,
+  Symbols,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotColor } from '../../utils/patternGenerator';
+import { calcYAxisWidth } from '../../utils/helpers';
+
+// Custom dot component that renders different shapes
+const CustomDot = ({ cx, cy, fill, stroke, r, shape }) => {
+  if (!cx || !cy) return null;
+  return (
+    <Symbols
+      cx={cx}
+      cy={cy}
+      type={shape}
+      size={r * r * Math.PI}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={0}
+    />
+  );
+};
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -33,11 +51,12 @@ export function LineChartComponent() {
     ? line.markerOverride
     : global.markersEnabled;
 
-  // Generate data with 8 series
+  // Generate data with 8 series - each slot has unique values
   const data = CATEGORIES.map((name, catIndex) => {
     const entry = { name };
     for (let i = 0; i < 8; i++) {
-      entry[`slot${i}`] = Math.floor(3 + (i % 4) + (catIndex % 3));
+      // Use different offsets for each slot to ensure distinct lines
+      entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
     }
     return entry;
   });
@@ -55,7 +74,7 @@ export function LineChartComponent() {
 
   // Axis configuration
   const yDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const yTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const yScale = axis?.yScale ?? 'linear';
@@ -68,11 +87,12 @@ export function LineChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
+      <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && (
           <YAxis 
+            width={calcYAxisWidth(10)}
             domain={yDomain} 
             tickCount={yTickCount}
             scale={yScale}
@@ -100,19 +120,35 @@ export function LineChartComponent() {
         {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const strokeColor = getSlotColor(slot);
+          const dotShape = line.dotShape ?? 'circle';
           const dotProps = markersEnabled 
-            ? { r: line.markerRadius, fill: strokeColor, stroke: strokeColor, strokeWidth: 0 }
+            ? (props) => (
+                <CustomDot
+                  {...props}
+                  fill={strokeColor}
+                  stroke={strokeColor}
+                  r={line.markerRadius}
+                  shape={dotShape}
+                />
+              )
             : false;
+          
+          // Per-slot line style with global fallback
+          const slotLineStyle = slot.lineStyle || {};
+          const slotDashStyle = slotLineStyle.dashStyle ?? line.dashStyle;
+          const slotLineWidth = slotLineStyle.lineWidth ?? line.lineWidth;
+          const slotCurveType = slotLineStyle.curveType ?? line.curveType;
           
           return (
             <Line
               key={slotIndex}
-              type={line.curveType}
+              type={slotCurveType}
               dataKey={`slot${slotIndex}`}
               stroke={strokeColor}
-              strokeWidth={line.lineWidth}
-              strokeDasharray={getDashArray(line.dashStyle)}
+              strokeWidth={slotLineWidth}
+              strokeDasharray={getDashArray(slotDashStyle)}
               dot={dotProps}
+              connectNulls={line.connectNulls ?? false}
               name={slot.label}
               isAnimationActive={global.animation}
             >

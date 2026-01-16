@@ -5,7 +5,7 @@ import ColorPicker from './ColorPicker';
 
 export function ChartSettings() {
   const { state, updateChartSettings } = usePalette();
-  const { global, gap, columnBar, line, area, pie, donut, funnel, axis, legend, referenceLine } = state.chartSettings;
+  const { global, gap, columnBar, line, area, pie, donut, funnel, stacked, axis, legend, referenceLine } = state.chartSettings;
 
   // Helper to update nested applyTo object
   const updateGapApplyTo = (chartType, value) => {
@@ -747,34 +747,60 @@ export function ChartSettings() {
             </select>
           </div>
           {lineMarkersEnabled && (
-            <div className="field">
-              <label htmlFor="cs-line-markerRadius">
-                Marker radius
-                {isMarkerSyncEnabled && <span className="sync-indicator" title="Synced with area"> ⟷</span>}
-              </label>
-              <div className="range-input-combo">
-                <input
-                  id="cs-line-markerRadius"
-                  type="range"
-                  min="2"
-                  max="10"
-                  step="1"
-                  value={line.markerRadius}
-                  onChange={(e) => handleLineMarkerRadiusChange(Number(e.target.value))}
-                />
-                <input
-                  type="number"
-                  className="num-input"
-                  min={2}
-                  max={10}
-                  step={1}
-                  value={line.markerRadius}
-                  onChange={(e) => handleLineMarkerRadiusChange(Number(e.target.value))}
-                />
-                <span className="unit">px</span>
+            <>
+              <div className="field">
+                <label htmlFor="cs-line-markerRadius">
+                  Marker radius
+                  {isMarkerSyncEnabled && <span className="sync-indicator" title="Synced with area"> ⟷</span>}
+                </label>
+                <div className="range-input-combo">
+                  <input
+                    id="cs-line-markerRadius"
+                    type="range"
+                    min="2"
+                    max="10"
+                    step="1"
+                    value={line.markerRadius}
+                    onChange={(e) => handleLineMarkerRadiusChange(Number(e.target.value))}
+                  />
+                  <input
+                    type="number"
+                    className="num-input"
+                    min={2}
+                    max={10}
+                    step={1}
+                    value={line.markerRadius}
+                    onChange={(e) => handleLineMarkerRadiusChange(Number(e.target.value))}
+                  />
+                  <span className="unit">px</span>
+                </div>
               </div>
-            </div>
+              <div className="field">
+                <label htmlFor="cs-line-dotShape">Dot shape</label>
+                <select
+                  id="cs-line-dotShape"
+                  value={line.dotShape ?? 'circle'}
+                  onChange={(e) => updateChartSettings('line', { dotShape: e.target.value })}
+                >
+                  <option value="circle">Circle</option>
+                  <option value="square">Square</option>
+                  <option value="diamond">Diamond</option>
+                  <option value="cross">Cross</option>
+                  <option value="star">Star</option>
+                  <option value="triangle">Triangle</option>
+                  <option value="wye">Wye</option>
+                </select>
+              </div>
+            </>
           )}
+          <label className="cs-toggle">
+            <input
+              type="checkbox"
+              checked={line.connectNulls ?? false}
+              onChange={(e) => updateChartSettings('line', { connectNulls: e.target.checked })}
+            />
+            Connect nulls
+          </label>
         </div>
       </details>
 
@@ -926,36 +952,62 @@ export function ChartSettings() {
                 </>
               )}
               {(area.markerType === 'marker' || area.markerType === 'both') && (
-                <div className="field">
-                  <label htmlFor="cs-area-markerRadius">
-                    Marker radius
-                    {isMarkerSyncEnabled && <span className="sync-indicator" title="Synced with line"> ⟷</span>}
-                  </label>
-                  <div className="range-input-combo">
-                    <input
-                      id="cs-area-markerRadius"
-                      type="range"
-                      min="2"
-                      max="10"
-                      step="1"
-                      value={area.markerRadius}
-                      onChange={(e) => handleAreaMarkerRadiusChange(Number(e.target.value))}
-                    />
-                    <input
-                      type="number"
-                      className="num-input"
-                      min={2}
-                      max={10}
-                      step={1}
-                      value={area.markerRadius}
-                      onChange={(e) => handleAreaMarkerRadiusChange(Number(e.target.value))}
-                    />
-                    <span className="unit">px</span>
+                <>
+                  <div className="field">
+                    <label htmlFor="cs-area-markerRadius">
+                      Marker radius
+                      {isMarkerSyncEnabled && <span className="sync-indicator" title="Synced with line"> ⟷</span>}
+                    </label>
+                    <div className="range-input-combo">
+                      <input
+                        id="cs-area-markerRadius"
+                        type="range"
+                        min="2"
+                        max="10"
+                        step="1"
+                        value={area.markerRadius}
+                        onChange={(e) => handleAreaMarkerRadiusChange(Number(e.target.value))}
+                      />
+                      <input
+                        type="number"
+                        className="num-input"
+                        min={2}
+                        max={10}
+                        step={1}
+                        value={area.markerRadius}
+                        onChange={(e) => handleAreaMarkerRadiusChange(Number(e.target.value))}
+                      />
+                      <span className="unit">px</span>
+                    </div>
                   </div>
-                </div>
+                  <div className="field">
+                    <label htmlFor="cs-area-dotShape">Dot shape</label>
+                    <select
+                      id="cs-area-dotShape"
+                      value={area.dotShape ?? 'circle'}
+                      onChange={(e) => updateChartSettings('area', { dotShape: e.target.value })}
+                    >
+                      <option value="circle">Circle</option>
+                      <option value="square">Square</option>
+                      <option value="diamond">Diamond</option>
+                      <option value="cross">Cross</option>
+                      <option value="star">Star</option>
+                      <option value="triangle">Triangle</option>
+                      <option value="wye">Wye</option>
+                    </select>
+                  </div>
+                </>
               )}
             </>
           )}
+          <label className="cs-toggle">
+            <input
+              type="checkbox"
+              checked={area.connectNulls ?? false}
+              onChange={(e) => updateChartSettings('area', { connectNulls: e.target.checked })}
+            />
+            Connect nulls
+          </label>
           <label className="cs-toggle">
             <input
               type="checkbox"
@@ -1069,6 +1121,29 @@ export function ChartSettings() {
               )}
             </>
           )}
+        </div>
+      </details>
+
+      {/* Stacked Settings */}
+      <details className="cs-type-section">
+        <summary>Stacked</summary>
+        <div className="cs-type-body">
+          <div className="field">
+            <label htmlFor="cs-stacked-stackOffset">Stack offset</label>
+            <select
+              id="cs-stacked-stackOffset"
+              value={stacked?.stackOffset ?? 'none'}
+              onChange={(e) => updateChartSettings('stacked', { stackOffset: e.target.value })}
+            >
+              <option value="none">None (default)</option>
+              <option value="expand">Expand (0-100%)</option>
+              <option value="wiggle">Wiggle (streamgraph)</option>
+              <option value="silhouette">Silhouette (centered)</option>
+            </select>
+          </div>
+          <p className="cs-hint">
+            Affects Stacked Bar and Stacked Area charts.
+          </p>
         </div>
       </details>
 

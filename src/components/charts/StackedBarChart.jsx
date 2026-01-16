@@ -63,7 +63,7 @@ function StackedBarShape(props) {
 
 export function StackedBarChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, columnBar, gap, axis, legend, referenceLine } = state.chartSettings;
+  const { global, columnBar, gap, stacked, axis, legend, referenceLine } = state.chartSettings;
 
   // Gap settings for stacked bar
   const useGap = gap?.enabled && gap?.applyTo?.stackedBar;
@@ -79,7 +79,7 @@ export function StackedBarChart() {
 
   // Axis configuration (for horizontal stacked bar, X is the value axis)
   const xDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const xTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const xScale = axis?.yScale ?? 'linear';
@@ -90,15 +90,19 @@ export function StackedBarChart() {
   const legendLayout = legend?.layout ?? 'horizontal';
   const legendIconType = legend?.iconType ?? 'square';
 
+  // Stack offset configuration
+  const stackOffset = stacked?.stackOffset ?? 'none';
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
         data={STATIC_DATA} 
         layout="vertical"
-        margin={{ top: 10, right: 10, left: 20, bottom: 0 }}
+        margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
+        stackOffset={stackOffset}
       >
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
-        {global.axisLabels && <YAxis dataKey="name" type="category" />}
+        {global.axisLabels && <YAxis dataKey="name" type="category" width={28} />}
         {global.axisLabels && (
           <XAxis 
             type="number"

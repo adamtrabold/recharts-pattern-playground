@@ -46,7 +46,7 @@ export function BarChartHorizontal() {
 
   // Axis configuration (for horizontal bar, X is the value axis)
   const xDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const xTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const xScale = axis?.yScale ?? 'linear';
@@ -62,11 +62,11 @@ export function BarChartHorizontal() {
       <BarChart 
         data={data} 
         layout="vertical"
-        margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+        margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         barGap={`${barGap}%`}
       >
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
-        {global.axisLabels && <YAxis dataKey="name" type="category" />}
+        {global.axisLabels && <YAxis dataKey="name" type="category" interval={0} width={20} />}
         {global.axisLabels && (
           <XAxis 
             type="number"

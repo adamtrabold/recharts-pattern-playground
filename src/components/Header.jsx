@@ -2,8 +2,18 @@ import React from 'react';
 import { usePalette } from '../context/PaletteContext';
 
 export function Header() {
-  const { state, updateUI } = usePalette();
+  const { state, updateUI, resetAll } = usePalette();
   const { darkTheme, grayscale, lowContrast } = state.ui;
+
+  const handleReset = () => {
+    if (window.confirm('Reset all settings to defaults? This will clear your saved palette and chart settings.')) {
+      resetAll();
+      // Also clear the URL hash if present
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  };
 
   return (
     <header className="site-header">
@@ -35,6 +45,14 @@ export function Header() {
               />
               <span>Low contrast</span>
             </label>
+            <button 
+              type="button" 
+              className="reset-btn"
+              onClick={handleReset}
+              title="Reset all settings to defaults"
+            >
+              Reset
+            </button>
           </div>
         </div>
       </div>

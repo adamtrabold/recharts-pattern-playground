@@ -306,6 +306,90 @@ export function PatternControls() {
         </>
       )}
 
+      {/* Line Chart Style (per-slot) */}
+      <details className="editor-section line-style-section">
+        <summary>Line Chart Style</summary>
+        <div className="editor-row">
+          <div className="field">
+            <label htmlFor="lineDashStyle">Dash style</label>
+            <select
+              id="lineDashStyle"
+              value={slot.lineStyle?.dashStyle || 'solid'}
+              onChange={(e) => handleUpdate({ 
+                lineStyle: { ...slot.lineStyle, dashStyle: e.target.value } 
+              })}
+            >
+              <option value="solid">Solid</option>
+              <option value="Dash">Dash</option>
+              <option value="Dot">Dot</option>
+              <option value="DashDot">Dash-Dot</option>
+              <option value="LongDash">Long Dash</option>
+              <option value="ShortDash">Short Dash</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="lineCurveType">
+              Curve
+              <span className="field-hint">(null = global)</span>
+            </label>
+            <select
+              id="lineCurveType"
+              value={slot.lineStyle?.curveType || ''}
+              onChange={(e) => handleUpdate({ 
+                lineStyle: { ...slot.lineStyle, curveType: e.target.value || null } 
+              })}
+            >
+              <option value="">Global default</option>
+              <option value="linear">Linear</option>
+              <option value="monotone">Monotone</option>
+              <option value="cardinal">Cardinal</option>
+              <option value="natural">Natural</option>
+              <option value="basis">Basis</option>
+              <option value="step">Step</option>
+            </select>
+          </div>
+        </div>
+        <div className="editor-row">
+          <div className="field field-full">
+            <label htmlFor="lineLineWidth">
+              Line width
+              <span className="field-hint">(null = global)</span>
+            </label>
+            <div className="range-input-combo">
+              <input
+                id="lineLineWidth"
+                type="range"
+                min="0"
+                max="8"
+                step="1"
+                value={slot.lineStyle?.lineWidth ?? 0}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  handleUpdate({ 
+                    lineStyle: { ...slot.lineStyle, lineWidth: val === 0 ? null : val } 
+                  });
+                }}
+              />
+              <input
+                type="number"
+                className="num-input"
+                min={0}
+                max={8}
+                step={1}
+                value={slot.lineStyle?.lineWidth ?? 0}
+                onChange={(e) => {
+                  const val = clamp(Number(e.target.value), 0, 8);
+                  handleUpdate({ 
+                    lineStyle: { ...slot.lineStyle, lineWidth: val === 0 ? null : val } 
+                  });
+                }}
+              />
+              <span className="unit">{slot.lineStyle?.lineWidth ? 'px' : '(global)'}</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
       {/* Version Controls */}
       <div className="editor-section version-section">
         <div className="version-controls">

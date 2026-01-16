@@ -11,9 +11,27 @@ import {
   Customized,
   LabelList,
   ReferenceLine,
+  Symbols,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill, getSlotColor } from '../../utils/patternGenerator';
+import { calcYAxisWidth } from '../../utils/helpers';
+
+// Custom dot component that renders different shapes
+const CustomDot = ({ cx, cy, fill, stroke, r, shape }) => {
+  if (!cx || !cy) return null;
+  return (
+    <Symbols
+      cx={cx}
+      cy={cy}
+      type={shape}
+      size={r * r * Math.PI}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={0}
+    />
+  );
+};
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -82,11 +100,12 @@ export function AreaChartComponent() {
   const cursorStrokeWidth = area.cursorWidth || 1;
   const cursorDashArray = getCursorDashArray();
 
-  // Generate data with 8 series
+  // Generate data with 8 series - each slot has unique values
   const data = CATEGORIES.map((name, catIndex) => {
     const entry = { name };
     for (let i = 0; i < 8; i++) {
-      entry[`slot${i}`] = Math.floor(2 + (i % 4) + (catIndex % 3));
+      // Use different offsets for each slot to ensure distinct areas
+      entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
     }
     return entry;
   });
@@ -114,7 +133,7 @@ export function AreaChartComponent() {
 
   // Axis configuration
   const yDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const yTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const yScale = axis?.yScale ?? 'linear';
@@ -127,7 +146,7 @@ export function AreaChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         {/* Gradient definitions */}
         <defs>
           {gradientEnabled && [0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
@@ -152,6 +171,7 @@ export function AreaChartComponent() {
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && (
           <YAxis 
+            width={calcYAxisWidth(10)}
             domain={yDomain} 
             tickCount={yTickCount}
             scale={yScale}
@@ -186,8 +206,17 @@ export function AreaChartComponent() {
           const slot = getActiveSlot(slotIndex);
           const fillValue = getFillForSlot(slot, slotIndex);
           const strokeColor = getSlotColor(slot);
+          const dotShape = area.dotShape ?? 'circle';
           const dotProps = showMarkers 
-            ? { r: area.markerRadius, fill: strokeColor, stroke: strokeColor, strokeWidth: 0, clipDot: true }
+            ? (props) => (
+                <CustomDot
+                  {...props}
+                  fill={strokeColor}
+                  stroke={strokeColor}
+                  r={area.markerRadius}
+                  shape={dotShape}
+                />
+              )
             : false;
           const activeDotProps = showMarkers
             ? { r: area.markerRadius + 1, fill: strokeColor, stroke: '#fff', strokeWidth: 2 }
@@ -204,6 +233,7 @@ export function AreaChartComponent() {
               strokeWidth={useGap ? gapThickness : area.lineWidth}
               dot={dotProps}
               activeDot={activeDotProps}
+              connectNulls={area.connectNulls ?? false}
               name={slot.label}
               isAnimationActive={global.animation}
             >

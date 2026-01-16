@@ -13,10 +13,10 @@ export const DEFAULT_STATE = {
     activeVersions: ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
   },
   palette: [
-    { type: 'solid', label: 'Slot 1', color: '#00478F' },
-    { type: 'solid', label: 'Slot 2', color: '#006BD6' },
-    { type: 'solid', label: 'Slot 3', color: '#3FA1A6' },
-    { type: 'solid', label: 'Slot 4', color: '#7A45E5' },
+    { type: 'solid', label: 'Slot 1', color: '#00478F', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 2', color: '#006BD6', lineStyle: { dashStyle: 'Dash', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 3', color: '#3FA1A6', lineStyle: { dashStyle: 'Dot', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 4', color: '#7A45E5', lineStyle: { dashStyle: 'DashDot', lineWidth: null, curveType: null } },
     {
       type: 'pattern',
       label: 'Slot 5',
@@ -29,6 +29,7 @@ export const DEFAULT_STATE = {
       angle: 45,
       invert: false,
       roundCaps: true,
+      lineStyle: { dashStyle: 'LongDash', lineWidth: null, curveType: null },
     },
     {
       type: 'pattern',
@@ -42,6 +43,7 @@ export const DEFAULT_STATE = {
       angle: 45,
       invert: false,
       roundCaps: false,
+      lineStyle: { dashStyle: 'ShortDash', lineWidth: null, curveType: null },
     },
     {
       type: 'pattern',
@@ -59,6 +61,7 @@ export const DEFAULT_STATE = {
       dotOffsetX: 0,
       dotOffsetY: 0,
       dotStaggered: false,
+      lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null },
     },
     {
       type: 'pattern',
@@ -72,17 +75,18 @@ export const DEFAULT_STATE = {
       angle: 0,
       invert: false,
       roundCaps: false,
+      lineStyle: { dashStyle: 'Dash', lineWidth: null, curveType: null },
     },
   ],
   paletteB: [
-    { type: 'solid', label: 'Slot 1', color: '#6baed6' },
-    { type: 'solid', label: 'Slot 2', color: '#fdae6b' },
-    { type: 'solid', label: 'Slot 3', color: '#74c476' },
-    { type: 'solid', label: 'Slot 4', color: '#fb6a4a' },
-    { type: 'solid', label: 'Slot 5', color: '#9e9ac8' },
-    { type: 'solid', label: 'Slot 6', color: '#fdd0a2' },
-    { type: 'solid', label: 'Slot 7', color: '#a1d99b' },
-    { type: 'solid', label: 'Slot 8', color: '#fcbba1' },
+    { type: 'solid', label: 'Slot 1', color: '#6baed6', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 2', color: '#fdae6b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 3', color: '#74c476', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 4', color: '#fb6a4a', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 5', color: '#9e9ac8', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 6', color: '#fdd0a2', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 7', color: '#a1d99b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { type: 'solid', label: 'Slot 8', color: '#fcbba1', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
   ],
   chartSettings: {
     global: {
@@ -122,8 +126,10 @@ export const DEFAULT_STATE = {
       lineWidth: 2,
       markerOverride: null,
       markerRadius: 4,
+      dotShape: 'circle', // circle, square, diamond, cross, star, triangle, wye
       dashStyle: 'solid',
       curveType: 'linear',
+      connectNulls: false,
     },
     area: {
       fillOpacity: 1,
@@ -131,17 +137,19 @@ export const DEFAULT_STATE = {
       markerOverride: null,
       markerType: 'marker',
       markerRadius: 4,
+      dotShape: 'circle', // circle, square, diamond, cross, star, triangle, wye
       cursorStyle: 'solid',
       cursorColor: '#666666',
       cursorWidth: 1,
       curveType: 'linear',
+      connectNulls: false,
       gradientEnabled: false,
       gradientMode: 'shared',
       sharedAngle: 90,
       sharedTopColor: null,
       sharedTopOpacity: 1,
       sharedBottomColor: null,
-      sharedBottomOpacity: 0.1,
+      sharedBottomOpacity: 1,
     },
     pie: {
       startAngle: 0,
@@ -154,6 +162,9 @@ export const DEFAULT_STATE = {
     },
     funnel: {
       reversed: false,
+    },
+    stacked: {
+      stackOffset: 'none', // none, expand, wiggle, silhouette
     },
     axis: {
       yDomainAuto: true,
@@ -179,6 +190,9 @@ export const DEFAULT_STATE = {
     },
   },
 };
+
+const VALID_DASH_STYLES = ['solid', 'Dash', 'Dot', 'DashDot', 'LongDash', 'ShortDash'];
+const VALID_CURVE_TYPES = ['linear', 'monotone', 'cardinal', 'natural', 'basis', 'step'];
 
 function normalizeSlot(slot, defaultSlot, index) {
   if (!slot || typeof slot !== 'object') return deepCopy(defaultSlot);
@@ -209,6 +223,14 @@ function normalizeSlot(slot, defaultSlot, index) {
     result.dotOffsetY = clamp(Number(slot.dotOffsetY) || 0, 0, 100);
     result.dotStaggered = !!slot.dotStaggered;
   }
+  
+  // Line style settings (applies to both solid and pattern)
+  const ls = slot.lineStyle || {};
+  result.lineStyle = {
+    dashStyle: VALID_DASH_STYLES.includes(ls.dashStyle) ? ls.dashStyle : 'solid',
+    lineWidth: ls.lineWidth != null ? clamp(Number(ls.lineWidth), 1, 8) : null,
+    curveType: VALID_CURVE_TYPES.includes(ls.curveType) ? ls.curveType : null,
+  };
   
   return result;
 }

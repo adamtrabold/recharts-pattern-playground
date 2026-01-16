@@ -14,9 +14,11 @@ import {
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
+import { calcYAxisWidth } from '../../utils/helpers';
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
+const MAX_VALUE = Math.max(...VALUES);
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -46,7 +48,7 @@ export function ColumnChart() {
 
   // Axis configuration
   const yDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const yTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const yScale = axis?.yScale ?? 'linear';
@@ -59,11 +61,12 @@ export function ColumnChart() {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
+      <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
         {global.gridLines && <CartesianGrid strokeDasharray="3 3" />}
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && (
           <YAxis 
+            width={calcYAxisWidth(MAX_VALUE)}
             domain={yDomain} 
             tickCount={yTickCount}
             scale={yScale}

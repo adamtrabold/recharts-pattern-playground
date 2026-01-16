@@ -94,6 +94,28 @@ body.low-contrast .charts-panel {
   align-items: center;
 }
 
+.reset-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.reset-btn:hover {
+  background: var(--hover);
+  border-color: var(--accent);
+}
+
+.reset-btn:active {
+  background: var(--accent);
+  color: white;
+}
+
 .toggle {
   display: inline-flex;
   gap: 5px;
@@ -448,6 +470,40 @@ input[type="range"] {
   padding-top: 8px;
   border-top: 1px solid var(--border);
   gap: 8px;
+}
+
+details.editor-section {
+  display: block;
+}
+
+details.editor-section summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 4px 0;
+  user-select: none;
+}
+
+details.editor-section summary:hover {
+  color: var(--text);
+}
+
+details.editor-section[open] summary {
+  margin-bottom: 8px;
+}
+
+.line-style-section .editor-row {
+  margin-bottom: 8px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--muted);
+  text-transform: none;
 }
 
 .version-section {
@@ -811,7 +867,7 @@ textarea:focus-visible,
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 8px;
+  padding: 16px;
 }
 
 .chart-card-title {

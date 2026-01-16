@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Phase: Feature Enhancement** (Migration Complete)
+**Phase: Feature Complete** ✅
 
-The React + Recharts migration is complete. The project is now in a feature enhancement phase focused on fixing broken controls and adding missing Recharts functionality.
+The React + Recharts migration is complete, and all planned features have been implemented. All critical, high, and medium priority items are done.
 
 ---
 
@@ -35,11 +35,15 @@ These features have been implemented:
 | Pie/Donut corner radius | Configurable corner radius for rounded segment edges | ✅ Complete |
 | Reference lines | Y-axis reference line with color, width, dash style, and optional label | ✅ Complete |
 
-### Medium Priority (Polish)
+### Medium Priority (Polish) - ALL COMPLETE ✅
 
-- Dot shape options for Line/Area
-- `connectNulls` for Line/Area charts
-- Stack offset options for stacked charts
+These features have been implemented:
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Dot shape options | Circle, square, diamond, cross, star, triangle, wye for Line/Area markers | ✅ Complete |
+| `connectNulls` | Toggle to connect lines across null values in Line/Area charts | ✅ Complete |
+| Stack offset options | None, expand (0-100%), wiggle (streamgraph), silhouette (centered) for stacked charts | ✅ Complete |
 
 ---
 
@@ -108,6 +112,24 @@ These features have been implemented:
    - `dashStyle`: Solid, dashed, or dotted
    - `label`: Optional text label
    - Applied to: ColumnChart, BarChartHorizontal, StackedBarChart, LineChart, AreaChart, StackedAreaChart
+
+### Medium Priority Features Added (Jan 2026) ✅
+
+1. **Dot Shape Options** - Added `dotShape` setting to Line and Area charts:
+   - Shapes available: circle, square, diamond, cross, star, triangle, wye
+   - Uses Recharts `Symbols` component for rendering custom shapes
+   - UI control appears when markers are enabled
+
+2. **Connect Nulls** - Added `connectNulls` toggle to Line and Area charts:
+   - When enabled, lines connect across null/missing data points
+   - Applied to: LineChart, AreaChart, StackedAreaChart
+
+3. **Stack Offset Options** - Added `stacked.stackOffset` setting:
+   - `none`: Default stacking behavior
+   - `expand`: Normalizes to 0-100% (percentage stacking)
+   - `wiggle`: Streamgraph layout (minimizes weighted wiggle)
+   - `silhouette`: Centered around zero baseline
+   - Applied to: StackedBarChart, StackedAreaChart
 
 ## How to Run
 

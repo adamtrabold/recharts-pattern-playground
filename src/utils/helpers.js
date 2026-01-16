@@ -69,3 +69,18 @@ export async function writeClipboard(text) {
     return false;
   }
 }
+
+/**
+ * Calculate Y-axis width based on max value
+ * Estimates pixel width needed to display tick labels
+ */
+export function calcYAxisWidth(maxValue, options = {}) {
+  const { fontSize = 12, padding = 8 } = options;
+  // Approximate character width at given font size
+  const charWidth = fontSize * 0.6;
+  // Number of characters in the max value
+  const numChars = Math.max(1, Math.ceil(Math.log10(Math.abs(maxValue) + 1)));
+  // Add space for negative sign if needed
+  const signWidth = maxValue < 0 ? charWidth : 0;
+  return Math.ceil(numChars * charWidth + signWidth + padding);
+}

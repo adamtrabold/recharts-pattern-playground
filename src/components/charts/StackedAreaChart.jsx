@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill, getSlotColor } from '../../utils/patternGenerator';
+import { calcYAxisWidth } from '../../utils/helpers';
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -69,7 +70,7 @@ const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
 
 export function StackedAreaChart() {
   const { state, getActiveSlot } = usePalette();
-  const { global, gap, area, axis, legend, referenceLine } = state.chartSettings;
+  const { global, gap, area, stacked, axis, legend, referenceLine } = state.chartSettings;
 
   // Determine if markers are enabled (override or global)
   const markersEnabled = area.markerOverride !== null && area.markerOverride !== undefined
@@ -114,7 +115,7 @@ export function StackedAreaChart() {
 
   // Axis configuration
   const yDomain = (axis?.yDomainAuto ?? true) 
-    ? ['auto', 'auto'] 
+    ? [0, 'auto'] 
     : [axis?.yDomainMin ?? 0, axis?.yDomainMax ?? 10];
   const yTickCount = (axis?.yTickCount ?? 0) > 0 ? axis.yTickCount : undefined;
   const yScale = axis?.yScale ?? 'linear';
@@ -125,9 +126,16 @@ export function StackedAreaChart() {
   const legendLayout = legend?.layout ?? 'horizontal';
   const legendIconType = legend?.iconType ?? 'square';
 
+  // Stack offset configuration
+  const stackOffset = stacked?.stackOffset ?? 'none';
+
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={STATIC_DATA} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <AreaChart 
+        data={STATIC_DATA} 
+        margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
+        stackOffset={stackOffset}
+      >
         {/* Gradient definitions */}
         <defs>
           {gradientEnabled && [0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
@@ -152,6 +160,7 @@ export function StackedAreaChart() {
         {global.axisLabels && <XAxis dataKey="name" />}
         {global.axisLabels && (
           <YAxis 
+            width={calcYAxisWidth(50)}
             domain={yDomain} 
             tickCount={yTickCount}
             scale={yScale}
@@ -203,6 +212,7 @@ export function StackedAreaChart() {
               strokeWidth={useGap ? gapThickness : area.lineWidth}
               dot={false}
               activeDot={activeDotProps}
+              connectNulls={area.connectNulls ?? false}
               name={slot.label}
               isAnimationActive={global.animation}
             >

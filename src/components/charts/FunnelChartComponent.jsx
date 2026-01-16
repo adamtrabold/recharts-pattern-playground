@@ -35,7 +35,7 @@ export function FunnelChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <FunnelChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+      <FunnelChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
         {global.tooltip && <Tooltip />}
         <Funnel
           data={data}
