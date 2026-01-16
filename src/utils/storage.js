@@ -25,7 +25,7 @@ export const DEFAULT_STATE = {
       patternType: 'lines',
       spacing: 14,
       strokeWidth: 4,
-      opacity: 0.85,
+      opacity: 1,
       angle: 45,
       invert: false,
       roundCaps: true,
@@ -38,7 +38,7 @@ export const DEFAULT_STATE = {
       patternType: 'crosshatch',
       spacing: 16,
       strokeWidth: 3,
-      opacity: 0.75,
+      opacity: 1,
       angle: 45,
       invert: false,
       roundCaps: false,
@@ -51,7 +51,7 @@ export const DEFAULT_STATE = {
       patternType: 'dots',
       spacing: 14,
       strokeWidth: 5,
-      opacity: 0.85,
+      opacity: 1,
       angle: 0,
       invert: false,
       roundCaps: true,
@@ -68,7 +68,7 @@ export const DEFAULT_STATE = {
       patternType: 'lines',
       spacing: 12,
       strokeWidth: 3,
-      opacity: 0.85,
+      opacity: 1,
       angle: 0,
       invert: false,
       roundCaps: false,
@@ -112,7 +112,7 @@ export const DEFAULT_STATE = {
       },
     },
     columnBar: {
-      borderRadius: 0,
+      borderRadius: 4,
       barGap: 4,
     },
     line: {
@@ -120,10 +120,10 @@ export const DEFAULT_STATE = {
       markerOverride: null,
       markerRadius: 4,
       dashStyle: 'solid',
-      curveType: 'monotone',
+      curveType: 'linear',
     },
     area: {
-      fillOpacity: 0.65,
+      fillOpacity: 1,
       lineWidth: 2,
       markerOverride: null,
       markerType: 'marker',
@@ -131,7 +131,7 @@ export const DEFAULT_STATE = {
       cursorStyle: 'solid',
       cursorColor: '#666666',
       cursorWidth: 1,
-      curveType: 'monotone',
+      curveType: 'linear',
       gradientEnabled: false,
       gradientMode: 'shared',
       sharedAngle: 90,
@@ -171,7 +171,7 @@ function normalizeSlot(slot, defaultSlot, index) {
       : 'lines';
     result.spacing = clamp(Number(slot.spacing) || 14, 4, 40);
     result.strokeWidth = clamp(Number(slot.strokeWidth) || 3, 1, 12);
-    result.opacity = clamp(Number(slot.opacity) || 0.8, 0.05, 1);
+    result.opacity = clamp(Number(slot.opacity) || 1, 0.05, 1);
     result.angle = clamp(Number(slot.angle) || 0, 0, 180);
     result.invert = !!slot.invert;
     result.roundCaps = !!slot.roundCaps;
