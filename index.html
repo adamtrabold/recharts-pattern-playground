@@ -92,31 +92,45 @@
               </select>
             </div>
             <div class="field">
-              <label for="spacing">Spacing <span id="spacingValue" class="val"></span></label>
-              <input id="spacing" name="spacing" type="range" min="4" max="40" step="1" />
+              <label for="spacing">Spacing</label>
+              <div class="range-input-combo">
+                <input id="spacing" name="spacing" type="range" min="4" max="40" step="1" tabindex="-1" />
+                <input id="spacingNum" type="number" class="num-input" min="4" max="40" step="1" aria-label="Spacing value" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <div class="field">
-              <label for="strokeWidth">Stroke <span id="strokeWidthValue" class="val"></span></label>
-              <input id="strokeWidth" name="strokeWidth" type="range" min="1" max="12" step="1" />
+              <label for="strokeWidth">Stroke</label>
+              <div class="range-input-combo">
+                <input id="strokeWidth" name="strokeWidth" type="range" min="1" max="12" step="1" tabindex="-1" />
+                <input id="strokeWidthNum" type="number" class="num-input" min="1" max="12" step="1" aria-label="Stroke width value" />
+                <span class="unit">px</span>
+              </div>
             </div>
           </div>
 
           <div class="editor-row" data-only="pattern">
             <div class="field">
-              <label for="opacity">Opacity <span id="opacityValue" class="val"></span></label>
-              <input id="opacity" name="opacity" type="range" min="0.05" max="1" step="0.05" />
+              <label for="opacity">Opacity</label>
+              <div class="range-input-combo">
+                <input id="opacity" name="opacity" type="range" min="0.05" max="1" step="0.05" tabindex="-1" />
+                <input id="opacityNum" type="number" class="num-input" min="5" max="100" step="5" aria-label="Opacity percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
             <div class="field" data-hide="dots">
-              <label for="angle">Angle <span id="angleValue" class="val"></span></label>
-              <div class="range-with-snaps">
-                <input id="angle" name="angle" type="range" min="0" max="180" step="5" />
-                <div class="snap-buttons" data-target="angle">
-                  <button type="button" data-value="0">0</button>
-                  <button type="button" data-value="45">45</button>
-                  <button type="button" data-value="90">90</button>
-                  <button type="button" data-value="135">135</button>
-                  <button type="button" data-value="180">180</button>
-                </div>
+              <label for="angle">Angle</label>
+              <div class="range-input-combo with-snaps">
+                <input id="angle" name="angle" type="range" min="0" max="180" step="5" tabindex="-1" />
+                <input id="angleNum" type="number" class="num-input" min="0" max="180" step="5" aria-label="Angle in degrees" />
+                <span class="unit">°</span>
+              </div>
+              <div class="snap-buttons" data-target="angle">
+                <button type="button" data-value="0" tabindex="-1">0</button>
+                <button type="button" data-value="45" tabindex="-1">45</button>
+                <button type="button" data-value="90" tabindex="-1">90</button>
+                <button type="button" data-value="135" tabindex="-1">135</button>
+                <button type="button" data-value="180" tabindex="-1">180</button>
               </div>
             </div>
             <div class="field icon-toggles" data-hide="dots">
@@ -142,12 +156,20 @@
               </select>
             </div>
             <div class="field">
-              <label for="dotOffsetX">X offset <span id="dotOffsetXValue" class="val"></span></label>
-              <input id="dotOffsetX" name="dotOffsetX" type="range" min="0" max="100" step="5" />
+              <label for="dotOffsetX">X offset</label>
+              <div class="range-input-combo">
+                <input id="dotOffsetX" name="dotOffsetX" type="range" min="0" max="100" step="5" tabindex="-1" />
+                <input id="dotOffsetXNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="X offset percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
             <div class="field">
-              <label for="dotOffsetY">Y offset <span id="dotOffsetYValue" class="val"></span></label>
-              <input id="dotOffsetY" name="dotOffsetY" type="range" min="0" max="100" step="5" />
+              <label for="dotOffsetY">Y offset</label>
+              <div class="range-input-combo">
+                <input id="dotOffsetY" name="dotOffsetY" type="range" min="0" max="100" step="5" tabindex="-1" />
+                <input id="dotOffsetYNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Y offset percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
           </div>
 
@@ -172,16 +194,18 @@
               <label class="cs-toggle"><input type="checkbox" id="grad-enabled" /> Enable gradient</label>
               
               <div class="field">
-                <label for="grad-angle">Angle <span id="grad-angle-val" class="val"></span></label>
-                <div class="range-with-snaps">
-                  <input id="grad-angle" type="range" min="0" max="360" step="5" />
-                  <div class="snap-buttons" data-target="grad-angle">
-                    <button type="button" data-value="0">0</button>
-                    <button type="button" data-value="45">45</button>
-                    <button type="button" data-value="90">90</button>
-                    <button type="button" data-value="180">180</button>
-                    <button type="button" data-value="270">270</button>
-                  </div>
+                <label for="grad-angle">Angle</label>
+                <div class="range-input-combo with-snaps">
+                  <input id="grad-angle" type="range" min="0" max="360" step="5" tabindex="-1" />
+                  <input id="grad-angleNum" type="number" class="num-input" min="0" max="360" step="5" aria-label="Gradient angle in degrees" />
+                  <span class="unit">°</span>
+                </div>
+                <div class="snap-buttons" data-target="grad-angle">
+                  <button type="button" data-value="0" tabindex="-1">0</button>
+                  <button type="button" data-value="45" tabindex="-1">45</button>
+                  <button type="button" data-value="90" tabindex="-1">90</button>
+                  <button type="button" data-value="180" tabindex="-1">180</button>
+                  <button type="button" data-value="270" tabindex="-1">270</button>
                 </div>
               </div>
 
@@ -197,8 +221,12 @@
                   </div>
                 </div>
                 <div class="field field-sm">
-                  <label for="grad-topOpacity">Opacity <span id="grad-topOpacity-val" class="val"></span></label>
-                  <input id="grad-topOpacity" type="range" min="0" max="1" step="0.05" />
+                  <label for="grad-topOpacity">Opacity</label>
+                  <div class="range-input-combo compact">
+                    <input id="grad-topOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
+                    <input id="grad-topOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Top opacity percentage" />
+                    <span class="unit">%</span>
+                  </div>
                 </div>
               </div>
 
@@ -214,8 +242,12 @@
                   </div>
                 </div>
                 <div class="field field-sm">
-                  <label for="grad-bottomOpacity">Opacity <span id="grad-bottomOpacity-val" class="val"></span></label>
-                  <input id="grad-bottomOpacity" type="range" min="0" max="1" step="0.05" />
+                  <label for="grad-bottomOpacity">Opacity</label>
+                  <div class="range-input-combo compact">
+                    <input id="grad-bottomOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
+                    <input id="grad-bottomOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Bottom opacity percentage" />
+                    <span class="unit">%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -271,20 +303,34 @@
           <summary>Column / Bar</summary>
           <div class="cs-type-body">
             <div class="field">
-              <label for="cs-cb-borderRadius">Border radius <span id="cs-cb-borderRadius-val" class="val"></span></label>
-              <input id="cs-cb-borderRadius" type="range" min="0" max="20" step="1" />
+              <label for="cs-cb-borderRadius">Border radius</label>
+              <div class="range-input-combo">
+                <input id="cs-cb-borderRadius" type="range" min="0" max="20" step="1" tabindex="-1" />
+                <input id="cs-cb-borderRadiusNum" type="number" class="num-input" min="0" max="20" step="1" aria-label="Border radius in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <div class="field">
-              <label for="cs-cb-pointPadding">Point padding <span id="cs-cb-pointPadding-val" class="val"></span></label>
-              <input id="cs-cb-pointPadding" type="range" min="0" max="0.5" step="0.05" />
+              <label for="cs-cb-pointPadding">Point padding</label>
+              <div class="range-input-combo">
+                <input id="cs-cb-pointPadding" type="range" min="0" max="0.5" step="0.05" tabindex="-1" />
+                <input id="cs-cb-pointPaddingNum" type="number" class="num-input" min="0" max="0.5" step="0.05" aria-label="Point padding value" />
+              </div>
             </div>
             <div class="field">
-              <label for="cs-cb-groupPadding">Group padding <span id="cs-cb-groupPadding-val" class="val"></span></label>
-              <input id="cs-cb-groupPadding" type="range" min="0" max="0.5" step="0.05" />
+              <label for="cs-cb-groupPadding">Group padding</label>
+              <div class="range-input-combo">
+                <input id="cs-cb-groupPadding" type="range" min="0" max="0.5" step="0.05" tabindex="-1" />
+                <input id="cs-cb-groupPaddingNum" type="number" class="num-input" min="0" max="0.5" step="0.05" aria-label="Group padding value" />
+              </div>
             </div>
             <div class="field">
-              <label for="cs-cb-borderWidth">Border width <span id="cs-cb-borderWidth-val" class="val"></span></label>
-              <input id="cs-cb-borderWidth" type="range" min="0" max="5" step="1" />
+              <label for="cs-cb-borderWidth">Border width</label>
+              <div class="range-input-combo">
+                <input id="cs-cb-borderWidth" type="range" min="0" max="5" step="1" tabindex="-1" />
+                <input id="cs-cb-borderWidthNum" type="number" class="num-input" min="0" max="5" step="1" aria-label="Border width in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
           </div>
         </details>
@@ -294,8 +340,12 @@
           <summary>Line</summary>
           <div class="cs-type-body">
             <div class="field">
-              <label for="cs-line-lineWidth">Line width <span id="cs-line-lineWidth-val" class="val"></span></label>
-              <input id="cs-line-lineWidth" type="range" min="1" max="8" step="1" />
+              <label for="cs-line-lineWidth">Line width</label>
+              <div class="range-input-combo">
+                <input id="cs-line-lineWidth" type="range" min="1" max="8" step="1" tabindex="-1" />
+                <input id="cs-line-lineWidthNum" type="number" class="num-input" min="1" max="8" step="1" aria-label="Line width in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <div class="field">
               <label for="cs-line-dashStyle">Dash style</label>
@@ -310,8 +360,12 @@
             </div>
             <label class="cs-toggle"><input type="checkbox" id="cs-line-markerEnabled" /> Show markers</label>
             <div class="field">
-              <label for="cs-line-markerRadius">Marker radius <span id="cs-line-markerRadius-val" class="val"></span></label>
-              <input id="cs-line-markerRadius" type="range" min="2" max="10" step="1" />
+              <label for="cs-line-markerRadius">Marker radius</label>
+              <div class="range-input-combo">
+                <input id="cs-line-markerRadius" type="range" min="2" max="10" step="1" tabindex="-1" />
+                <input id="cs-line-markerRadiusNum" type="number" class="num-input" min="2" max="10" step="1" aria-label="Marker radius in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
           </div>
         </details>
@@ -321,12 +375,20 @@
           <summary>Area</summary>
           <div class="cs-type-body">
             <div class="field">
-              <label for="cs-area-fillOpacity">Fill opacity <span id="cs-area-fillOpacity-val" class="val"></span></label>
-              <input id="cs-area-fillOpacity" type="range" min="0.1" max="1" step="0.05" />
+              <label for="cs-area-fillOpacity">Fill opacity</label>
+              <div class="range-input-combo">
+                <input id="cs-area-fillOpacity" type="range" min="0.1" max="1" step="0.05" tabindex="-1" />
+                <input id="cs-area-fillOpacityNum" type="number" class="num-input" min="10" max="100" step="5" aria-label="Fill opacity percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
             <div class="field">
-              <label for="cs-area-lineWidth">Line width <span id="cs-area-lineWidth-val" class="val"></span></label>
-              <input id="cs-area-lineWidth" type="range" min="0" max="8" step="1" />
+              <label for="cs-area-lineWidth">Line width</label>
+              <div class="range-input-combo">
+                <input id="cs-area-lineWidth" type="range" min="0" max="8" step="1" tabindex="-1" />
+                <input id="cs-area-lineWidthNum" type="number" class="num-input" min="0" max="8" step="1" aria-label="Line width in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <label class="cs-toggle"><input type="checkbox" id="cs-area-markerEnabled" /> Show markers</label>
             
@@ -346,8 +408,12 @@
                   </div>
                 </div>
                 <div class="field field-sm">
-                  <label for="cs-area-sharedBottomOpacity">Opacity <span id="cs-area-sharedBottomOpacity-val" class="val"></span></label>
-                  <input id="cs-area-sharedBottomOpacity" type="range" min="0" max="1" step="0.05" />
+                  <label for="cs-area-sharedBottomOpacity">Opacity</label>
+                  <div class="range-input-combo compact">
+                    <input id="cs-area-sharedBottomOpacity" type="range" min="0" max="1" step="0.05" tabindex="-1" />
+                    <input id="cs-area-sharedBottomOpacityNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Shared bottom opacity percentage" />
+                    <span class="unit">%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -359,29 +425,43 @@
           <summary>Pie / Donut</summary>
           <div class="cs-type-body">
             <div class="field">
-              <label for="cs-pie-startAngle">Start angle <span id="cs-pie-startAngle-val" class="val"></span></label>
-              <div class="range-with-snaps">
-                <input id="cs-pie-startAngle" type="range" min="-180" max="180" step="5" />
-                <div class="snap-buttons" data-target="cs-pie-startAngle">
-                  <button type="button" data-value="-90">-90</button>
-                  <button type="button" data-value="-45">-45</button>
-                  <button type="button" data-value="0">0</button>
-                  <button type="button" data-value="45">45</button>
-                  <button type="button" data-value="90">90</button>
-                </div>
+              <label for="cs-pie-startAngle">Start angle</label>
+              <div class="range-input-combo with-snaps">
+                <input id="cs-pie-startAngle" type="range" min="-180" max="180" step="5" tabindex="-1" />
+                <input id="cs-pie-startAngleNum" type="number" class="num-input" min="-180" max="180" step="5" aria-label="Start angle in degrees" />
+                <span class="unit">°</span>
+              </div>
+              <div class="snap-buttons" data-target="cs-pie-startAngle">
+                <button type="button" data-value="-90" tabindex="-1">-90</button>
+                <button type="button" data-value="-45" tabindex="-1">-45</button>
+                <button type="button" data-value="0" tabindex="-1">0</button>
+                <button type="button" data-value="45" tabindex="-1">45</button>
+                <button type="button" data-value="90" tabindex="-1">90</button>
               </div>
             </div>
             <div class="field">
-              <label for="cs-pie-slicedOffset">Sliced offset <span id="cs-pie-slicedOffset-val" class="val"></span></label>
-              <input id="cs-pie-slicedOffset" type="range" min="0" max="40" step="1" />
+              <label for="cs-pie-slicedOffset">Sliced offset</label>
+              <div class="range-input-combo">
+                <input id="cs-pie-slicedOffset" type="range" min="0" max="40" step="1" tabindex="-1" />
+                <input id="cs-pie-slicedOffsetNum" type="number" class="num-input" min="0" max="40" step="1" aria-label="Sliced offset in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <div class="field">
-              <label for="cs-pie-borderWidth">Gap <span id="cs-pie-borderWidth-val" class="val"></span></label>
-              <input id="cs-pie-borderWidth" type="range" min="0" max="10" step="1" />
+              <label for="cs-pie-borderWidth">Gap</label>
+              <div class="range-input-combo">
+                <input id="cs-pie-borderWidth" type="range" min="0" max="10" step="1" tabindex="-1" />
+                <input id="cs-pie-borderWidthNum" type="number" class="num-input" min="0" max="10" step="1" aria-label="Gap width in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
             <div class="field">
-              <label for="cs-pie-dataLabelDistance">Label distance <span id="cs-pie-dataLabelDistance-val" class="val"></span></label>
-              <input id="cs-pie-dataLabelDistance" type="range" min="-50" max="80" step="5" />
+              <label for="cs-pie-dataLabelDistance">Label distance</label>
+              <div class="range-input-combo">
+                <input id="cs-pie-dataLabelDistance" type="range" min="-50" max="80" step="5" tabindex="-1" />
+                <input id="cs-pie-dataLabelDistanceNum" type="number" class="num-input" min="-50" max="80" step="5" aria-label="Label distance in pixels" />
+                <span class="unit">px</span>
+              </div>
             </div>
           </div>
         </details>
@@ -391,12 +471,20 @@
           <summary>Funnel</summary>
           <div class="cs-type-body">
             <div class="field">
-              <label for="cs-funnel-neckWidthPercent">Neck width <span id="cs-funnel-neckWidthPercent-val" class="val"></span></label>
-              <input id="cs-funnel-neckWidthPercent" type="range" min="0" max="100" step="5" />
+              <label for="cs-funnel-neckWidthPercent">Neck width</label>
+              <div class="range-input-combo">
+                <input id="cs-funnel-neckWidthPercent" type="range" min="0" max="100" step="5" tabindex="-1" />
+                <input id="cs-funnel-neckWidthPercentNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Neck width percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
             <div class="field">
-              <label for="cs-funnel-neckHeightPercent">Neck height <span id="cs-funnel-neckHeightPercent-val" class="val"></span></label>
-              <input id="cs-funnel-neckHeightPercent" type="range" min="0" max="100" step="5" />
+              <label for="cs-funnel-neckHeightPercent">Neck height</label>
+              <div class="range-input-combo">
+                <input id="cs-funnel-neckHeightPercent" type="range" min="0" max="100" step="5" tabindex="-1" />
+                <input id="cs-funnel-neckHeightPercentNum" type="number" class="num-input" min="0" max="100" step="5" aria-label="Neck height percentage" />
+                <span class="unit">%</span>
+              </div>
             </div>
             <label class="cs-toggle"><input type="checkbox" id="cs-funnel-reversed" /> Reversed (pyramid)</label>
           </div>

@@ -1005,6 +1005,65 @@ textarea:focus-visible,
   color: #fff;
 }
 
+/* Range + Number input combo */
+.range-input-combo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.range-input-combo input[type="range"] {
+  flex: 1;
+  min-width: 40px;
+}
+
+.range-input-combo .num-input {
+  width: 52px;
+  padding: 4px 2px 4px 6px;
+  font-size: 12px;
+  font-family: inherit;
+  text-align: right;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  -moz-appearance: textfield;
+}
+
+.range-input-combo .num-input::-webkit-outer-spin-button,
+.range-input-combo .num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.range-input-combo .num-input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: -1px;
+  border-color: var(--focus);
+}
+
+.range-input-combo .unit {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 14px;
+}
+
+/* Compact variant for smaller spaces */
+.range-input-combo.compact input[type="range"] {
+  min-width: 30px;
+}
+
+.range-input-combo.compact .num-input {
+  width: 44px;
+  padding: 3px 1px 3px 4px;
+  font-size: 11px;
+}
+
+/* With snaps variant - keep slider and input on same row, snaps below */
+.range-input-combo.with-snaps {
+  margin-bottom: 0;
+}
+
 /* Utilities */
 .sr-only {
   position: absolute;

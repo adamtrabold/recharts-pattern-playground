@@ -32,16 +32,18 @@
   const $dotStaggered = document.getElementById("dotStaggered");
   const $invertDots = document.getElementById("invertDots");
 
-  const $spacingValue = document.getElementById("spacingValue");
-  const $strokeWidthValue = document.getElementById("strokeWidthValue");
-  const $opacityValue = document.getElementById("opacityValue");
-  const $angleValue = document.getElementById("angleValue");
 
   const $dotShape = document.getElementById("dotShape");
   const $dotOffsetX = document.getElementById("dotOffsetX");
   const $dotOffsetY = document.getElementById("dotOffsetY");
-  const $dotOffsetXValue = document.getElementById("dotOffsetXValue");
-  const $dotOffsetYValue = document.getElementById("dotOffsetYValue");
+
+  // Number inputs for pattern settings
+  const $spacingNum = document.getElementById("spacingNum");
+  const $strokeWidthNum = document.getElementById("strokeWidthNum");
+  const $opacityNum = document.getElementById("opacityNum");
+  const $angleNum = document.getElementById("angleNum");
+  const $dotOffsetXNum = document.getElementById("dotOffsetXNum");
+  const $dotOffsetYNum = document.getElementById("dotOffsetYNum");
 
   const $btnVersionA = document.getElementById("btnVersionA");
   const $btnVersionB = document.getElementById("btnVersionB");
@@ -926,10 +928,11 @@
       $invert.classList.toggle("active", !!slot.invert);
       $roundCaps.classList.toggle("active", !!slot.roundCaps);
 
-      $spacingValue.textContent = slot.spacing + "px";
-      $strokeWidthValue.textContent = slot.strokeWidth + "px";
-      $opacityValue.textContent = Math.round(slot.opacity * 100) + "%";
-      $angleValue.textContent = slot.angle + "°";
+      // Update number inputs (skip if focused to avoid interrupting typing)
+      if (activeEl !== $spacingNum) $spacingNum.value = slot.spacing;
+      if (activeEl !== $strokeWidthNum) $strokeWidthNum.value = slot.strokeWidth;
+      if (activeEl !== $opacityNum) $opacityNum.value = Math.round(slot.opacity * 100);
+      if (activeEl !== $angleNum) $angleNum.value = slot.angle;
 
       // Dots-specific controls
       $dotShape.value = slot.dotShape || "circle";
@@ -937,8 +940,8 @@
       $dotOffsetY.value = String(slot.dotOffsetY || 0);
       $dotStaggered.classList.toggle("active", !!slot.dotStaggered);
       $invertDots.classList.toggle("active", !!slot.invert);
-      $dotOffsetXValue.textContent = (slot.dotOffsetX || 0) + "%";
-      $dotOffsetYValue.textContent = (slot.dotOffsetY || 0) + "%";
+      if (activeEl !== $dotOffsetXNum) $dotOffsetXNum.value = slot.dotOffsetX || 0;
+      if (activeEl !== $dotOffsetYNum) $dotOffsetYNum.value = slot.dotOffsetY || 0;
 
       setEditorVisibilityForMode("pattern", slot.patternType);
     }
@@ -1553,16 +1556,40 @@
     document.querySelectorAll(".snap-buttons").forEach((container) => {
       const targetId = container.dataset.target;
       const targetInput = document.getElementById(targetId);
+      const targetNumInput = document.getElementById(targetId + "Num");
       if (!targetInput) return;
 
       container.querySelectorAll("button[data-value]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const value = Number(btn.dataset.value);
           targetInput.value = String(value);
+          if (targetNumInput) targetNumInput.value = String(value);
           targetInput.dispatchEvent(new Event("input", { bubbles: true }));
         });
       });
     });
+  }
+
+
+  // Keyboard handler for number inputs - handles arrow up/down for increment/decrement
+  function handleNumInputKeydown(e) {
+    const numEl = e.target;
+    const step = Number(numEl.step) || 1;
+    const min = Number(numEl.min);
+    const max = Number(numEl.max);
+    let val = Number(numEl.value) || min;
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      val = clamp(val + step, min, max);
+      numEl.value = val;
+      numEl.dispatchEvent(new Event("input", { bubbles: true }));
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      val = clamp(val - step, min, max);
+      numEl.value = val;
+      numEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }
   }
 
   function wireUI() {
@@ -1667,37 +1694,102 @@
       }),
     );
 
-    $spacing.addEventListener("input", () =>
+    // Wire spacing range + number input pair
+    const handleSpacingChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern") return;
-        slot.spacing = clamp(Number($spacing.value), 4, 40);
-      }),
-    );
+        slot.spacing = clamp(val, 4, 40);
+      });
+    };
+    $spacing.addEventListener("input", () => {
+      $spacingNum.value = $spacing.value;
+      handleSpacingChange(Number($spacing.value));
+    });
+    $spacingNum.addEventListener("input", () => {
+      const val = clamp(Number($spacingNum.value) || 4, 4, 40);
+      $spacing.value = val;
+      handleSpacingChange(val);
+    });
+    $spacingNum.addEventListener("blur", () => {
+      const val = clamp(Number($spacingNum.value) || 4, 4, 40);
+      $spacingNum.value = val;
+      $spacing.value = val;
+    });
+    $spacingNum.addEventListener("keydown", handleNumInputKeydown);
 
-    $strokeWidth.addEventListener("input", () =>
+    // Wire strokeWidth range + number input pair
+    const handleStrokeWidthChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern") return;
-        slot.strokeWidth = clamp(Number($strokeWidth.value), 1, 12);
-      }),
-    );
+        slot.strokeWidth = clamp(val, 1, 12);
+      });
+    };
+    $strokeWidth.addEventListener("input", () => {
+      $strokeWidthNum.value = $strokeWidth.value;
+      handleStrokeWidthChange(Number($strokeWidth.value));
+    });
+    $strokeWidthNum.addEventListener("input", () => {
+      const val = clamp(Number($strokeWidthNum.value) || 1, 1, 12);
+      $strokeWidth.value = val;
+      handleStrokeWidthChange(val);
+    });
+    $strokeWidthNum.addEventListener("blur", () => {
+      const val = clamp(Number($strokeWidthNum.value) || 1, 1, 12);
+      $strokeWidthNum.value = val;
+      $strokeWidth.value = val;
+    });
+    $strokeWidthNum.addEventListener("keydown", handleNumInputKeydown);
 
-    $opacity.addEventListener("input", () =>
+    // Wire opacity range + number input pair (converts between 0-1 and 0-100%)
+    const handleOpacityChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern") return;
-        slot.opacity = clamp(Number($opacity.value), 0.05, 1);
-      }),
-    );
+        slot.opacity = clamp(val, 0.05, 1);
+      });
+    };
+    $opacity.addEventListener("input", () => {
+      $opacityNum.value = Math.round(Number($opacity.value) * 100);
+      handleOpacityChange(Number($opacity.value));
+    });
+    $opacityNum.addEventListener("input", () => {
+      const pct = clamp(Number($opacityNum.value) || 5, 5, 100);
+      const val = pct / 100;
+      $opacity.value = val;
+      handleOpacityChange(val);
+    });
+    $opacityNum.addEventListener("blur", () => {
+      const pct = clamp(Number($opacityNum.value) || 5, 5, 100);
+      $opacityNum.value = pct;
+      $opacity.value = pct / 100;
+    });
+    $opacityNum.addEventListener("keydown", handleNumInputKeydown);
 
-    $angle.addEventListener("input", () =>
+    // Wire angle range + number input pair
+    const handleAngleChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern") return;
-        slot.angle = clamp(Number($angle.value), 0, 180);
-      }),
-    );
+        slot.angle = clamp(val, 0, 180);
+      });
+    };
+    $angle.addEventListener("input", () => {
+      $angleNum.value = $angle.value;
+      handleAngleChange(Number($angle.value));
+    });
+    $angleNum.addEventListener("input", () => {
+      const val = clamp(Number($angleNum.value) || 0, 0, 180);
+      $angle.value = val;
+      handleAngleChange(val);
+    });
+    $angleNum.addEventListener("blur", () => {
+      const val = clamp(Number($angleNum.value) || 0, 0, 180);
+      $angleNum.value = val;
+      $angle.value = val;
+    });
+    $angleNum.addEventListener("keydown", handleNumInputKeydown);
 
     $invert.addEventListener("click", () =>
       setState((s) => {
@@ -1724,21 +1816,53 @@
       }),
     );
 
-    $dotOffsetX.addEventListener("input", () =>
+    // Wire dotOffsetX range + number input pair
+    const handleDotOffsetXChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern" || slot.patternType !== "dots") return;
-        slot.dotOffsetX = clamp(Number($dotOffsetX.value), 0, 100);
-      }),
-    );
+        slot.dotOffsetX = clamp(val, 0, 100);
+      });
+    };
+    $dotOffsetX.addEventListener("input", () => {
+      $dotOffsetXNum.value = $dotOffsetX.value;
+      handleDotOffsetXChange(Number($dotOffsetX.value));
+    });
+    $dotOffsetXNum.addEventListener("input", () => {
+      const val = clamp(Number($dotOffsetXNum.value) || 0, 0, 100);
+      $dotOffsetX.value = val;
+      handleDotOffsetXChange(val);
+    });
+    $dotOffsetXNum.addEventListener("blur", () => {
+      const val = clamp(Number($dotOffsetXNum.value) || 0, 0, 100);
+      $dotOffsetXNum.value = val;
+      $dotOffsetX.value = val;
+    });
+    $dotOffsetXNum.addEventListener("keydown", handleNumInputKeydown);
 
-    $dotOffsetY.addEventListener("input", () =>
+    // Wire dotOffsetY range + number input pair
+    const handleDotOffsetYChange = (val) => {
       setState((s) => {
         const slot = getEditSlot(s);
         if (slot.type !== "pattern" || slot.patternType !== "dots") return;
-        slot.dotOffsetY = clamp(Number($dotOffsetY.value), 0, 100);
-      }),
-    );
+        slot.dotOffsetY = clamp(val, 0, 100);
+      });
+    };
+    $dotOffsetY.addEventListener("input", () => {
+      $dotOffsetYNum.value = $dotOffsetY.value;
+      handleDotOffsetYChange(Number($dotOffsetY.value));
+    });
+    $dotOffsetYNum.addEventListener("input", () => {
+      const val = clamp(Number($dotOffsetYNum.value) || 0, 0, 100);
+      $dotOffsetY.value = val;
+      handleDotOffsetYChange(val);
+    });
+    $dotOffsetYNum.addEventListener("blur", () => {
+      const val = clamp(Number($dotOffsetYNum.value) || 0, 0, 100);
+      $dotOffsetYNum.value = val;
+      $dotOffsetY.value = val;
+    });
+    $dotOffsetYNum.addEventListener("keydown", handleNumInputKeydown);
 
     $dotStaggered.addEventListener("click", () =>
       setState((s) => {
@@ -1858,41 +1982,79 @@
       }
     });
 
-    // Column/Bar settings
+    // Column/Bar settings - wire range + number input pairs
     const cbRanges = [
-      { id: "cs-cb-borderRadius", key: "borderRadius", min: 0, max: 20 },
-      { id: "cs-cb-pointPadding", key: "pointPadding", min: 0, max: 0.5 },
-      { id: "cs-cb-groupPadding", key: "groupPadding", min: 0, max: 0.5 },
-      { id: "cs-cb-borderWidth", key: "borderWidth", min: 0, max: 5 },
+      { id: "cs-cb-borderRadius", key: "borderRadius", min: 0, max: 20, unit: "px" },
+      { id: "cs-cb-pointPadding", key: "pointPadding", min: 0, max: 0.5, isDecimal: true },
+      { id: "cs-cb-groupPadding", key: "groupPadding", min: 0, max: 0.5, isDecimal: true },
+      { id: "cs-cb-borderWidth", key: "borderWidth", min: 0, max: 5, unit: "px" },
     ];
-    cbRanges.forEach(({ id, key, min, max }) => {
+    cbRanges.forEach(({ id, key, min, max, isDecimal }) => {
       const el = document.getElementById(id);
+      const numEl = document.getElementById(id + "Num");
+      const handler = (val) => {
+        setState((s) => {
+          s.chartSettings.columnBar[key] = clamp(val, min, max);
+        });
+        applyChartSettings();
+        renderChartSettingsValues();
+      };
       if (el) {
         el.addEventListener("input", () => {
-          setState((s) => {
-            s.chartSettings.columnBar[key] = clamp(Number(el.value), min, max);
-          });
-          applyChartSettings();
-          renderChartSettingsValues();
+          const val = Number(el.value);
+          if (numEl) numEl.value = isDecimal ? val.toFixed(2) : val;
+          handler(val);
         });
+      }
+      if (numEl) {
+        numEl.addEventListener("input", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          if (el) el.value = val;
+          handler(val);
+        });
+        numEl.addEventListener("blur", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          numEl.value = isDecimal ? val.toFixed(2) : val;
+          if (el) el.value = val;
+        });
+        numEl.addEventListener("keydown", handleNumInputKeydown);
       }
     });
 
-    // Line settings
+    // Line settings - wire range + number input pairs
     const lineRanges = [
       { id: "cs-line-lineWidth", key: "lineWidth", min: 1, max: 8 },
       { id: "cs-line-markerRadius", key: "markerRadius", min: 2, max: 10 },
     ];
     lineRanges.forEach(({ id, key, min, max }) => {
       const el = document.getElementById(id);
+      const numEl = document.getElementById(id + "Num");
+      const handler = (val) => {
+        setState((s) => {
+          s.chartSettings.line[key] = clamp(val, min, max);
+        });
+        applyChartSettings();
+        renderChartSettingsValues();
+      };
       if (el) {
         el.addEventListener("input", () => {
-          setState((s) => {
-            s.chartSettings.line[key] = clamp(Number(el.value), min, max);
-          });
-          applyChartSettings();
-          renderChartSettingsValues();
+          const val = Number(el.value);
+          if (numEl) numEl.value = val;
+          handler(val);
         });
+      }
+      if (numEl) {
+        numEl.addEventListener("input", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          if (el) el.value = val;
+          handler(val);
+        });
+        numEl.addEventListener("blur", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          numEl.value = val;
+          if (el) el.value = val;
+        });
+        numEl.addEventListener("keydown", handleNumInputKeydown);
       }
     });
 
@@ -1916,21 +2078,45 @@
       });
     }
 
-    // Area settings
+    // Area settings - wire range + number input pairs
     const areaRanges = [
-      { id: "cs-area-fillOpacity", key: "fillOpacity", min: 0.1, max: 1 },
+      { id: "cs-area-fillOpacity", key: "fillOpacity", min: 0.1, max: 1, isPercent: true },
       { id: "cs-area-lineWidth", key: "lineWidth", min: 0, max: 8 },
     ];
-    areaRanges.forEach(({ id, key, min, max }) => {
+    areaRanges.forEach(({ id, key, min, max, isPercent }) => {
       const el = document.getElementById(id);
+      const numEl = document.getElementById(id + "Num");
+      const handler = (val) => {
+        setState((s) => {
+          s.chartSettings.area[key] = clamp(val, min, max);
+        });
+        applyChartSettings();
+        renderChartSettingsValues();
+      };
       if (el) {
         el.addEventListener("input", () => {
-          setState((s) => {
-            s.chartSettings.area[key] = clamp(Number(el.value), min, max);
-          });
-          applyChartSettings();
-          renderChartSettingsValues();
+          const val = Number(el.value);
+          if (numEl) numEl.value = isPercent ? Math.round(val * 100) : val;
+          handler(val);
         });
+      }
+      if (numEl) {
+        numEl.addEventListener("input", () => {
+          const numMin = isPercent ? Math.round(min * 100) : min;
+          const numMax = isPercent ? Math.round(max * 100) : max;
+          const numVal = clamp(Number(numEl.value) || numMin, numMin, numMax);
+          const val = isPercent ? numVal / 100 : numVal;
+          if (el) el.value = val;
+          handler(val);
+        });
+        numEl.addEventListener("blur", () => {
+          const numMin = isPercent ? Math.round(min * 100) : min;
+          const numMax = isPercent ? Math.round(max * 100) : max;
+          const numVal = clamp(Number(numEl.value) || numMin, numMin, numMax);
+          numEl.value = numVal;
+          if (el) el.value = isPercent ? numVal / 100 : numVal;
+        });
+        numEl.addEventListener("keydown", handleNumInputKeydown);
       }
     });
 
@@ -1944,7 +2130,7 @@
       });
     }
 
-    // Pie settings
+    // Pie settings - wire range + number input pairs
     const pieRanges = [
       { id: "cs-pie-startAngle", key: "startAngle", min: -180, max: 180 },
       { id: "cs-pie-dataLabelDistance", key: "dataLabelDistance", min: -50, max: 80 },
@@ -1953,32 +2139,70 @@
     ];
     pieRanges.forEach(({ id, key, min, max }) => {
       const el = document.getElementById(id);
+      const numEl = document.getElementById(id + "Num");
+      const handler = (val) => {
+        setState((s) => {
+          s.chartSettings.pie[key] = clamp(val, min, max);
+        });
+        applyChartSettings();
+        renderChartSettingsValues();
+      };
       if (el) {
         el.addEventListener("input", () => {
-          setState((s) => {
-            s.chartSettings.pie[key] = clamp(Number(el.value), min, max);
-          });
-          applyChartSettings();
-          renderChartSettingsValues();
+          const val = Number(el.value);
+          if (numEl) numEl.value = val;
+          handler(val);
         });
+      }
+      if (numEl) {
+        numEl.addEventListener("input", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          if (el) el.value = val;
+          handler(val);
+        });
+        numEl.addEventListener("blur", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          numEl.value = val;
+          if (el) el.value = val;
+        });
+        numEl.addEventListener("keydown", handleNumInputKeydown);
       }
     });
 
-    // Funnel settings
+    // Funnel settings - wire range + number input pairs
     const funnelRanges = [
       { id: "cs-funnel-neckWidthPercent", key: "neckWidthPercent", min: 0, max: 100 },
       { id: "cs-funnel-neckHeightPercent", key: "neckHeightPercent", min: 0, max: 100 },
     ];
     funnelRanges.forEach(({ id, key, min, max }) => {
       const el = document.getElementById(id);
+      const numEl = document.getElementById(id + "Num");
+      const handler = (val) => {
+        setState((s) => {
+          s.chartSettings.funnel[key] = clamp(val, min, max);
+        });
+        applyChartSettings();
+        renderChartSettingsValues();
+      };
       if (el) {
         el.addEventListener("input", () => {
-          setState((s) => {
-            s.chartSettings.funnel[key] = clamp(Number(el.value), min, max);
-          });
-          applyChartSettings();
-          renderChartSettingsValues();
+          const val = Number(el.value);
+          if (numEl) numEl.value = val;
+          handler(val);
         });
+      }
+      if (numEl) {
+        numEl.addEventListener("input", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          if (el) el.value = val;
+          handler(val);
+        });
+        numEl.addEventListener("blur", () => {
+          const val = clamp(Number(numEl.value) || min, min, max);
+          numEl.value = val;
+          if (el) el.value = val;
+        });
+        numEl.addEventListener("keydown", handleNumInputKeydown);
       }
     });
 
@@ -2009,17 +2233,26 @@
     });
 
     // Column/Bar ranges
+    const activeEl = document.activeElement;
     const cbVals = { borderRadius: cb.borderRadius, pointPadding: cb.pointPadding, groupPadding: cb.groupPadding, borderWidth: cb.borderWidth };
     Object.entries(cbVals).forEach(([key, val]) => {
       const el = document.getElementById(`cs-cb-${key}`);
       if (el) el.value = String(val);
+      const numEl = document.getElementById(`cs-cb-${key}Num`);
+      if (numEl && activeEl !== numEl) {
+        numEl.value = (key === "pointPadding" || key === "groupPadding") ? val.toFixed(2) : val;
+      }
     });
 
     // Line
     const lnEl = document.getElementById("cs-line-lineWidth");
     if (lnEl) lnEl.value = String(ln.lineWidth);
+    const lnElNum = document.getElementById("cs-line-lineWidthNum");
+    if (lnElNum && activeEl !== lnElNum) lnElNum.value = ln.lineWidth;
     const lnMrEl = document.getElementById("cs-line-markerRadius");
     if (lnMrEl) lnMrEl.value = String(ln.markerRadius);
+    const lnMrElNum = document.getElementById("cs-line-markerRadiusNum");
+    if (lnMrElNum && activeEl !== lnMrElNum) lnMrElNum.value = ln.markerRadius;
     const lnMeEl = document.getElementById("cs-line-markerEnabled");
     if (lnMeEl) lnMeEl.checked = ln.markerEnabled;
     const lnDsEl = document.getElementById("cs-line-dashStyle");
@@ -2028,26 +2261,42 @@
     // Area
     const arFoEl = document.getElementById("cs-area-fillOpacity");
     if (arFoEl) arFoEl.value = String(ar.fillOpacity);
+    const arFoElNum = document.getElementById("cs-area-fillOpacityNum");
+    if (arFoElNum && activeEl !== arFoElNum) arFoElNum.value = Math.round(ar.fillOpacity * 100);
     const arLwEl = document.getElementById("cs-area-lineWidth");
     if (arLwEl) arLwEl.value = String(ar.lineWidth);
+    const arLwElNum = document.getElementById("cs-area-lineWidthNum");
+    if (arLwElNum && activeEl !== arLwElNum) arLwElNum.value = ar.lineWidth;
     const arMeEl = document.getElementById("cs-area-markerEnabled");
     if (arMeEl) arMeEl.checked = ar.markerEnabled;
 
     // Pie
     const piSaEl = document.getElementById("cs-pie-startAngle");
     if (piSaEl) piSaEl.value = String(pi.startAngle);
+    const piSaElNum = document.getElementById("cs-pie-startAngleNum");
+    if (piSaElNum && activeEl !== piSaElNum) piSaElNum.value = pi.startAngle;
     const piDdEl = document.getElementById("cs-pie-dataLabelDistance");
     if (piDdEl) piDdEl.value = String(pi.dataLabelDistance);
+    const piDdElNum = document.getElementById("cs-pie-dataLabelDistanceNum");
+    if (piDdElNum && activeEl !== piDdElNum) piDdElNum.value = pi.dataLabelDistance;
     const piSoEl = document.getElementById("cs-pie-slicedOffset");
     if (piSoEl) piSoEl.value = String(pi.slicedOffset);
+    const piSoElNum = document.getElementById("cs-pie-slicedOffsetNum");
+    if (piSoElNum && activeEl !== piSoElNum) piSoElNum.value = pi.slicedOffset;
     const piBwEl = document.getElementById("cs-pie-borderWidth");
     if (piBwEl) piBwEl.value = String(pi.borderWidth);
+    const piBwElNum = document.getElementById("cs-pie-borderWidthNum");
+    if (piBwElNum && activeEl !== piBwElNum) piBwElNum.value = pi.borderWidth;
 
     // Funnel
     const fnNwEl = document.getElementById("cs-funnel-neckWidthPercent");
     if (fnNwEl) fnNwEl.value = String(fn.neckWidthPercent);
+    const fnNwElNum = document.getElementById("cs-funnel-neckWidthPercentNum");
+    if (fnNwElNum && activeEl !== fnNwElNum) fnNwElNum.value = fn.neckWidthPercent;
     const fnNhEl = document.getElementById("cs-funnel-neckHeightPercent");
     if (fnNhEl) fnNhEl.value = String(fn.neckHeightPercent);
+    const fnNhElNum = document.getElementById("cs-funnel-neckHeightPercentNum");
+    if (fnNhElNum && activeEl !== fnNhElNum) fnNhElNum.value = fn.neckHeightPercent;
     const fnRvEl = document.getElementById("cs-funnel-reversed");
     if (fnRvEl) fnRvEl.checked = fn.reversed;
 
@@ -2107,6 +2356,10 @@
     }
     const sharedOpacity = document.getElementById("cs-area-sharedBottomOpacity");
     if (sharedOpacity) sharedOpacity.value = String(ar.sharedBottomOpacity);
+    const sharedOpacityNum = document.getElementById("cs-area-sharedBottomOpacityNum");
+    if (sharedOpacityNum && document.activeElement !== sharedOpacityNum) {
+      sharedOpacityNum.value = Math.round(ar.sharedBottomOpacity * 100);
+    }
     const gradientToggle = document.getElementById("cs-area-gradientEnabled");
     if (gradientToggle) gradientToggle.checked = ar.gradientEnabled;
   }
@@ -2136,8 +2389,10 @@
 
     const angleEl = document.getElementById("grad-angle");
     if (angleEl) angleEl.value = String(grad.angle ?? 90);
-    const angleVal = document.getElementById("grad-angle-val");
-    if (angleVal) angleVal.textContent = (grad.angle ?? 90) + "°";
+    const gradAngleNum = document.getElementById("grad-angleNum");
+    if (gradAngleNum && document.activeElement !== gradAngleNum) {
+      gradAngleNum.value = grad.angle ?? 90;
+    }
 
     // Top color
     const topSwatch = document.getElementById("grad-topColor-swatch");
@@ -2153,8 +2408,10 @@
     }
     const topOpacityEl = document.getElementById("grad-topOpacity");
     if (topOpacityEl) topOpacityEl.value = String(grad.topOpacity ?? 1);
-    const topOpacityVal = document.getElementById("grad-topOpacity-val");
-    if (topOpacityVal) topOpacityVal.textContent = Math.round((grad.topOpacity ?? 1) * 100) + "%";
+    const topOpacityNum = document.getElementById("grad-topOpacityNum");
+    if (topOpacityNum && document.activeElement !== topOpacityNum) {
+      topOpacityNum.value = Math.round((grad.topOpacity ?? 1) * 100);
+    }
 
     // Bottom color
     const bottomSwatch = document.getElementById("grad-bottomColor-swatch");
@@ -2174,8 +2431,10 @@
     }
     const bottomOpacityEl = document.getElementById("grad-bottomOpacity");
     if (bottomOpacityEl) bottomOpacityEl.value = String(grad.bottomOpacity ?? 0.1);
-    const bottomOpacityVal = document.getElementById("grad-bottomOpacity-val");
-    if (bottomOpacityVal) bottomOpacityVal.textContent = Math.round((grad.bottomOpacity ?? 0.1) * 100) + "%";
+    const bottomOpacityNum = document.getElementById("grad-bottomOpacityNum");
+    if (bottomOpacityNum && document.activeElement !== bottomOpacityNum) {
+      bottomOpacityNum.value = Math.round((grad.bottomOpacity ?? 0.1) * 100);
+    }
   }
 
   // Color picker popover
@@ -2267,16 +2526,34 @@
       });
     }
 
-    // Angle slider
+    // Angle slider + number input
     const angleEl = document.getElementById("grad-angle");
+    const gradAngleNum = document.getElementById("grad-angleNum");
+    const handleGradAngleChange = (val) => {
+      setState((s) => {
+        const slot = getEditSlot(s);
+        if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
+        slot.areaGradient.angle = clamp(val, 0, 360);
+      });
+    };
     if (angleEl) {
       angleEl.addEventListener("input", () => {
-        setState((s) => {
-          const slot = getEditSlot(s);
-          if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
-          slot.areaGradient.angle = clamp(Number(angleEl.value), 0, 360);
-        });
+        if (gradAngleNum) gradAngleNum.value = angleEl.value;
+        handleGradAngleChange(Number(angleEl.value));
       });
+    }
+    if (gradAngleNum) {
+      gradAngleNum.addEventListener("input", () => {
+        const val = clamp(Number(gradAngleNum.value) || 0, 0, 360);
+        if (angleEl) angleEl.value = val;
+        handleGradAngleChange(val);
+      });
+      gradAngleNum.addEventListener("blur", () => {
+        const val = clamp(Number(gradAngleNum.value) || 0, 0, 360);
+        gradAngleNum.value = val;
+        if (angleEl) angleEl.value = val;
+      });
+      gradAngleNum.addEventListener("keydown", handleNumInputKeydown);
     }
 
     // Top color swatch
@@ -2310,16 +2587,35 @@
       });
     }
 
-    // Top opacity
+    // Top opacity + number input
     const topOpacityEl = document.getElementById("grad-topOpacity");
+    const topOpacityNum = document.getElementById("grad-topOpacityNum");
+    const handleTopOpacityChange = (val) => {
+      setState((s) => {
+        const slot = getEditSlot(s);
+        if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
+        slot.areaGradient.topOpacity = clamp(val, 0, 1);
+      });
+    };
     if (topOpacityEl) {
       topOpacityEl.addEventListener("input", () => {
-        setState((s) => {
-          const slot = getEditSlot(s);
-          if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
-          slot.areaGradient.topOpacity = clamp(Number(topOpacityEl.value), 0, 1);
-        });
+        if (topOpacityNum) topOpacityNum.value = Math.round(Number(topOpacityEl.value) * 100);
+        handleTopOpacityChange(Number(topOpacityEl.value));
       });
+    }
+    if (topOpacityNum) {
+      topOpacityNum.addEventListener("input", () => {
+        const pct = clamp(Number(topOpacityNum.value) || 0, 0, 100);
+        const val = pct / 100;
+        if (topOpacityEl) topOpacityEl.value = val;
+        handleTopOpacityChange(val);
+      });
+      topOpacityNum.addEventListener("blur", () => {
+        const pct = clamp(Number(topOpacityNum.value) || 0, 0, 100);
+        topOpacityNum.value = pct;
+        if (topOpacityEl) topOpacityEl.value = pct / 100;
+      });
+      topOpacityNum.addEventListener("keydown", handleNumInputKeydown);
     }
 
     // Bottom color swatch
@@ -2353,16 +2649,35 @@
       });
     }
 
-    // Bottom opacity
+    // Bottom opacity + number input
     const bottomOpacityEl = document.getElementById("grad-bottomOpacity");
+    const bottomOpacityNum = document.getElementById("grad-bottomOpacityNum");
+    const handleBottomOpacityChange = (val) => {
+      setState((s) => {
+        const slot = getEditSlot(s);
+        if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
+        slot.areaGradient.bottomOpacity = clamp(val, 0, 1);
+      });
+    };
     if (bottomOpacityEl) {
       bottomOpacityEl.addEventListener("input", () => {
-        setState((s) => {
-          const slot = getEditSlot(s);
-          if (!slot.areaGradient) slot.areaGradient = normalizeAreaGradient(null);
-          slot.areaGradient.bottomOpacity = clamp(Number(bottomOpacityEl.value), 0, 1);
-        });
+        if (bottomOpacityNum) bottomOpacityNum.value = Math.round(Number(bottomOpacityEl.value) * 100);
+        handleBottomOpacityChange(Number(bottomOpacityEl.value));
       });
+    }
+    if (bottomOpacityNum) {
+      bottomOpacityNum.addEventListener("input", () => {
+        const pct = clamp(Number(bottomOpacityNum.value) || 0, 0, 100);
+        const val = pct / 100;
+        if (bottomOpacityEl) bottomOpacityEl.value = val;
+        handleBottomOpacityChange(val);
+      });
+      bottomOpacityNum.addEventListener("blur", () => {
+        const pct = clamp(Number(bottomOpacityNum.value) || 0, 0, 100);
+        bottomOpacityNum.value = pct;
+        if (bottomOpacityEl) bottomOpacityEl.value = pct / 100;
+      });
+      bottomOpacityNum.addEventListener("keydown", handleNumInputKeydown);
     }
 
     // Area gradient enabled toggle
@@ -2407,16 +2722,35 @@
       });
     }
 
-    // Shared bottom opacity
+    // Shared bottom opacity + number input
     const sharedOpacity = document.getElementById("cs-area-sharedBottomOpacity");
+    const sharedOpacityNum = document.getElementById("cs-area-sharedBottomOpacityNum");
+    const handleSharedOpacityChange = (val) => {
+      setState((s) => {
+        s.chartSettings.area.sharedBottomOpacity = clamp(val, 0, 1);
+      });
+      applyChartSettings();
+      updateCharts();
+    };
     if (sharedOpacity) {
       sharedOpacity.addEventListener("input", () => {
-        setState((s) => {
-          s.chartSettings.area.sharedBottomOpacity = clamp(Number(sharedOpacity.value), 0, 1);
-        });
-        applyChartSettings();
-        updateCharts();
+        if (sharedOpacityNum) sharedOpacityNum.value = Math.round(Number(sharedOpacity.value) * 100);
+        handleSharedOpacityChange(Number(sharedOpacity.value));
       });
+    }
+    if (sharedOpacityNum) {
+      sharedOpacityNum.addEventListener("input", () => {
+        const pct = clamp(Number(sharedOpacityNum.value) || 0, 0, 100);
+        const val = pct / 100;
+        if (sharedOpacity) sharedOpacity.value = val;
+        handleSharedOpacityChange(val);
+      });
+      sharedOpacityNum.addEventListener("blur", () => {
+        const pct = clamp(Number(sharedOpacityNum.value) || 0, 0, 100);
+        sharedOpacityNum.value = pct;
+        if (sharedOpacity) sharedOpacity.value = pct / 100;
+      });
+      sharedOpacityNum.addEventListener("keydown", handleNumInputKeydown);
     }
   }
 
