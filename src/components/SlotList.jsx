@@ -53,7 +53,7 @@ export function SlotList() {
           >
             <div 
               className="slot-swatch"
-              style={{ background: swatchBackgroundCSS(slot) }}
+              style={swatchBackgroundCSS(slot)}
             />
             <div className="slot-info">
               <span className="slot-label">{slot.label}</span>

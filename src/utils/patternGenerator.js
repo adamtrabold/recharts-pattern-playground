@@ -179,11 +179,12 @@ function generateStaggeredDots(spacing, radius, shape, color, opacity, offsetX, 
 }
 
 /**
- * Generate CSS background for a swatch preview
+ * Generate CSS background style object for a swatch preview
+ * Returns an object with background and optionally backgroundSize
  */
 export function swatchBackgroundCSS(slot) {
-  if (!slot) return '#999';
-  if (slot.type === 'solid') return slot.color;
+  if (!slot) return { background: '#999' };
+  if (slot.type === 'solid') return { background: slot.color };
 
   const bg = slot.invert ? slot.inkColor : slot.backgroundColor;
   const ink = slot.invert ? slot.backgroundColor : slot.inkColor;
@@ -212,25 +213,46 @@ export function swatchBackgroundCSS(slot) {
         transparent ${(spacing + strokeWidth) / 2}px,
         transparent ${spacing}px
       )`;
-      return `${gradient1}, ${gradient2}, ${bg}`;
+      return { background: `${gradient1}, ${gradient2}, ${bg}` };
     }
     
     case 'dots': {
       const dotRadius = clamp(strokeWidth, 1, 10);
-      return `radial-gradient(circle at center, ${ink} ${dotRadius}px, transparent ${dotRadius}px), ${bg}`;
+      const staggered = !!slot.dotStaggered;
+      
+      if (staggered) {
+        // Staggered dots - two offset radial gradients
+        const size = spacing * 2;
+        return {
+          background: `
+            radial-gradient(circle at ${spacing / 2}px ${spacing / 2}px, ${ink} ${dotRadius}px, transparent ${dotRadius}px),
+            radial-gradient(circle at ${spacing * 1.5}px ${spacing * 1.5}px, ${ink} ${dotRadius}px, transparent ${dotRadius}px),
+            ${bg}
+          `,
+          backgroundSize: `${size}px ${size}px`,
+        };
+      }
+      
+      // Regular grid dots
+      return {
+        background: `radial-gradient(circle at center, ${ink} ${dotRadius}px, transparent ${dotRadius}px), ${bg}`,
+        backgroundSize: `${spacing}px ${spacing}px`,
+      };
     }
     
     case 'lines':
     default: {
-      return `repeating-linear-gradient(
-        ${angle}deg,
-        transparent,
-        transparent ${(spacing - strokeWidth) / 2}px,
-        ${ink} ${(spacing - strokeWidth) / 2}px,
-        ${ink} ${(spacing + strokeWidth) / 2}px,
-        transparent ${(spacing + strokeWidth) / 2}px,
-        transparent ${spacing}px
-      ), ${bg}`;
+      return {
+        background: `repeating-linear-gradient(
+          ${angle}deg,
+          transparent,
+          transparent ${(spacing - strokeWidth) / 2}px,
+          ${ink} ${(spacing - strokeWidth) / 2}px,
+          ${ink} ${(spacing + strokeWidth) / 2}px,
+          transparent ${(spacing + strokeWidth) / 2}px,
+          transparent ${spacing}px
+        ), ${bg}`,
+      };
     }
   }
 }
