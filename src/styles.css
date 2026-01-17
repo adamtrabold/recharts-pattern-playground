@@ -134,6 +134,11 @@ body.low-contrast .charts-panel {
   margin: 0;
 }
 
+.toggle input[type="checkbox"] {
+  accent-color: var(--focus);
+  color-scheme: light;
+}
+
 /* Dashboard layout */
 .dashboard {
   display: grid;
@@ -522,6 +527,22 @@ details.editor-section summary {
   text-transform: uppercase;
   padding: 4px 0;
   user-select: none;
+  list-style: none;
+}
+
+details.editor-section summary::-webkit-details-marker {
+  display: none;
+}
+
+details.editor-section summary::before {
+  content: "▶";
+  font-size: 9px;
+  margin-right: 4px;
+  color: #ccc;
+}
+
+details.editor-section[open] summary::before {
+  content: "▼";
 }
 
 details.editor-section summary:hover {
@@ -645,13 +666,14 @@ details.editor-section[open] summary {
 }
 
 .offset-section > summary::before {
-  content: "▸ ";
-  font-size: 10px;
-  color: var(--muted);
+  content: "▶";
+  font-size: 9px;
+  margin-right: 4px;
+  color: #ccc;
 }
 
 .offset-section[open] > summary::before {
-  content: "▾ ";
+  content: "▼";
 }
 
 .offset-body {
@@ -732,13 +754,14 @@ textarea:focus-visible,
 }
 
 .export-panel-header::before {
-  content: "▸ ";
-  font-size: 13px;
-  color: var(--muted);
+  content: "▶";
+  font-size: 11px;
+  margin-right: 4px;
+  color: #ccc;
 }
 
 .export-panel[open] > .export-panel-header::before {
-  content: "▾ ";
+  content: "▼";
 }
 
 .export-panel-title {
@@ -949,14 +972,14 @@ textarea:focus-visible,
 }
 
 .chart-settings-header::before {
-  content: "▸ ";
-  font-size: 13px;
-  color: var(--muted);
+  content: "▶";
+  font-size: 11px;
   margin-right: 4px;
+  color: #ccc;
 }
 
 .chart-settings-card[open] > .chart-settings-header::before {
-  content: "▾ ";
+  content: "▼";
 }
 
 .chart-settings-card[open] > .chart-settings-header {
@@ -995,6 +1018,13 @@ textarea:focus-visible,
 
 .cs-toggle input {
   margin: 0;
+}
+
+.cs-toggle input[type="checkbox"] {
+  accent-color: var(--focus);
+  color-scheme: light;
+  width: 14px;
+  height: 14px;
 }
 
 /* Toggle Switch List */
@@ -1109,6 +1139,22 @@ textarea:focus-visible,
   font-weight: 600;
   color: var(--fg);
   cursor: pointer;
+  list-style: none;
+}
+
+.cs-type-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cs-type-section > summary::before {
+  content: "▶";
+  font-size: 9px;
+  margin-right: 4px;
+  color: #ccc;
+}
+
+.cs-type-section[open] > summary::before {
+  content: "▼";
 }
 
 .cs-type-section > summary:hover {
