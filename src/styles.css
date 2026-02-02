@@ -232,8 +232,24 @@ body.low-contrast .charts-panel {
 /* Slot list */
 .slot-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 6px;
+}
+
+/* Slot wrapper with position number */
+.slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.slot-position {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.7;
+  text-align: center;
 }
 
 .slot-option {
@@ -258,28 +274,31 @@ body.low-contrast .charts-panel {
 
 .slot-swatch {
   width: 100%;
-  height: 24px;
+  height: 32px;
   border-radius: 4px;
   border: 1px solid rgba(0,0,0,0.1);
   background: #fff;
 }
 
-.slot-info {
+.slot-description {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1px;
+  min-height: 22px;
 }
 
-.slot-label {
-  font-size: 10px;
-  font-weight: 600;
+.slot-type {
+  font-size: 9px;
+  font-weight: 500;
   color: var(--muted);
+  text-transform: capitalize;
 }
 
-.slot-description {
+.slot-details {
   font-size: 8px;
   color: var(--muted);
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .slot-version-badge {
@@ -292,6 +311,141 @@ body.low-contrast .charts-panel {
   background: var(--focus);
   padding: 1px 3px;
   border-radius: 3px;
+}
+
+/* Slot list container */
+.slot-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Drag handle */
+.slot-drag-handle {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  border-radius: 3px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.slot-option:hover .slot-drag-handle {
+  opacity: 1;
+}
+
+.slot-drag-handle:hover {
+  border-color: var(--muted);
+}
+
+.slot-drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle-icon {
+  width: 10px;
+  height: 8px;
+  background: 
+    linear-gradient(var(--muted), var(--muted)) 0 0 / 100% 1px no-repeat,
+    linear-gradient(var(--muted), var(--muted)) 0 3px / 100% 1px no-repeat,
+    linear-gradient(var(--muted), var(--muted)) 0 6px / 100% 1px no-repeat;
+}
+
+.drag-handle-icon span {
+  display: none;
+}
+
+/* Dragging state */
+.slot-option.dragging {
+  opacity: 0.5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+/* Remove button */
+.slot-remove-btn {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.slot-option:hover .slot-remove-btn {
+  opacity: 1;
+}
+
+.slot-remove-btn:hover {
+  border-color: var(--muted);
+  color: #DD1243;
+}
+
+.slot-remove-btn:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+/* Add slot button */
+.slot-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.slot-add-btn:hover {
+  border-color: var(--focus);
+  color: var(--focus);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.slot-add-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.slot-add-icon {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.slot-add-text {
+  font-size: 11px;
 }
 
 /* A/B Controls */

@@ -3,6 +3,45 @@ import { deepCopy, clamp, safeParseJSON, normalizeHexColor } from './helpers';
 export const STORAGE_KEY = 'rechartsPatternPlayground:v1';
 export const SCHEMA_VERSION = 1;
 
+// Slot constraints
+export const MIN_SLOTS = 1;
+export const MAX_SLOTS = 12;
+
+// Default colors for new slots (cycles through design system primary colors)
+const DEFAULT_SLOT_COLORS = [
+  '#00478F', '#006BD6', '#3FA1A6', '#7A45E5',
+  '#DD1243', '#FF6119', '#FFC34E', '#04BA6E',
+  '#0ECAD4', '#9064E9', '#E33962', '#80310D',
+];
+
+// Get default color for a slot index (cycles through palette)
+export function getDefaultSlotColor(index) {
+  return DEFAULT_SLOT_COLORS[index % DEFAULT_SLOT_COLORS.length];
+}
+
+// Create a new default slot for palette A
+export function createDefaultSlot(index, id) {
+  return {
+    id,
+    type: 'solid',
+    label: `Slot ${index + 1}`,
+    color: getDefaultSlotColor(index),
+    lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null },
+  };
+}
+
+// Create a new default slot for palette B
+export function createDefaultSlotB(index, id) {
+  const colors = ['#6baed6', '#fdae6b', '#74c476', '#fb6a4a', '#9e9ac8', '#fdd0a2', '#a1d99b', '#fcbba1'];
+  return {
+    id,
+    type: 'solid',
+    label: `Slot ${index + 1}`,
+    color: colors[index % colors.length],
+    lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null },
+  };
+}
+
 export const DEFAULT_STATE = {
   schemaVersion: SCHEMA_VERSION,
   ui: {
@@ -12,13 +51,15 @@ export const DEFAULT_STATE = {
     selectedSlot: 0,
     activeVersions: ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
     animationKey: 0,
+    slotIdCounter: 8, // Next ID to assign when adding a slot
   },
   palette: [
-    { type: 'solid', label: 'Slot 1', color: '#00478F', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 2', color: '#006BD6', lineStyle: { dashStyle: 'Dash', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 3', color: '#3FA1A6', lineStyle: { dashStyle: 'Dot', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 4', color: '#7A45E5', lineStyle: { dashStyle: 'DashDot', lineWidth: null, curveType: null } },
+    { id: 0, type: 'solid', label: 'Slot 1', color: '#00478F', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 1, type: 'solid', label: 'Slot 2', color: '#006BD6', lineStyle: { dashStyle: 'Dash', lineWidth: null, curveType: null } },
+    { id: 2, type: 'solid', label: 'Slot 3', color: '#3FA1A6', lineStyle: { dashStyle: 'Dot', lineWidth: null, curveType: null } },
+    { id: 3, type: 'solid', label: 'Slot 4', color: '#7A45E5', lineStyle: { dashStyle: 'DashDot', lineWidth: null, curveType: null } },
     {
+      id: 4,
       type: 'pattern',
       label: 'Slot 5',
       backgroundColor: '#AACEF1',
@@ -33,6 +74,7 @@ export const DEFAULT_STATE = {
       lineStyle: { dashStyle: 'LongDash', lineWidth: null, curveType: null },
     },
     {
+      id: 5,
       type: 'pattern',
       label: 'Slot 6',
       backgroundColor: '#006BD6',
@@ -47,6 +89,7 @@ export const DEFAULT_STATE = {
       lineStyle: { dashStyle: 'ShortDash', lineWidth: null, curveType: null },
     },
     {
+      id: 6,
       type: 'pattern',
       label: 'Slot 7',
       backgroundColor: '#AFEDF1',
@@ -65,6 +108,7 @@ export const DEFAULT_STATE = {
       lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null },
     },
     {
+      id: 7,
       type: 'pattern',
       label: 'Slot 8',
       backgroundColor: '#E9E0FB',
@@ -80,14 +124,14 @@ export const DEFAULT_STATE = {
     },
   ],
   paletteB: [
-    { type: 'solid', label: 'Slot 1', color: '#6baed6', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 2', color: '#fdae6b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 3', color: '#74c476', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 4', color: '#fb6a4a', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 5', color: '#9e9ac8', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 6', color: '#fdd0a2', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 7', color: '#a1d99b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
-    { type: 'solid', label: 'Slot 8', color: '#fcbba1', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 0, type: 'solid', label: 'Slot 1', color: '#6baed6', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 1, type: 'solid', label: 'Slot 2', color: '#fdae6b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 2, type: 'solid', label: 'Slot 3', color: '#74c476', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 3, type: 'solid', label: 'Slot 4', color: '#fb6a4a', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 4, type: 'solid', label: 'Slot 5', color: '#9e9ac8', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 5, type: 'solid', label: 'Slot 6', color: '#fdd0a2', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 6, type: 'solid', label: 'Slot 7', color: '#a1d99b', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
+    { id: 7, type: 'solid', label: 'Slot 8', color: '#fcbba1', lineStyle: { dashStyle: 'solid', lineWidth: null, curveType: null } },
   ],
   chartSettings: {
     global: {
@@ -236,10 +280,15 @@ export const DEFAULT_STATE = {
 const VALID_DASH_STYLES = ['solid', 'Dash', 'Dot', 'DashDot', 'LongDash', 'ShortDash'];
 const VALID_CURVE_TYPES = ['linear', 'monotone', 'cardinal', 'natural', 'basis', 'step'];
 
-function normalizeSlot(slot, defaultSlot, index) {
-  if (!slot || typeof slot !== 'object') return deepCopy(defaultSlot);
+function normalizeSlot(slot, defaultSlot, index, id) {
+  if (!slot || typeof slot !== 'object') {
+    const copy = deepCopy(defaultSlot);
+    copy.id = id;
+    return copy;
+  }
   
   const result = {
+    id: typeof slot.id === 'number' ? slot.id : id,
     type: slot.type === 'pattern' ? 'pattern' : 'solid',
     label: typeof slot.label === 'string' ? slot.label.slice(0, 32) : `Slot ${index + 1}`,
   };
@@ -291,17 +340,60 @@ export function migrateState(raw) {
   state.ui.darkTheme = !!ui.darkTheme;
   state.ui.grayscale = !!ui.grayscale;
   state.ui.lowContrast = !!ui.lowContrast;
-  state.ui.selectedSlot = clamp(Number(ui.selectedSlot || 0), 0, 7);
-  state.ui.activeVersions = Array.isArray(ui.activeVersions) && ui.activeVersions.length === 8
-    ? ui.activeVersions.map(v => v === 'b' ? 'b' : 'a')
-    : ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'];
   
-  if (Array.isArray(raw.palette) && raw.palette.length === 8) {
-    state.palette = raw.palette.map((slot, i) => normalizeSlot(slot, DEFAULT_STATE.palette[i], i));
+  // Handle dynamic palette arrays (1 to MAX_SLOTS)
+  let paletteLength = 8; // default
+  if (Array.isArray(raw.palette) && raw.palette.length >= MIN_SLOTS && raw.palette.length <= MAX_SLOTS) {
+    paletteLength = raw.palette.length;
   }
   
-  if (Array.isArray(raw.paletteB) && raw.paletteB.length === 8) {
-    state.paletteB = raw.paletteB.map((slot, i) => normalizeSlot(slot, DEFAULT_STATE.paletteB[i], i));
+  state.ui.selectedSlot = clamp(Number(ui.selectedSlot || 0), 0, paletteLength - 1);
+  
+  // Handle activeVersions with dynamic length
+  if (Array.isArray(ui.activeVersions) && ui.activeVersions.length >= MIN_SLOTS) {
+    // Take up to paletteLength versions, padding with 'a' if needed
+    state.ui.activeVersions = Array.from({ length: paletteLength }, (_, i) => 
+      ui.activeVersions[i] === 'b' ? 'b' : 'a'
+    );
+  } else {
+    state.ui.activeVersions = Array.from({ length: paletteLength }, () => 'a');
+  }
+  
+  // Determine the max ID from existing slots to set the counter
+  let maxId = paletteLength - 1;
+  if (Array.isArray(raw.palette)) {
+    raw.palette.forEach(slot => {
+      if (slot && typeof slot.id === 'number' && slot.id > maxId) {
+        maxId = slot.id;
+      }
+    });
+  }
+  state.ui.slotIdCounter = typeof ui.slotIdCounter === 'number' ? ui.slotIdCounter : maxId + 1;
+  
+  // Migrate palette with dynamic length
+  if (Array.isArray(raw.palette) && raw.palette.length >= MIN_SLOTS && raw.palette.length <= MAX_SLOTS) {
+    state.palette = raw.palette.map((slot, i) => {
+      const defaultSlot = DEFAULT_STATE.palette[i % DEFAULT_STATE.palette.length];
+      const slotId = (slot && typeof slot.id === 'number') ? slot.id : i;
+      return normalizeSlot(slot, defaultSlot, i, slotId);
+    });
+  }
+  
+  // Migrate paletteB with dynamic length (must match palette length)
+  if (Array.isArray(raw.paletteB) && raw.paletteB.length >= MIN_SLOTS) {
+    // Ensure paletteB has same length as palette
+    state.paletteB = Array.from({ length: paletteLength }, (_, i) => {
+      const slot = raw.paletteB[i];
+      const defaultSlot = DEFAULT_STATE.paletteB[i % DEFAULT_STATE.paletteB.length];
+      const slotId = (slot && typeof slot.id === 'number') ? slot.id : i;
+      return normalizeSlot(slot, defaultSlot, i, slotId);
+    });
+  } else {
+    // Create paletteB matching palette length
+    state.paletteB = Array.from({ length: paletteLength }, (_, i) => {
+      const defaultSlot = DEFAULT_STATE.paletteB[i % DEFAULT_STATE.paletteB.length];
+      return { ...deepCopy(defaultSlot), id: i };
+    });
   }
   
   if (raw.chartSettings && typeof raw.chartSettings === 'object') {

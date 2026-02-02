@@ -17,16 +17,17 @@ import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
 import { calcYAxisWidth } from '../../utils/helpers';
 
-const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
-const MAX_VALUE = Math.max(...VALUES);
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+const VALUES = [8, 6, 7, 4, 9, 5, 3, 7, 6, 8, 5, 4];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, i) => ({
-  name,
-  value: VALUES[i],
-  slotIndex: i,
-}));
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  return CATEGORIES.slice(0, slotCount).map((name, i) => ({
+    name,
+    value: VALUES[i % VALUES.length],
+    slotIndex: i,
+  }));
+}
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -41,6 +42,11 @@ export function ColumnChart() {
   const { global, columnBar, axis, legend, referenceLine, brush, animation, grid, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
+  const maxValue = Math.max(...chartData.map(d => d.value));
 
   const hoverEnabled = columnBar.hoverEnabled ?? true;
   const hoverColor = columnBar.hoverColor ?? '#000000';
@@ -84,7 +90,7 @@ export function ColumnChart() {
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
-      <BarChart data={STATIC_DATA} margin={{ top: 5, right: 5, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
+      <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }} barGap={`${barGap}%`}>
         {global.gridLines && (
           <CartesianGrid 
             horizontal={grid?.horizontal ?? true}
@@ -96,7 +102,7 @@ export function ColumnChart() {
         )}
         <XAxis dataKey="name" hide={!global.axisLabels} />
         <YAxis 
-          width={global.axisLabels ? calcYAxisWidth(MAX_VALUE) : 0}
+          width={global.axisLabels ? calcYAxisWidth(maxValue) : 0}
           domain={yDomain} 
           tickCount={yTickCount}
           scale={yScale}
@@ -154,7 +160,7 @@ export function ColumnChart() {
           animationBegin={animDelay}
           activeBar={activeBarConfig}
         >
-          {STATIC_DATA.map((entry, index) => {
+          {chartData.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

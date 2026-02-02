@@ -10,15 +10,17 @@ import {
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
 
-const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+const VALUES = [8, 6, 7, 4, 9, 5, 3, 7, 6, 8, 5, 4];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, i) => ({
-  name,
-  value: VALUES[i],
-  slotIndex: i,
-}));
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  return CATEGORIES.slice(0, slotCount).map((name, i) => ({
+    name,
+    value: VALUES[i % VALUES.length],
+    slotIndex: i,
+  }));
+}
 
 // Custom label renderer that draws radial stroke at segment start
 function renderRadialStroke(props, strokeColor, strokeWidth) {
@@ -74,6 +76,10 @@ export function DonutChart() {
   const { global, gap, donut, legend, animation, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
   
   // Animation configuration
   const animDuration = animation?.duration ?? 1500;
@@ -138,7 +144,7 @@ export function DonutChart() {
           />
         )}
         <Pie
-          data={STATIC_DATA}
+          data={chartData}
           dataKey="value"
           nameKey="name"
           cx="50%"
@@ -158,7 +164,7 @@ export function DonutChart() {
             : (global.dataLabels ? (props) => renderDataLabel(props, labelColor) : false)}
           labelLine={false}
         >
-          {STATIC_DATA.map((entry, index) => {
+          {chartData.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

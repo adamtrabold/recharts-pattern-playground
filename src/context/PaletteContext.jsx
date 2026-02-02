@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { STORAGE_KEY, SCHEMA_VERSION, DEFAULT_STATE, migrateState, loadFromStorage, saveToStorage, encodeStateToHash, decodeStateFromHash } from '../utils/storage';
+import { STORAGE_KEY, SCHEMA_VERSION, DEFAULT_STATE, migrateState, loadFromStorage, saveToStorage, encodeStateToHash, decodeStateFromHash, MIN_SLOTS, MAX_SLOTS, createDefaultSlot, createDefaultSlotB } from '../utils/storage';
 import { deepCopy, clamp } from '../utils/helpers';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const PaletteContext = createContext(null);
 
@@ -15,6 +16,9 @@ const ACTIONS = {
   RESET_SLOT: 'RESET_SLOT',
   RESET_ALL: 'RESET_ALL',
   IMPORT_STATE: 'IMPORT_STATE',
+  ADD_SLOT: 'ADD_SLOT',
+  REMOVE_SLOT: 'REMOVE_SLOT',
+  REORDER_SLOTS: 'REORDER_SLOTS',
 };
 
 function paletteReducer(state, action) {
@@ -69,13 +73,20 @@ function paletteReducer(state, action) {
     
     case ACTIONS.RESET_SLOT: {
       const { index, version = 'a' } = action.payload;
+      const currentId = version === 'b' ? state.paletteB[index]?.id : state.palette[index]?.id;
       if (version === 'b') {
         const newPaletteB = [...state.paletteB];
-        newPaletteB[index] = deepCopy(DEFAULT_STATE.paletteB[index]);
+        const defaultSlot = deepCopy(DEFAULT_STATE.paletteB[index % DEFAULT_STATE.paletteB.length]);
+        defaultSlot.id = currentId ?? index;
+        defaultSlot.label = `Slot ${index + 1}`;
+        newPaletteB[index] = defaultSlot;
         return { ...state, paletteB: newPaletteB };
       } else {
         const newPalette = [...state.palette];
-        newPalette[index] = deepCopy(DEFAULT_STATE.palette[index]);
+        const defaultSlot = deepCopy(DEFAULT_STATE.palette[index % DEFAULT_STATE.palette.length]);
+        defaultSlot.id = currentId ?? index;
+        defaultSlot.label = `Slot ${index + 1}`;
+        newPalette[index] = defaultSlot;
         return { ...state, palette: newPalette };
       }
     }
@@ -85,6 +96,87 @@ function paletteReducer(state, action) {
     
     case ACTIONS.IMPORT_STATE:
       return migrateState(action.payload);
+    
+    case ACTIONS.ADD_SLOT: {
+      if (state.palette.length >= MAX_SLOTS) return state;
+      const newId = state.ui.slotIdCounter;
+      const newIndex = state.palette.length;
+      const newSlotA = createDefaultSlot(newIndex, newId);
+      const newSlotB = createDefaultSlotB(newIndex, newId);
+      return {
+        ...state,
+        palette: [...state.palette, newSlotA],
+        paletteB: [...state.paletteB, newSlotB],
+        ui: {
+          ...state.ui,
+          activeVersions: [...state.ui.activeVersions, 'a'],
+          slotIdCounter: newId + 1,
+        },
+      };
+    }
+    
+    case ACTIONS.REMOVE_SLOT: {
+      const { index } = action.payload;
+      if (state.palette.length <= MIN_SLOTS) return state;
+      if (index < 0 || index >= state.palette.length) return state;
+      
+      const newPalette = state.palette.filter((_, i) => i !== index);
+      const newPaletteB = state.paletteB.filter((_, i) => i !== index);
+      const newActiveVersions = state.ui.activeVersions.filter((_, i) => i !== index);
+      
+      // Adjust selected slot if needed
+      let newSelectedSlot = state.ui.selectedSlot;
+      if (newSelectedSlot >= newPalette.length) {
+        newSelectedSlot = newPalette.length - 1;
+      } else if (newSelectedSlot > index) {
+        newSelectedSlot = newSelectedSlot - 1;
+      } else if (newSelectedSlot === index && newSelectedSlot > 0) {
+        newSelectedSlot = newSelectedSlot - 1;
+      }
+      
+      return {
+        ...state,
+        palette: newPalette,
+        paletteB: newPaletteB,
+        ui: {
+          ...state.ui,
+          activeVersions: newActiveVersions,
+          selectedSlot: newSelectedSlot,
+        },
+      };
+    }
+    
+    case ACTIONS.REORDER_SLOTS: {
+      const { oldIndex, newIndex } = action.payload;
+      if (oldIndex === newIndex) return state;
+      if (oldIndex < 0 || oldIndex >= state.palette.length) return state;
+      if (newIndex < 0 || newIndex >= state.palette.length) return state;
+      
+      const newPalette = arrayMove(state.palette, oldIndex, newIndex);
+      const newPaletteB = arrayMove(state.paletteB, oldIndex, newIndex);
+      const newActiveVersions = arrayMove(state.ui.activeVersions, oldIndex, newIndex);
+      
+      // Update selected slot to follow the moved item
+      let newSelectedSlot = state.ui.selectedSlot;
+      if (state.ui.selectedSlot === oldIndex) {
+        newSelectedSlot = newIndex;
+      } else if (oldIndex < state.ui.selectedSlot && newIndex >= state.ui.selectedSlot) {
+        newSelectedSlot = state.ui.selectedSlot - 1;
+      } else if (oldIndex > state.ui.selectedSlot && newIndex <= state.ui.selectedSlot) {
+        newSelectedSlot = state.ui.selectedSlot + 1;
+      }
+      
+      return {
+        ...state,
+        palette: newPalette,
+        paletteB: newPaletteB,
+        ui: {
+          ...state.ui,
+          activeVersions: newActiveVersions,
+          selectedSlot: newSelectedSlot,
+        },
+      };
+    }
     
     default:
       return state;
@@ -179,6 +271,18 @@ export function PaletteProvider({ children }) {
     dispatch({ type: ACTIONS.UPDATE_UI, payload: { animationKey: (state.ui.animationKey ?? 0) + 1 } });
   }, [state.ui.animationKey]);
   
+  const addSlot = useCallback(() => {
+    dispatch({ type: ACTIONS.ADD_SLOT });
+  }, []);
+  
+  const removeSlot = useCallback((index) => {
+    dispatch({ type: ACTIONS.REMOVE_SLOT, payload: { index } });
+  }, []);
+  
+  const reorderSlots = useCallback((oldIndex, newIndex) => {
+    dispatch({ type: ACTIONS.REORDER_SLOTS, payload: { oldIndex, newIndex } });
+  }, []);
+  
   const value = {
     state,
     dispatch,
@@ -195,6 +299,9 @@ export function PaletteProvider({ children }) {
     getActiveSlot,
     setActiveVersion,
     triggerAnimationPreview,
+    addSlot,
+    removeSlot,
+    reorderSlots,
   };
   
   return (

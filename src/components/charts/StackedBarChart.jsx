@@ -25,17 +25,18 @@ const getRefLineDashArray = (style) => {
 
 const CATEGORIES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
-  const entry = { name };
-  // Deterministic values based on index
-  const baseValues = [3, 5, 4, 6, 2, 7, 3, 5];
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  const baseValues = [3, 5, 4, 6, 2, 7, 3, 5, 4, 6, 2, 7];
   const offsets = [1, 0, 2, 1, 0, 1, 2, 0];
-  for (let i = 0; i < 8; i++) {
-    entry[`slot${i}`] = baseValues[i] + offsets[(catIndex + i) % offsets.length];
-  }
-  return entry;
-});
+  return CATEGORIES.map((name, catIndex) => {
+    const entry = { name };
+    for (let i = 0; i < slotCount; i++) {
+      entry[`slot${i}`] = baseValues[i % baseValues.length] + offsets[(catIndex + i) % offsets.length];
+    }
+    return entry;
+  });
+}
 
 // Custom shape that draws a stroke only on the left edge (between stacked segments)
 function StackedBarShape(props) {
@@ -66,6 +67,10 @@ export function StackedBarChart() {
   const { global, columnBar, gap, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
 
   // Gap settings for stacked bar
   const useGap = gap?.enabled && gap?.applyTo?.stackedBar;
@@ -109,7 +114,7 @@ export function StackedBarChart() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
-        data={STATIC_DATA} 
+        data={chartData} 
         layout="vertical"
         margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         stackOffset={stackOffset}
@@ -174,10 +179,10 @@ export function StackedBarChart() {
             label={referenceLine?.label || undefined}
           />
         )}
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
+        {state.palette.map((_, slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const fill = getSlotFill(slot, slotIndex);
-          const isLast = slotIndex === 7;
+          const isLast = slotIndex === state.palette.length - 1;
           
           if (useGap) {
             return (

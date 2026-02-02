@@ -35,15 +35,17 @@ const CustomDot = ({ cx, cy, fill, stroke, r, shape }) => {
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-// Static data - generated once, never changes (8 series for 8 slots)
-const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
-  const entry = { name };
-  for (let i = 0; i < 8; i++) {
-    // Use different offsets for each slot to ensure distinct lines
-    entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
-  }
-  return entry;
-});
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  return CATEGORIES.map((name, catIndex) => {
+    const entry = { name };
+    for (let i = 0; i < slotCount; i++) {
+      // Use different offsets for each slot to ensure distinct lines
+      entry[`slot${i}`] = 2 + i + ((catIndex + i) % 3);
+    }
+    return entry;
+  });
+}
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -58,6 +60,10 @@ export function LineChartComponent() {
   const { global, line, axis, legend, referenceLine, brush, animation, grid, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
 
   // Determine if markers are enabled (override or global)
   const markersEnabled = line.markerOverride !== null && line.markerOverride !== undefined
@@ -103,7 +109,7 @@ export function LineChartComponent() {
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
-        <LineChart data={STATIC_DATA} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
         {global.gridLines && (
           <CartesianGrid 
             horizontal={grid?.horizontal ?? true}
@@ -164,7 +170,7 @@ export function LineChartComponent() {
             label={referenceLine?.label || undefined}
           />
         )}
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
+        {state.palette.map((_, slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const strokeColor = getSlotColor(slot);
           const dotShape = line.dotShape ?? 'circle';

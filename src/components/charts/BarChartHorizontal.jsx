@@ -15,15 +15,17 @@ import {
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
 
-const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-const VALUES = [8, 6, 7, 4, 9, 5, 3, 7];
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+const VALUES = [8, 6, 7, 4, 9, 5, 3, 7, 6, 8, 5, 4];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, i) => ({
-  name,
-  value: VALUES[i],
-  slotIndex: i,
-}));
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  return CATEGORIES.slice(0, slotCount).map((name, i) => ({
+    name,
+    value: VALUES[i % VALUES.length],
+    slotIndex: i,
+  }));
+}
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -38,6 +40,10 @@ export function BarChartHorizontal() {
   const { global, columnBar, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
 
   const hoverEnabled = columnBar.hoverEnabled ?? true;
   const hoverColor = columnBar.hoverColor ?? '#000000';
@@ -74,7 +80,7 @@ export function BarChartHorizontal() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart 
-        data={STATIC_DATA} 
+        data={chartData} 
         layout="vertical"
         margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         barGap={`${barGap}%`}
@@ -148,7 +154,7 @@ export function BarChartHorizontal() {
           animationBegin={animDelay}
           activeBar={activeBarConfig}
         >
-          {STATIC_DATA.map((entry, index) => {
+          {chartData.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 

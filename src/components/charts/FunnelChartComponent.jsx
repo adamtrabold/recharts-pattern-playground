@@ -10,18 +10,18 @@ import {
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
 
-const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-const VALUES = [100, 80, 60, 50, 40, 30, 20, 10];
+const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+const VALUES = [100, 80, 60, 50, 40, 30, 20, 10, 8, 6, 4, 2];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, i) => ({
-  name,
-  value: VALUES[i],
-  slotIndex: i,
-}));
-
-// Reversed (pyramid) data
-const STATIC_DATA_REVERSED = [...STATIC_DATA].reverse();
+// Generate data dynamically based on slot count
+function generateChartData(slotCount, reversed) {
+  const data = CATEGORIES.slice(0, slotCount).map((name, i) => ({
+    name,
+    value: VALUES[i % VALUES.length],
+    slotIndex: i,
+  }));
+  return reversed ? [...data].reverse() : data;
+}
 
 // Custom label renderer that draws horizontal lines between segments
 function renderHorizontalDivider(props, strokeColor, strokeWidth, totalSegments) {
@@ -50,13 +50,15 @@ export function FunnelChartComponent() {
   const { global, gap, funnel, animation, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const reversed = funnel.reversed;
+  const chartData = React.useMemo(() => generateChartData(slotCount, reversed), [slotCount, reversed]);
+  
   // Animation configuration
   const animDuration = animation?.duration ?? 1500;
   const animEasing = animation?.easing ?? 'ease';
   const animDelay = animation?.delay ?? 0;
-
-  // Use pre-computed static data (reversed for pyramid mode)
-  const data = funnel.reversed ? STATIC_DATA_REVERSED : STATIC_DATA;
 
   // Use global gap settings if enabled and applied to funnel
   const useGap = gap?.enabled && gap?.applyTo?.funnel;
@@ -90,7 +92,7 @@ export function FunnelChartComponent() {
           />
         )}
         <Funnel
-          data={data}
+          data={chartData}
           dataKey="value"
           isAnimationActive={global.animation}
           animationDuration={animDuration}
@@ -98,7 +100,7 @@ export function FunnelChartComponent() {
           animationBegin={animDelay}
           labelLine={false}
         >
-          {data.map((entry, index) => {
+          {chartData.map((entry, index) => {
             const slot = getActiveSlot(entry.slotIndex);
             return (
               <Cell 
@@ -112,7 +114,7 @@ export function FunnelChartComponent() {
           )}
           {useGap && (
             <LabelList 
-              content={(props) => renderHorizontalDivider(props, gapColor, gapThickness, data.length)}
+              content={(props) => renderHorizontalDivider(props, gapColor, gapThickness, chartData.length)}
             />
           )}
         </Funnel>

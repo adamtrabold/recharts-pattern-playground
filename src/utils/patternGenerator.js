@@ -261,12 +261,12 @@ export function swatchBackgroundCSS(slot) {
  * Get a short description of a slot's pattern
  */
 export function getSlotDescription(slot) {
-  if (!slot) return '';
-  if (slot.type === 'solid') return 'Solid';
+  if (!slot) return { type: '', details: '' };
+  if (slot.type === 'solid') return { type: 'Solid', details: '' };
   
   const type = slot.patternType || 'lines';
   const spacing = slot.spacing || 14;
   const angle = slot.angle || 0;
   
-  return `${type} ${spacing}px @ ${angle}°`;
+  return { type, details: `${spacing}px @ ${angle}°` };
 }

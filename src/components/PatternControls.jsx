@@ -445,7 +445,7 @@ export function PatternControls() {
       <div className="editor-section copy-section">
         <span className="copy-label">Copy to</span>
         <div className="copy-targets" role="group" aria-label="Copy to slot">
-          {[0, 1, 2, 3, 4, 5, 6, 7].map((targetIndex) => (
+          {state.palette.map((_, targetIndex) => (
             <button
               key={targetIndex}
               type="button"

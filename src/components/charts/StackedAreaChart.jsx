@@ -35,23 +35,28 @@ function angleToCoords(angle) {
 
 const CATEGORIES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
-// Static data - generated once, never changes
-const STATIC_DATA = CATEGORIES.map((name, catIndex) => {
-  const entry = { name };
-  // Deterministic values based on index
-  const baseValues = [4, 3, 5, 6, 2, 4, 3, 5];
+// Generate data dynamically based on slot count
+function generateChartData(slotCount) {
+  const baseValues = [4, 3, 5, 6, 2, 4, 3, 5, 4, 3, 5, 6];
   const offsets = [1, 2, 0, 1, 2, 0, 1, 2];
-  for (let i = 0; i < 8; i++) {
-    entry[`slot${i}`] = baseValues[i] + offsets[(catIndex + i) % offsets.length];
-  }
-  return entry;
-});
+  return CATEGORIES.map((name, catIndex) => {
+    const entry = { name };
+    for (let i = 0; i < slotCount; i++) {
+      entry[`slot${i}`] = baseValues[i % baseValues.length] + offsets[(catIndex + i) % offsets.length];
+    }
+    return entry;
+  });
+}
 
 export function StackedAreaChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, area, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
   const labelColor = global.labelColor ?? '#333333';
   const legendTextColor = legend?.textColor ?? '#333333';
+  
+  // Generate chart data based on current slot count
+  const slotCount = state.palette.length;
+  const chartData = React.useMemo(() => generateChartData(slotCount), [slotCount]);
 
   // Determine if markers are enabled (override or global)
   const markersEnabled = area.markerOverride !== null && area.markerOverride !== undefined
@@ -118,13 +123,13 @@ export function StackedAreaChart() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart 
-        data={STATIC_DATA} 
+        data={chartData} 
         margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
         stackOffset={stackOffset}
       >
         {/* Gradient definitions */}
         <defs>
-          {gradientEnabled && [0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
+          {gradientEnabled && state.palette.map((_, slotIndex) => {
             const slot = getActiveSlot(slotIndex);
             const color = getSlotColor(slot);
             return (
@@ -208,7 +213,7 @@ export function StackedAreaChart() {
             label={referenceLine?.label || undefined}
           />
         )}
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((slotIndex) => {
+        {state.palette.map((_, slotIndex) => {
           const slot = getActiveSlot(slotIndex);
           const fillValue = getFillForSlot(slot, slotIndex);
           const strokeColor = getSlotColor(slot);
@@ -216,6 +221,7 @@ export function StackedAreaChart() {
           const activeDotProps = showMarkers 
             ? { r: area.markerRadius + 1, fill: strokeColor, stroke: '#fff', strokeWidth: 2 }
             : false;
+          const isLastSlot = slotIndex === state.palette.length - 1;
           
           return (
             <Area
@@ -236,7 +242,7 @@ export function StackedAreaChart() {
               animationEasing={animEasing}
               animationBegin={animDelay}
             >
-              {global.dataLabels && slotIndex === 7 && (
+              {global.dataLabels && isLastSlot && (
                 <LabelList dataKey={`slot${slotIndex}`} position="top" fill={labelColor} fontSize={9} />
               )}
             </Area>
