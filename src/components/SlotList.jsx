@@ -189,18 +189,6 @@ export function SlotList() {
           </div>
         </SortableContext>
       </DndContext>
-      
-      {canAddSlot && (
-        <button
-          type="button"
-          className="slot-add-btn"
-          onClick={handleAddSlot}
-          aria-label="Add new slot"
-        >
-          <span className="slot-add-icon">+</span>
-          <span className="slot-add-text">Add Slot</span>
-        </button>
-      )}
     </div>
   );
 }

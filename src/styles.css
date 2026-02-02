@@ -409,43 +409,32 @@ body.low-contrast .charts-panel {
   outline-offset: 1px;
 }
 
-/* Add slot button */
-.slot-add-btn {
+/* Add slot button - in header */
+.add-slot-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px dashed var(--border);
-  border-radius: 6px;
-  background: transparent;
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
   color: var(--muted);
-  font-size: 12px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.slot-add-btn:hover {
+.add-slot-btn:hover {
+  background: var(--focus);
   border-color: var(--focus);
-  color: var(--focus);
-  background: rgba(37, 99, 235, 0.05);
+  color: #fff;
 }
 
-.slot-add-btn:focus-visible {
+.add-slot-btn:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 1px;
-}
-
-.slot-add-icon {
-  font-size: 16px;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.slot-add-text {
-  font-size: 11px;
 }
 
 /* A/B Controls */
