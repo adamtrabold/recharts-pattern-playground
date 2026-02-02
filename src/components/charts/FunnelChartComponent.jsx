@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
+import { CHART_DEFAULTS } from '../../utils/chartDefaults';
 import { getSlotFill } from '../../utils/patternGenerator';
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -48,7 +49,7 @@ function renderHorizontalDivider(props, strokeColor, strokeWidth, totalSegments)
 export function FunnelChartComponent() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, funnel, animation, tooltip } = state.chartSettings;
-  const labelColor = global.labelColor ?? '#333333';
+  const labelColor = global.labelColor ?? CHART_DEFAULTS.labelColor;
   
   // Generate chart data based on current slot count
   const slotCount = state.palette.length;
@@ -63,7 +64,7 @@ export function FunnelChartComponent() {
   // Use global gap settings if enabled and applied to funnel
   const useGap = gap?.enabled && gap?.applyTo?.funnel;
   const gapThickness = useGap ? (gap?.thickness ?? 2) : 0;
-  const gapColor = gap?.color ?? '#ffffff';
+  const gapColor = gap?.color ?? CHART_DEFAULTS.gapColor;
 
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -76,18 +77,18 @@ export function FunnelChartComponent() {
             animationDuration={tooltip?.animationDuration ?? 200}
             animationEasing={tooltip?.animationEasing ?? 'ease'}
             contentStyle={{
-              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
-              borderColor: tooltip?.borderColor ?? '#cccccc',
+              backgroundColor: tooltip?.backgroundColor ?? CHART_DEFAULTS.backgroundColor,
+              borderColor: tooltip?.borderColor ?? CHART_DEFAULTS.borderColor,
               borderRadius: tooltip?.borderRadius ?? 4,
               borderWidth: tooltip?.borderWidth ?? 1,
               borderStyle: 'solid',
             }}
             labelStyle={{
-              color: tooltip?.labelColor ?? '#333333',
+              color: tooltip?.labelColor ?? CHART_DEFAULTS.tooltipLabelColor,
               fontWeight: tooltip?.labelFontWeight ?? 'bold',
             }}
             itemStyle={{
-              color: tooltip?.itemColor ?? '#666666',
+              color: tooltip?.itemColor ?? CHART_DEFAULTS.tooltipItemColor,
             }}
           />
         )}

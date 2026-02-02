@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
+import { CHART_DEFAULTS } from '../../utils/chartDefaults';
 import { getSlotFill } from '../../utils/patternGenerator';
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -74,8 +75,8 @@ function renderDataLabel(props, labelColor) {
 export function DonutChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, donut, legend, animation, tooltip } = state.chartSettings;
-  const labelColor = global.labelColor ?? '#333333';
-  const legendTextColor = legend?.textColor ?? '#333333';
+  const labelColor = global.labelColor ?? CHART_DEFAULTS.labelColor;
+  const legendTextColor = legend?.textColor ?? CHART_DEFAULTS.legendTextColor;
   
   // Generate chart data based on current slot count
   const slotCount = state.palette.length;
@@ -98,7 +99,7 @@ export function DonutChart() {
   const paddingAngle = useGap && useAngle ? (gap?.angle ?? 2) : 0;
   const useRadialStroke = useGap && !useAngle;
   const strokeThickness = gap?.thickness ?? 2;
-  const strokeColor = gap?.color ?? '#ffffff';
+  const strokeColor = gap?.color ?? CHART_DEFAULTS.gapColor;
 
   const startAngleOffset = donut?.startAngle ?? 0;
 
@@ -119,18 +120,18 @@ export function DonutChart() {
             animationDuration={tooltip?.animationDuration ?? 200}
             animationEasing={tooltip?.animationEasing ?? 'ease'}
             contentStyle={{
-              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
-              borderColor: tooltip?.borderColor ?? '#cccccc',
+              backgroundColor: tooltip?.backgroundColor ?? CHART_DEFAULTS.backgroundColor,
+              borderColor: tooltip?.borderColor ?? CHART_DEFAULTS.borderColor,
               borderRadius: tooltip?.borderRadius ?? 4,
               borderWidth: tooltip?.borderWidth ?? 1,
               borderStyle: 'solid',
             }}
             labelStyle={{
-              color: tooltip?.labelColor ?? '#333333',
+              color: tooltip?.labelColor ?? CHART_DEFAULTS.tooltipLabelColor,
               fontWeight: tooltip?.labelFontWeight ?? 'bold',
             }}
             itemStyle={{
-              color: tooltip?.itemColor ?? '#666666',
+              color: tooltip?.itemColor ?? CHART_DEFAULTS.tooltipItemColor,
             }}
           />
         )}

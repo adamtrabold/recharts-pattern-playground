@@ -1,22 +1,69 @@
 :root {
-  --bg: #F5F6F7;          /* gray100 */
-  --fg: #0f172a;
-  --muted: #64748b;
-  --panel: #ffffff;        /* white for cards */
-  --panel-inset: #FAFBFC;  /* gray25 for interior elements */
-  --border: #EEF0F1;       /* gray300 */
-  --focus: #2563eb;
-  --danger: #dc2626;
-  --radius: 8px;
+  /* Semantic Color Tokens from Figma Design System */
+  
+  /* Background */
+  --bg-primary: #FFFFFF;        /* bg-primary - main content */
+  --bg-secondary: #F5F6F7;      /* bg-secondary - secondary areas */
+  --bg: var(--bg-secondary);    /* alias for legacy usage */
+  
+  /* Text */
+  --text-primary: #1F2426;      /* text-primary - main body text */
+  --text-secondary: #2E3538;    /* text-secondary - supporting text */
+  --text-tertiary: #5B6C74;     /* text-tertiary - muted text */
+  --text-action: #006BD6;       /* text-action - links, clickable text */
+  --fg: var(--text-primary);    /* alias for legacy usage */
+  --muted: var(--text-tertiary); /* alias for legacy usage */
+  
+  /* Foreground */
+  --fg-primary: #1F2426;        /* fg-primary - primary icons/elements */
+  --fg-action: #006BD6;         /* fg-action-primary - interactive elements */
+  
+  /* Border */
+  --border-primary: #E2E6E8;    /* border-primary - main borders (gray400) */
+  --border-secondary: #EEF0F1;  /* border-secondary - subtle borders (gray300) */
+  --border: var(--border-secondary); /* alias for legacy usage */
+  
+  /* Panel/Card backgrounds */
+  --panel: var(--bg-primary);   /* cards use primary background */
+  --panel-inset: #FAFBFC;       /* gray25 - inset elements */
+  
+  /* Action colors (buttons, focus, links) */
+  --action-primary: #006BD6;    /* blue700 - primary action color */
+  --action-hover: #0059B2;      /* blue800 - hover state */
+  --action-active: #00478F;     /* blue900 - active/pressed state */
+  --focus: var(--action-primary); /* alias for legacy usage */
+  
+  /* Status colors */
+  --success: #039B5C;           /* green800 - success state */
+  --warning: #DC6803;           /* warning text */
+  --danger: #DD1243;            /* red700 - error/danger */
+  
+  /* Data visualization */
+  --data-primary: #189990;      /* mint500/data-500 */
+  
+  /* Spacing & sizing */
+  --radius: 8px;                /* radius-md */
+  --radius-xs: 4px;             /* radius-xs */
 }
 
 body.dark {
-  --bg: #1F2426;          /* gray1200 */
-  --fg: #e2e8f0;
-  --muted: #94a3b8;
-  --panel: #272D30;        /* gray1150 */
-  --panel-inset: #2E3538;  /* gray1100 */
-  --border: #394247;       /* gray1050 */
+  /* Dark mode semantic tokens */
+  --bg-primary: #1F2426;        /* gray1200 */
+  --bg-secondary: #272D30;      /* gray1150 */
+  --bg: var(--bg-primary);
+  
+  --text-primary: #E2E6E8;      /* gray400 - inverted for dark */
+  --text-secondary: #CED5D8;    /* gray500 */
+  --text-tertiary: #9EACB2;     /* gray700 */
+  --fg: var(--text-primary);
+  --muted: var(--text-tertiary);
+  
+  --border-primary: #435056;    /* gray1000 */
+  --border-secondary: #394247;  /* gray1050 */
+  --border: var(--border-secondary);
+  
+  --panel: var(--bg-secondary);
+  --panel-inset: #2E3538;       /* gray1100 */
 }
 
 * {
@@ -156,7 +203,7 @@ body.low-contrast .charts-panel {
   gap: 12px;
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100%;
+  min-height: 0; /* Critical for grid child overflow */
   padding-right: 4px;
 }
 
@@ -174,7 +221,7 @@ body.low-contrast .charts-panel {
 
 .charts-panel {
   overflow-y: auto;
-  height: 100%;
+  min-height: 0; /* Critical for grid child overflow */
   position: relative;
 }
 
@@ -184,15 +231,18 @@ body.low-contrast .charts-panel {
     grid-template-rows: auto 1fr;
     height: auto;
     min-height: calc(100vh - 50px);
+    overflow: visible;
   }
   
   .controls-sidebar {
     height: auto;
+    min-height: auto;
     overflow: visible;
   }
   
   .charts-panel {
     height: auto;
+    min-height: auto;
     overflow: visible;
   }
 }
@@ -277,7 +327,7 @@ body.low-contrast .charts-panel {
   height: 32px;
   border-radius: 4px;
   border: 1px solid rgba(0,0,0,0.1);
-  background: #fff;
+  background: var(--panel);
 }
 
 .slot-description {
@@ -307,7 +357,7 @@ body.low-contrast .charts-panel {
   right: 2px;
   font-size: 8px;
   font-weight: 700;
-  color: #fff;
+  color: var(--panel);
   background: var(--focus);
   padding: 1px 3px;
   border-radius: 3px;
@@ -400,7 +450,7 @@ body.low-contrast .charts-panel {
 
 .slot-remove-btn:hover {
   border-color: var(--muted);
-  color: #DD1243;
+  color: var(--danger);
 }
 
 .slot-remove-btn:focus-visible {
@@ -414,11 +464,11 @@ body.low-contrast .charts-panel {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--bg);
   color: var(--muted);
   cursor: pointer;
@@ -429,7 +479,7 @@ body.low-contrast .charts-panel {
 .add-slot-btn:hover {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 .add-slot-btn:focus-visible {
@@ -465,7 +515,7 @@ body.low-contrast .charts-panel {
 
 .ab-btn.active {
   background: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 /* Editor */
@@ -626,7 +676,7 @@ input[type="range"]::-moz-range-thumb {
 .icon-toggle.active {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 /* Labeled icon toggles */
@@ -681,7 +731,7 @@ details.editor-section summary::before {
   content: "▶";
   font-size: 9px;
   margin-right: 4px;
-  color: #ccc;
+  color: var(--muted);
 }
 
 details.editor-section[open] summary::before {
@@ -760,7 +810,7 @@ details.editor-section[open] summary {
 .copy-btn:not(.current):hover {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 /* Field modifiers */
@@ -812,7 +862,7 @@ details.editor-section[open] summary {
   content: "▶";
   font-size: 9px;
   margin-right: 4px;
-  color: #ccc;
+  color: var(--muted);
 }
 
 .offset-section[open] > summary::before {
@@ -900,7 +950,7 @@ textarea:focus-visible,
   content: "▶";
   font-size: 11px;
   margin-right: 4px;
-  color: #ccc;
+  color: var(--muted);
 }
 
 .export-panel[open] > .export-panel-header::before {
@@ -942,7 +992,7 @@ textarea:focus-visible,
 .export-png-btn:hover {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 .export-png-btn:disabled {
@@ -1019,12 +1069,12 @@ textarea:focus-visible,
 .export-actions .btn-sm.primary {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 .export-actions .btn-sm.primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: var(--action-hover);
+  border-color: var(--action-hover);
 }
 
 .export-preview {
@@ -1118,7 +1168,7 @@ textarea:focus-visible,
   content: "▶";
   font-size: 11px;
   margin-right: 4px;
-  color: #ccc;
+  color: var(--muted);
 }
 
 .chart-settings-card[open] > .chart-settings-header::before {
@@ -1220,7 +1270,7 @@ textarea:focus-visible,
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--panel);
   transition: transform 0.15s ease;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
@@ -1246,7 +1296,7 @@ textarea:focus-visible,
 }
 
 .cs-switch input:checked:hover + .cs-switch-track {
-  filter: brightness(1.1);
+  background: var(--action-hover);
 }
 
 /* Indented toggle for sub-options */
@@ -1293,7 +1343,7 @@ textarea:focus-visible,
   content: "▶";
   font-size: 9px;
   margin-right: 4px;
-  color: #ccc;
+  color: var(--muted);
 }
 
 .cs-type-section[open] > summary::before {
@@ -1434,7 +1484,7 @@ textarea:focus-visible,
 .snap-buttons button.active {
   background: var(--focus);
   border-color: var(--focus);
-  color: #fff;
+  color: var(--panel);
 }
 
 /* Recharts overrides */

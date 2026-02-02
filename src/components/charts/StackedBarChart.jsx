@@ -13,6 +13,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { usePalette } from '../../context/PaletteContext';
+import { CHART_DEFAULTS } from '../../utils/chartDefaults';
 import { getSlotFill } from '../../utils/patternGenerator';
 
 const getRefLineDashArray = (style) => {
@@ -65,8 +66,8 @@ function StackedBarShape(props) {
 export function StackedBarChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, columnBar, gap, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
-  const labelColor = global.labelColor ?? '#333333';
-  const legendTextColor = legend?.textColor ?? '#333333';
+  const labelColor = global.labelColor ?? CHART_DEFAULTS.labelColor;
+  const legendTextColor = legend?.textColor ?? CHART_DEFAULTS.legendTextColor;
   
   // Generate chart data based on current slot count
   const slotCount = state.palette.length;
@@ -75,11 +76,11 @@ export function StackedBarChart() {
   // Gap settings for stacked bar
   const useGap = gap?.enabled && gap?.applyTo?.stackedBar;
   const strokeThickness = gap?.thickness ?? 2;
-  const strokeColor = gap?.color ?? '#ffffff';
+  const strokeColor = gap?.color ?? CHART_DEFAULTS.gapColor;
 
   // Hover settings
   const hoverEnabled = columnBar.hoverEnabled ?? true;
-  const hoverColor = columnBar.hoverColor ?? '#000000';
+  const hoverColor = columnBar.hoverColor ?? CHART_DEFAULTS.hoverColor;
   const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
 
   // Native activeBar prop for bar hover styling
@@ -146,18 +147,18 @@ export function StackedBarChart() {
             animationDuration={tooltip?.animationDuration ?? 200}
             animationEasing={tooltip?.animationEasing ?? 'ease'}
             contentStyle={{
-              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
-              borderColor: tooltip?.borderColor ?? '#cccccc',
+              backgroundColor: tooltip?.backgroundColor ?? CHART_DEFAULTS.backgroundColor,
+              borderColor: tooltip?.borderColor ?? CHART_DEFAULTS.borderColor,
               borderRadius: tooltip?.borderRadius ?? 4,
               borderWidth: tooltip?.borderWidth ?? 1,
               borderStyle: 'solid',
             }}
             labelStyle={{
-              color: tooltip?.labelColor ?? '#333333',
+              color: tooltip?.labelColor ?? CHART_DEFAULTS.tooltipLabelColor,
               fontWeight: tooltip?.labelFontWeight ?? 'bold',
             }}
             itemStyle={{
-              color: tooltip?.itemColor ?? '#666666',
+              color: tooltip?.itemColor ?? CHART_DEFAULTS.tooltipItemColor,
             }}
           />
         )}
@@ -173,7 +174,7 @@ export function StackedBarChart() {
         {(referenceLine?.enabled ?? false) && (
           <ReferenceLine 
             x={referenceLine?.yValue ?? 5}
-            stroke={referenceLine?.color ?? '#ff0000'}
+            stroke={referenceLine?.color ?? CHART_DEFAULTS.referenceLineColor}
             strokeWidth={referenceLine?.strokeWidth ?? 1}
             strokeDasharray={getRefLineDashArray(referenceLine?.dashStyle)}
             label={referenceLine?.label || undefined}

@@ -14,6 +14,7 @@ import {
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill, getSlotColor } from '../../utils/patternGenerator';
 import { calcYAxisWidth } from '../../utils/helpers';
+import { CHART_DEFAULTS } from '../../utils/chartDefaults';
 
 const getRefLineDashArray = (style) => {
   switch (style) {
@@ -51,8 +52,8 @@ function generateChartData(slotCount) {
 export function StackedAreaChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, gap, area, stacked, axis, legend, referenceLine, animation, grid, tooltip } = state.chartSettings;
-  const labelColor = global.labelColor ?? '#333333';
-  const legendTextColor = legend?.textColor ?? '#333333';
+  const labelColor = global.labelColor ?? CHART_DEFAULTS.labelColor;
+  const legendTextColor = legend?.textColor ?? CHART_DEFAULTS.legendTextColor;
   
   // Generate chart data based on current slot count
   const slotCount = state.palette.length;
@@ -75,14 +76,14 @@ export function StackedAreaChart() {
       default: return undefined;
     }
   };
-  const cursorStroke = area.cursorColor || '#666666';
+  const cursorStroke = area.cursorColor || CHART_DEFAULTS.tooltipItemColor;
   const cursorStrokeWidth = area.cursorWidth || 1;
   const cursorDashArray = getCursorDashArray();
 
   // Use global gap settings if enabled and applied to stacked area
   const useGap = gap?.enabled && gap?.applyTo?.stackedArea;
   const gapThickness = useGap ? gap.thickness : 0;
-  const gapColor = gap?.color ?? '#ffffff';
+  const gapColor = gap?.color ?? CHART_DEFAULTS.gapColor;
 
   // Gradient settings
   const gradientEnabled = area.gradientEnabled ?? false;
@@ -178,18 +179,18 @@ export function StackedAreaChart() {
             animationDuration={tooltip?.animationDuration ?? 200}
             animationEasing={tooltip?.animationEasing ?? 'ease'}
             contentStyle={global.tooltip ? {
-              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
-              borderColor: tooltip?.borderColor ?? '#cccccc',
+              backgroundColor: tooltip?.backgroundColor ?? CHART_DEFAULTS.backgroundColor,
+              borderColor: tooltip?.borderColor ?? CHART_DEFAULTS.borderColor,
               borderRadius: tooltip?.borderRadius ?? 4,
               borderWidth: tooltip?.borderWidth ?? 1,
               borderStyle: 'solid',
             } : undefined}
             labelStyle={global.tooltip ? {
-              color: tooltip?.labelColor ?? '#333333',
+              color: tooltip?.labelColor ?? CHART_DEFAULTS.tooltipLabelColor,
               fontWeight: tooltip?.labelFontWeight ?? 'bold',
             } : undefined}
             itemStyle={global.tooltip ? {
-              color: tooltip?.itemColor ?? '#666666',
+              color: tooltip?.itemColor ?? CHART_DEFAULTS.tooltipItemColor,
             } : undefined}
             content={global.tooltip ? undefined : () => null}
             wrapperStyle={!global.tooltip ? { display: 'none' } : undefined}
@@ -207,7 +208,7 @@ export function StackedAreaChart() {
         {(referenceLine?.enabled ?? false) && (
           <ReferenceLine 
             y={referenceLine?.yValue ?? 5}
-            stroke={referenceLine?.color ?? '#ff0000'}
+            stroke={referenceLine?.color ?? CHART_DEFAULTS.referenceLineColor}
             strokeWidth={referenceLine?.strokeWidth ?? 1}
             strokeDasharray={getRefLineDashArray(referenceLine?.dashStyle)}
             label={referenceLine?.label || undefined}

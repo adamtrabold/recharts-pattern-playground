@@ -16,6 +16,7 @@ import {
 import { usePalette } from '../../context/PaletteContext';
 import { getSlotFill } from '../../utils/patternGenerator';
 import { calcYAxisWidth } from '../../utils/helpers';
+import { CHART_DEFAULTS } from '../../utils/chartDefaults';
 
 const CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 const VALUES = [8, 6, 7, 4, 9, 5, 3, 7, 6, 8, 5, 4];
@@ -40,8 +41,8 @@ const getRefLineDashArray = (style) => {
 export function ColumnChart() {
   const { state, getActiveSlot } = usePalette();
   const { global, columnBar, axis, legend, referenceLine, brush, animation, grid, tooltip } = state.chartSettings;
-  const labelColor = global.labelColor ?? '#333333';
-  const legendTextColor = legend?.textColor ?? '#333333';
+  const labelColor = global.labelColor ?? CHART_DEFAULTS.labelColor;
+  const legendTextColor = legend?.textColor ?? CHART_DEFAULTS.legendTextColor;
   
   // Generate chart data based on current slot count
   const slotCount = state.palette.length;
@@ -49,7 +50,7 @@ export function ColumnChart() {
   const maxValue = Math.max(...chartData.map(d => d.value));
 
   const hoverEnabled = columnBar.hoverEnabled ?? true;
-  const hoverColor = columnBar.hoverColor ?? '#000000';
+  const hoverColor = columnBar.hoverColor ?? CHART_DEFAULTS.hoverColor;
   const hoverOpacity = columnBar.hoverOpacity ?? 0.1;
 
   // Native activeBar prop for bar hover styling
@@ -78,7 +79,7 @@ export function ColumnChart() {
   // Brush configuration
   const brushEnabled = brush?.enabled ?? false;
   const brushHeight = brush?.height ?? 30;
-  const brushStroke = brush?.stroke ?? '#8884d8';
+  const brushStroke = brush?.stroke ?? CHART_DEFAULTS.brushStroke;
 
   // Animation configuration
   const animDuration = animation?.duration ?? 1500;
@@ -118,18 +119,18 @@ export function ColumnChart() {
             animationDuration={tooltip?.animationDuration ?? 200}
             animationEasing={tooltip?.animationEasing ?? 'ease'}
             contentStyle={{
-              backgroundColor: tooltip?.backgroundColor ?? '#ffffff',
-              borderColor: tooltip?.borderColor ?? '#cccccc',
+              backgroundColor: tooltip?.backgroundColor ?? CHART_DEFAULTS.backgroundColor,
+              borderColor: tooltip?.borderColor ?? CHART_DEFAULTS.borderColor,
               borderRadius: tooltip?.borderRadius ?? 4,
               borderWidth: tooltip?.borderWidth ?? 1,
               borderStyle: 'solid',
             }}
             labelStyle={{
-              color: tooltip?.labelColor ?? '#333333',
+              color: tooltip?.labelColor ?? CHART_DEFAULTS.tooltipLabelColor,
               fontWeight: tooltip?.labelFontWeight ?? 'bold',
             }}
             itemStyle={{
-              color: tooltip?.itemColor ?? '#666666',
+              color: tooltip?.itemColor ?? CHART_DEFAULTS.tooltipItemColor,
             }}
           />
         )}
@@ -145,7 +146,7 @@ export function ColumnChart() {
         {(referenceLine?.enabled ?? false) && (
           <ReferenceLine 
             y={referenceLine?.yValue ?? 5}
-            stroke={referenceLine?.color ?? '#ff0000'}
+            stroke={referenceLine?.color ?? CHART_DEFAULTS.referenceLineColor}
             strokeWidth={referenceLine?.strokeWidth ?? 1}
             strokeDasharray={getRefLineDashArray(referenceLine?.dashStyle)}
             label={referenceLine?.label || undefined}

@@ -2,6 +2,7 @@ import React from 'react';
 import { usePalette } from '../context/PaletteContext';
 import { clamp } from '../utils/helpers';
 import ColorPicker from './ColorPicker';
+import { CHART_DEFAULTS } from '../utils/chartDefaults';
 
 // Reusable toggle switch component
 function ToggleSwitch({ id, checked, onChange, label }) {
@@ -229,7 +230,7 @@ export function ChartSettings() {
               <label htmlFor="cs-global-labelColor">Label text color</label>
               <ColorPicker
                 id="cs-global-labelColor"
-                value={global.labelColor ?? '#333333'}
+                value={global.labelColor ?? 'CHART_DEFAULTS.labelColor'}
                 onChange={(color) => updateChartSettings('global', { labelColor: color })}
               />
             </div>
@@ -356,7 +357,7 @@ export function ChartSettings() {
               <label htmlFor="cs-tooltip-bgColor">Background</label>
               <ColorPicker
                 id="cs-tooltip-bgColor"
-                value={tooltip?.backgroundColor ?? '#ffffff'}
+                value={tooltip?.backgroundColor ?? 'CHART_DEFAULTS.backgroundColor'}
                 onChange={(color) => updateChartSettings('tooltip', { backgroundColor: color })}
               />
             </div>
@@ -364,7 +365,7 @@ export function ChartSettings() {
               <label htmlFor="cs-tooltip-borderColor">Border color</label>
               <ColorPicker
                 id="cs-tooltip-borderColor"
-                value={tooltip?.borderColor ?? '#cccccc'}
+                value={tooltip?.borderColor ?? 'CHART_DEFAULTS.borderColor'}
                 onChange={(color) => updateChartSettings('tooltip', { borderColor: color })}
               />
             </div>
@@ -423,7 +424,7 @@ export function ChartSettings() {
               <label htmlFor="cs-tooltip-labelColor">Label color</label>
               <ColorPicker
                 id="cs-tooltip-labelColor"
-                value={tooltip?.labelColor ?? '#333333'}
+                value={tooltip?.labelColor ?? 'CHART_DEFAULTS.labelColor'}
                 onChange={(color) => updateChartSettings('tooltip', { labelColor: color })}
               />
             </div>
@@ -445,7 +446,7 @@ export function ChartSettings() {
               <label htmlFor="cs-tooltip-itemColor">Item color</label>
               <ColorPicker
                 id="cs-tooltip-itemColor"
-                value={tooltip?.itemColor ?? '#666666'}
+                value={tooltip?.itemColor ?? 'CHART_DEFAULTS.tooltipItemColor'}
                 onChange={(color) => updateChartSettings('tooltip', { itemColor: color })}
               />
             </div>
@@ -604,7 +605,7 @@ export function ChartSettings() {
               <label htmlFor="cs-legend-textColor">Text color</label>
               <ColorPicker
                 id="cs-legend-textColor"
-                value={legend?.textColor ?? '#333333'}
+                value={legend?.textColor ?? 'CHART_DEFAULTS.labelColor'}
                 onChange={(color) => updateChartSettings('legend', { textColor: color })}
               />
             </div>
@@ -705,7 +706,7 @@ export function ChartSettings() {
               <label htmlFor="cs-refline-color">Color</label>
               <ColorPicker
                 id="cs-refline-color"
-                value={referenceLine?.color ?? '#ff0000'}
+                value={referenceLine?.color ?? 'CHART_DEFAULTS.referenceLineColor'}
                 onChange={(color) => updateChartSettings('referenceLine', { color })}
               />
             </div>
@@ -793,7 +794,7 @@ export function ChartSettings() {
               <label htmlFor="cs-brush-stroke">Stroke color</label>
               <ColorPicker
                 id="cs-brush-stroke"
-                value={brush?.stroke ?? '#8884d8'}
+                value={brush?.stroke ?? 'CHART_DEFAULTS.brushStroke'}
                 onChange={(color) => updateChartSettings('brush', { stroke: color })}
               />
             </div>
@@ -888,7 +889,7 @@ export function ChartSettings() {
                   <label htmlFor="cs-gap-color">Color</label>
                   <ColorPicker
                     id="cs-gap-color"
-                    value={gap?.color ?? '#ffffff'}
+                    value={gap?.color ?? 'CHART_DEFAULTS.backgroundColor'}
                     onChange={(color) => updateChartSettings('gap', { color })}
                   />
                 </div>
@@ -1097,7 +1098,7 @@ export function ChartSettings() {
                 <label htmlFor="cs-cb-hoverColor">Hover color</label>
                 <ColorPicker
                   id="cs-cb-hoverColor"
-                  value={columnBar.hoverColor ?? '#000000'}
+                  value={columnBar.hoverColor ?? 'CHART_DEFAULTS.hoverColor'}
                   onChange={(color) => updateChartSettings('columnBar', { hoverColor: color })}
                 />
               </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { usePalette } from '../context/PaletteContext';
 import { clamp } from '../utils/helpers';
 import ColorPicker from './ColorPicker';
+import { CHART_DEFAULTS } from '../utils/chartDefaults';
 
 export function PatternControls() {
   const { state, updateSlot, updateSlotB, getActiveSlot, setActiveVersion, resetSlot, copySlot } = usePalette();
@@ -22,13 +23,13 @@ export function PatternControls() {
     if (newType === 'solid') {
       handleUpdate({
         type: 'solid',
-        color: slot.backgroundColor || slot.color || '#999999',
+        color: slot.backgroundColor || slot.color || CHART_DEFAULTS.borderColor,
       });
     } else {
       handleUpdate({
         type: 'pattern',
-        backgroundColor: slot.color || '#ffffff',
-        inkColor: '#000000',
+        backgroundColor: slot.color || CHART_DEFAULTS.gapColor,
+        inkColor: CHART_DEFAULTS.labelColor,
         patternType: 'lines',
         spacing: 14,
         strokeWidth: 3,
@@ -77,7 +78,7 @@ export function PatternControls() {
             <label htmlFor="solidColor">Color</label>
             <ColorPicker
               id="solidColor"
-              value={slot.color || '#999999'}
+              value={slot.color || CHART_DEFAULTS.borderColor}
               onChange={(color) => handleUpdate({ color })}
             />
           </div>
@@ -88,7 +89,7 @@ export function PatternControls() {
               <label htmlFor="backgroundColor">Background</label>
               <ColorPicker
                 id="backgroundColor"
-                value={slot.backgroundColor || '#ffffff'}
+                value={slot.backgroundColor || CHART_DEFAULTS.gapColor}
                 onChange={(color) => handleUpdate({ backgroundColor: color })}
               />
             </div>
@@ -96,7 +97,7 @@ export function PatternControls() {
               <label htmlFor="inkColor">Ink</label>
               <ColorPicker
                 id="inkColor"
-                value={slot.inkColor || '#000000'}
+                value={slot.inkColor || CHART_DEFAULTS.labelColor}
                 onChange={(color) => handleUpdate({ inkColor: color })}
               />
             </div>
